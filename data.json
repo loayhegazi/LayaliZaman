@@ -180,6 +180,10 @@
         {
           "name": "مياه معدنية",
           "price": 10
+        },
+        {
+          "name": "شاي كشري",
+          "price": 15
         }
       ],
       "isPaid": false
@@ -253,5 +257,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786923283271
+  "lastModified": 1786923285750
 }
