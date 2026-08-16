@@ -44,6 +44,10 @@
     {
       "name": "كاكاو",
       "price": 45
+    },
+    {
+      "name": "شاي حليب",
+      "price": 45
     }
   ],
   "members": [
@@ -137,5 +141,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786902426005
+  "lastModified": 1786902432181
 }
