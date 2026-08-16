@@ -44,7 +44,7 @@
     },
     {
       "name": "فرج",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false
     },
