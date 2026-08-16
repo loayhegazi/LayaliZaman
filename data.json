@@ -174,7 +174,7 @@
     },
     {
       "name": "خضر",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false
     },
@@ -198,5 +198,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786907539791
+  "lastModified": 1786909215814
 }
