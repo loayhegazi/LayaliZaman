@@ -59,7 +59,12 @@
     {
       "name": "تركي",
       "isPresent": true,
-      "orders": [],
+      "orders": [
+        {
+          "name": "شاي كشري",
+          "price": 15
+        }
+      ],
       "isPaid": false
     },
     {
@@ -106,5 +111,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786900519061
+  "lastModified": 1786900523361
 }
