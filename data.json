@@ -36,6 +36,10 @@
     {
       "name": "موز باللبن",
       "price": 70
+    },
+    {
+      "name": "قرفة بحليب",
+      "price": 45
     }
   ],
   "members": [
@@ -129,5 +133,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786902384713
+  "lastModified": 1786902420720
 }
