@@ -64,6 +64,10 @@
     {
       "name": "ليمون بحليب",
       "price": 50
+    },
+    {
+      "name": "شاي كرك",
+      "price": 50
     }
   ],
   "members": [
@@ -216,5 +220,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786912808052
+  "lastModified": 1786915045991
 }
