@@ -32,6 +32,10 @@
     {
       "name": "شاي بحليب",
       "price": 45
+    },
+    {
+      "name": "موز باللبن",
+      "price": 70
     }
   ],
   "members": [
@@ -116,5 +120,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786900815414
+  "lastModified": 1786901504344
 }
