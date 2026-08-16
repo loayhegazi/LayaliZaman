@@ -164,6 +164,10 @@
         {
           "name": "شاي كشري",
           "price": 15
+        },
+        {
+          "name": "شاي كرك",
+          "price": 50
         }
       ],
       "isPaid": false
@@ -228,5 +232,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786915060552
+  "lastModified": 1786915067633
 }
