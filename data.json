@@ -168,6 +168,10 @@
         {
           "name": "شاي كرك",
           "price": 50
+        },
+        {
+          "name": "مياه معدنية",
+          "price": 10
         }
       ],
       "isPaid": false
@@ -241,5 +245,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786918031011
+  "lastModified": 1786923269645
 }
