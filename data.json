@@ -92,7 +92,8 @@
           "price": 30
         }
       ],
-      "isPaid": true
+      "isPaid": true,
+      "hasLeft": true
     },
     {
       "name": "فرج",
@@ -215,5 +216,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786912792221
+  "lastModified": 1786912808052
 }
