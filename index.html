@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>دفتر قعدتنا ☕ - حساب القهوة يبقى سهل</title>
+<title>دفتر قعدتنا ☕ - ليالي زمان</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -71,7 +71,6 @@ input:focus,select:focus{border-color:var(--brass);}
 .btn-block{width:100%;}
 .icon{font-size:1em;line-height:1;}
 
-/* ===== Header ===== */
 .app-shell{max-width:1280px;margin:0 auto;}
 header{
   display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
@@ -93,7 +92,6 @@ header{
 }
 .header-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:520px;justify-content:flex-end;}
 
-/* ===== Tally / stats board ===== */
 .stats-board{
   background:linear-gradient(180deg,var(--surface),var(--surface-2));
   border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:18px;
@@ -120,7 +118,6 @@ header{
 .stat-val.danger{color:var(--danger);}
 .stat-val.sky{color:var(--sky);}
 
-/* ===== Layout ===== */
 .layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start;}
 .card{
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
@@ -151,13 +148,11 @@ header{
 .actions-group{display:flex;gap:4px;flex-shrink:0;}
 .empty-hint{text-align:center;color:var(--text-faint);padding:18px 8px;font-size:.85rem;}
 
-/* toggle status pill in roster */
 .status-pill{font-size:.68rem;padding:2px 7px;border-radius:100px;font-weight:800;white-space:nowrap;}
 .status-pill.on{background:rgba(78,149,117,0.18);color:var(--mint);}
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
-/* ===== POS ordering ===== */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -185,7 +180,6 @@ header{
 .drink-tile .d-name{font-weight:800;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .drink-tile .d-price{color:var(--brass-hover);font-size:.78rem;font-weight:700;}
 
-/* ===== session grid ===== */
 .session-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;}
 .filter-tabs{display:flex;gap:6px;flex-wrap:wrap;}
 .filter-tab{
@@ -226,11 +220,9 @@ header{
 .payment-actions{display:flex;flex-wrap:wrap;gap:6px;}
 .payment-actions button{flex:1 1 45%;}
 
-/* advanced settings trigger */
 .gear-btn{width:38px;height:38px;padding:0;border-radius:50%;font-size:1.05rem;background:var(--surface-2);border:1px solid var(--line);color:var(--text);}
 .gear-btn:hover{border-color:var(--brass);}
 
-/* ===== modals ===== */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(10,7,4,0.78);backdrop-filter:blur(2px);
   display:none;justify-content:center;align-items:center;z-index:1000;padding:16px;
@@ -255,7 +247,6 @@ header{
 .form-group{display:flex;flex-direction:column;gap:5px;}
 .form-group label{font-size:.8rem;color:var(--text-dim);}
 
-/* toasts */
 #toastStack{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:2000;width:min(92vw,380px);}
 .toast{
   background:var(--surface-2);border:1px solid var(--line);border-right:4px solid var(--brass);color:var(--text);
@@ -272,7 +263,6 @@ header{
 .status-dot{width:9px;height:9px;border-radius:50%;background:var(--danger);flex-shrink:0;}
 .status-dot.active{background:var(--mint);box-shadow:0 0 8px var(--mint);}
 
-/* ===== ledger bill (export target) ===== */
 #billCaptureTarget{
   position:fixed;top:-9999px;left:-9999px;width:520px;background:var(--paper);color:#2c2113;
   border:1px solid #d9c6a0;border-radius:10px;padding:0 24px 22px;font-family:'Tajawal','Segoe UI',sans-serif;
@@ -305,7 +295,6 @@ header{
   header{flex-direction:column;}
   .header-actions{justify-content:flex-start;max-width:none;}
 }
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
 </head>
 <body>
@@ -316,7 +305,7 @@ header{
       <div class="brand-mark">☕</div>
       <div>
         <h1>دفتر قعدتنا</h1>
-        <p>حساب القهوة والشلة… يتسجل بضغطة، ويتقسم من غير زعل</p>
+        <p>حساب القهوة والشلة… مزامنة سحابية على GitHub ومحفوظة دايماً</p>
         <div class="session-timer" id="sessionTimer" style="display:none;">⏱️ <span id="sessionTimerText"></span></div>
       </div>
     </div>
@@ -326,14 +315,13 @@ header{
       <button class="btn-ghost btn-sm" onclick="exportBillImage()">🖼️ شيك صورة</button>
       <button class="btn-primary btn-sm" onclick="copySessionSummary()">📋 شير واتساب</button>
       <button class="btn-danger btn-sm" onclick="resetSessionOrders()">🔄 قعدة جديدة</button>
-      <button class="gear-btn" title="إعدادات متقدمة" onclick="openSettingsModal()">⚙️</button>
+      <button class="gear-btn" title="إعدادات والتزامن السحابي" onclick="openSettingsModal()">⚙️</button>
     </div>
   </header>
 
   <div class="stats-board" id="statsBoard"></div>
 
   <div class="layout">
-    <!-- العمود الجانبي: الشلة والمنيو -->
     <div style="display:flex;flex-direction:column;gap:18px;">
       <div class="card">
         <div class="card-title"><span>👥 شلة القهوة</span><small>حضور وغياب بضغطة</small></div>
@@ -357,7 +345,6 @@ header{
       </div>
     </div>
 
-    <!-- العمود الرئيسي: الطلبات والحسابات -->
     <div style="display:flex;flex-direction:column;gap:18px;">
       <div class="card">
         <div class="card-title"><span>☕ سجّل الطلب بضغطتين</span><small>اختار المعلم، بعدين اضغط ع المشروب</small></div>
@@ -384,11 +371,21 @@ header{
   </div>
 </div>
 
-<!-- نافذة الإعدادات المتقدمة -->
+<!-- نافذة الإعدادات والتزامن السحابي -->
 <div class="modal-overlay" id="settingsModal">
   <div class="modal-box">
-    <div class="modal-header"><span>⚙️ إعدادات متقدمة</span><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
+    <div class="modal-header"><span>⚙️ إعدادات المزامنة السحابية & الداتا</span><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
     <div class="modal-body">
+      <!-- مزامنة GitHub السحابية -->
+      <div class="form-group" style="background:var(--bg-2); padding:12px; border-radius:10px; border:1px solid var(--brass);">
+        <label style="color:var(--brass-hover); font-weight:bold;">☁️ المزامنة السحابية الدائمة (GitHub Token)</label>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">حط التوكن هنا مرة واحدة عشان الداتا تتسجل وتتزامن تلقائياً بين الموبايل واللابتوب.</p>
+        <div class="row-group">
+          <input type="password" id="ghTokenInput" placeholder="github_pat_...">
+          <button class="btn-mint btn-sm" onclick="saveGhToken()">حفظ ومزامنة</button>
+        </div>
+      </div>
+
       <div class="form-group">
         <label>عنوان / رقم InstaPay بتاعك (بيظهر في الشيك)</label>
         <div class="row-group">
@@ -397,16 +394,18 @@ header{
           <button class="btn-ghost btn-sm" onclick="copyInstaPay()">📋 نسخ</button>
         </div>
       </div>
+
       <div class="form-group">
-        <label>نسخة احتياطية من كل الداتا (المنيو، الشلة، الأرشيف)</label>
+        <label>نسخة احتياطية يدوية من الداتا (JSON)</label>
         <div class="row-group">
           <button class="btn-primary btn-sm" onclick="exportDataJson()">💾 احفظ نسخة</button>
           <button class="btn-ghost btn-sm" onclick="document.getElementById('importJsonInput').click()">📥 رجّع نسخة</button>
           <input type="file" id="importJsonInput" style="display:none" accept=".json" onchange="importDataJson(event)">
         </div>
       </div>
+
       <div class="form-group">
-        <label>بوت تيليجرام (اختياري - يسمح للشلة إنهم يسجلوا طلباتهم بنفسهم)</label>
+        <label>بوت تيليجرام (اختياري - للطلبات عن بعد)</label>
         <div class="row-group">
           <input type="password" id="botToken" placeholder="حط توكن تيليجرام هنا">
           <button id="toggleBotBtn" class="btn-mint btn-sm" onclick="toggleTelegramPolling()">صحّي البوت</button>
@@ -437,7 +436,7 @@ header{
   </div>
 </div>
 
-<!-- نافذة تأكيد عامة -->
+<!-- نافذة تأكيد -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box small">
     <div class="modal-header"><span id="confirmModalTitle">تأكيد</span><button class="modal-close" onclick="resolveConfirm(false)">✕</button></div>
@@ -449,7 +448,7 @@ header{
   </div>
 </div>
 
-<!-- نافذة اختيار مين هيستلم الفلوس -->
+<!-- نافذة نقل الفلوس -->
 <div class="modal-overlay" id="transferModal">
   <div class="modal-box small">
     <div class="modal-header"><span>💸 ساب فلوسه لحد</span><button class="modal-close" onclick="closeModal('transferModal')">✕</button></div>
@@ -462,7 +461,7 @@ header{
 
 <div id="toastStack"></div>
 
-<!-- كارت الفاتورة (لتصدير PDF / صورة) -->
+<!-- كارت الفاتورة -->
 <div id="billCaptureTarget">
   <div class="ledger-spiral"></div>
   <div class="bill-header">
@@ -485,13 +484,19 @@ header{
 
 <script>
 /* =========================================================
-   الداتا والتخزين
+   إعدادات GitHub السحابية والداتا
 ========================================================= */
-const OLD_KEY = 'cafe_egypt_keep_left_v5';
 const STORE_KEY = 'cafe_egypt_ledger_v6';
+const GITHUB_CONFIG = {
+  owner: 'loayhegazi',
+  repo: 'LayaliZaman',
+  path: 'data.json',
+  branch: 'main'
+};
 
 function defaultData(){
   return {
+    ghToken: '',
     botToken: '',
     instaPay: '',
     sessionStartedAt: null,
@@ -520,14 +525,6 @@ function loadAppData(){
   if (fresh) {
     try { return JSON.parse(fresh); } catch(e){ return defaultData(); }
   }
-  const legacy = localStorage.getItem(OLD_KEY);
-  if (legacy) {
-    try {
-      const parsed = JSON.parse(legacy);
-      if (parsed.sessionStartedAt === undefined) parsed.sessionStartedAt = null;
-      return parsed;
-    } catch(e){ /* fall through */ }
-  }
   return defaultData();
 }
 
@@ -537,10 +534,17 @@ let isPolling = false;
 let lastUpdateId = 0;
 let selectedPersonIndex = null;
 let sessionFilter = 'all';
+let syncTimeout = null;
 
 function saveData(){
   localStorage.setItem(STORE_KEY, JSON.stringify(appData));
   renderAll();
+  
+  // Debounce syncing to GitHub API
+  clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(() => {
+    pushDataToGitHub();
+  }, 1000);
 }
 
 function renderAll(){
@@ -552,7 +556,94 @@ function renderAll(){
 }
 
 /* =========================================================
-   أدوات مساعدة: توست، تأكيد، تنسيق
+   محرك المزامنة التلقائية مع GitHub
+========================================================= */
+async function pullDataFromGitHub() {
+  const token = appData.ghToken || localStorage.getItem('gh_sync_token');
+  if (!token) return;
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json'
+      }
+    });
+
+    if (res.ok) {
+      const fileData = await res.json();
+      const content = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
+      const remoteData = JSON.parse(content);
+
+      if (remoteData.menu && remoteData.members) {
+        remoteData.ghToken = token;
+        appData = remoteData;
+        localStorage.setItem(STORE_KEY, JSON.stringify(appData));
+        sessionStorage.setItem('gh_file_sha', fileData.sha);
+        renderAll();
+        toast('تم تحديث البيانات من GitHub ☁️', 'success');
+      }
+    }
+  } catch (err) {
+    console.error('GitHub Pull Error:', err);
+  }
+}
+
+async function pushDataToGitHub() {
+  const token = appData.ghToken || localStorage.getItem('gh_sync_token');
+  if (!token) return;
+
+  try {
+    let sha = sessionStorage.getItem('gh_file_sha');
+
+    if (!sha) {
+      const getRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+      });
+      if (getRes.ok) {
+        const currentFile = await getRes.json();
+        sha = currentFile.sha;
+      }
+    }
+
+    const payload = {
+      message: `Sync session data: ${new Date().toISOString()}`,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(appData, null, 2)))),
+      branch: GITHUB_CONFIG.branch,
+      ...(sha ? { sha } : {})
+    };
+
+    const putRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (putRes.ok) {
+      const result = await putRes.json();
+      sessionStorage.setItem('gh_file_sha', result.content.sha);
+      toast('تم حفظ التعديلات سحابياً ☁️', 'success');
+    }
+  } catch (err) {
+    console.error('GitHub Push Error:', err);
+  }
+}
+
+function saveGhToken() {
+  const val = document.getElementById('ghTokenInput').value.trim();
+  appData.ghToken = val;
+  localStorage.setItem('gh_sync_token', val);
+  saveData();
+  pullDataFromGitHub();
+  toast(val ? 'تم حفظ التوكن، جاري المزامنة...' : 'تم مسح التوكن', 'success');
+}
+
+/* =========================================================
+   أدوات الواجهة والمساعدات
 ========================================================= */
 function toast(msg, type='info', ms=3200){
   const stack = document.getElementById('toastStack');
@@ -602,7 +693,7 @@ function updateSessionTimer(){
 setInterval(updateSessionTimer, 30000);
 
 /* =========================================================
-   شلة القهوة (الأعضاء)
+   دليل الشلة
 ========================================================= */
 function renderMembers(){
   const list = document.getElementById('membersListUi');
@@ -684,7 +775,7 @@ async function deleteMember(index){
 }
 
 /* =========================================================
-   منيو المشاريب
+   المنيو
 ========================================================= */
 function renderMenu(){
   const list = document.getElementById('menuListUi');
@@ -780,7 +871,7 @@ async function deleteMenuItem(index){
 }
 
 /* =========================================================
-   تسجيل الطلبات - نظام الضغطتين (POS)
+   نظام الطلبات السريع (POS)
 ========================================================= */
 function renderPos(){
   const bar = document.getElementById('posPersonBar');
@@ -856,7 +947,7 @@ function removeOneOrder(personIndex, itemName){
 }
 
 /* =========================================================
-   حسابات القعدة (كروت الأشخاص)
+   كروت الحسابات
 ========================================================= */
 function togglePersonPayment(index){
   const person = appData.members[index];
@@ -958,7 +1049,6 @@ function renderSession(){
   if (sessionFilter === 'paid') visible = sessionMembers.filter(({ m }) => !m.hasLeft && m.isPaid);
   if (sessionFilter === 'left') visible = sessionMembers.filter(({ m }) => m.hasLeft);
 
-  // رتب: مدفعش الأول، بعدين خالص، بعدين اللي مشوا
   visible = visible.slice().sort((a, b) => {
     const rank = p => p.m.hasLeft ? 2 : (p.m.isPaid ? 1 : 0);
     return rank(a) - rank(b);
@@ -1027,7 +1117,7 @@ function renderSession(){
 function setSessionFilter(key){ sessionFilter = key; renderSession(); }
 
 /* =========================================================
-   الإحصائيات (لوحة التالي)
+   الإحصائيات
 ========================================================= */
 function renderStats(){
   let grandTotal = 0, collectedTotal = 0;
@@ -1062,7 +1152,7 @@ function renderStats(){
 }
 
 /* =========================================================
-   أرشيف القعدات
+   الأرشيف
 ========================================================= */
 function openHistoryModal(){
   const body = document.getElementById('historyModalBody');
@@ -1121,7 +1211,7 @@ async function resetSessionOrders(){
 }
 
 /* =========================================================
-   الشيك (الفاتورة) - PDF / صورة / نص
+   تصدير الفاتورة (PDF / صورة / نص)
 ========================================================= */
 function populateBillData(){
   const container = document.getElementById('billItemsContainer');
@@ -1275,11 +1365,12 @@ function copySessionSummary(){
 }
 
 /* =========================================================
-   الإعدادات المتقدمة: إنستاباي والنسخ الاحتياطي
+   النسخ الاحتياطي والإنستاباي
 ========================================================= */
 function openSettingsModal(){
   document.getElementById('instaPayAccount').value = appData.instaPay || '';
   document.getElementById('botToken').value = appData.botToken || '';
+  document.getElementById('ghTokenInput').value = appData.ghToken || localStorage.getItem('gh_sync_token') || '';
   openModal('settingsModal');
 }
 
@@ -1328,7 +1419,7 @@ function importDataJson(event){
 }
 
 /* =========================================================
-   محرك بوت تيليجرام
+   تيليجرام
 ========================================================= */
 function log(msg){
   const logBox = document.getElementById('botLog');
@@ -1654,7 +1745,6 @@ async function handleTelegramMessage(chatId, text){
   const cleanText = text.trim();
   log(`رسالة: "${cleanText}"`);
 
-  // استكمال حالة تعديل اسم/سعر مشروب لو المستخدم في نص عملية تعديل
   const state = userStates[chatId];
   if (state) {
     if (state.action === 'WAITING_EDIT_PRICE') {
@@ -1780,12 +1870,15 @@ function toggleTelegramPolling(){
 }
 
 /* =========================================================
-   بداية التشغيل
+   تشغيل الصفحة
 ========================================================= */
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   if (appData.botToken) { document.getElementById('botToken').value = appData.botToken; toggleTelegramPolling(); }
   if (appData.instaPay) document.getElementById('instaPayAccount').value = appData.instaPay;
   renderAll();
+  
+  // مزامنة تلقائية فور فتح الموقع
+  await pullDataFromGitHub();
 });
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
