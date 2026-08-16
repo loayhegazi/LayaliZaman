@@ -104,6 +104,10 @@
         {
           "name": "شاي كشري",
           "price": 15
+        },
+        {
+          "name": "كانز",
+          "price": 35
         }
       ],
       "isPaid": false
@@ -161,5 +165,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786904831337
+  "lastModified": 1786904835268
 }
