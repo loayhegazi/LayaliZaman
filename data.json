@@ -60,6 +60,10 @@
     {
       "name": "ليمون",
       "price": 45
+    },
+    {
+      "name": "ليمون بحليب",
+      "price": 50
     }
   ],
   "members": [
@@ -153,5 +157,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786902478584
+  "lastModified": 1786902497769
 }
