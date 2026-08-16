@@ -226,7 +226,7 @@
     {
       "name": "حماد",
       "isPresent": true,
-      "hasLeft": false,
+      "hasLeft": true,
       "orders": [
         {
           "name": "قهوة تركي",
@@ -241,5 +241,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786918028429
+  "lastModified": 1786918031011
 }
