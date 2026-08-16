@@ -175,7 +175,12 @@
     {
       "name": "خضر",
       "isPresent": true,
-      "orders": [],
+      "orders": [
+        {
+          "name": "قهوة تركي",
+          "price": 30
+        }
+      ],
       "isPaid": false
     },
     {
@@ -198,5 +203,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786909215814
+  "lastModified": 1786909220194
 }
