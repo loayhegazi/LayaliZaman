@@ -78,6 +78,10 @@
         {
           "name": "مياه معدنية",
           "price": 10
+        },
+        {
+          "name": "قهوة فرنساوي",
+          "price": 40
         }
       ],
       "isPaid": false
@@ -165,5 +169,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786907489697
+  "lastModified": 1786907499973
 }
