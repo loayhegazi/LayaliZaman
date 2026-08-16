@@ -1,149 +1,101 @@
 {
-  "botToken": "",
-  "instaPay": "Loayhegazi2",
-  "sessionStartedAt": 1786842292678,
+  "botToken": "8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450",
+  "instaPay": "",
   "menu": [
     {
       "name": "شاي كشري",
       "price": 15
     },
     {
-      "name": "قهوة مظبوط",
-      "price": 25
-    },
-    {
-      "name": "قهوة سادة",
-      "price": 25
-    },
-    {
-      "name": "قهوة تركي دوبل",
-      "price": 35
-    },
-    {
-      "name": "شيشة قص",
+      "name": "قهوة تركي",
       "price": 30
     },
     {
-      "name": "سحلب بالمكسرات",
-      "price": 40
-    },
-    {
-      "name": "كانز بيبسي",
-      "price": 20
+      "name": "قهوة تركي دوبل",
+      "price": 50
     },
     {
       "name": "مياه معدنية",
       "price": 10
+    },
+    {
+      "name": "قهوة فرنساوي",
+      "price": 40
+    },
+    {
+      "name": "نسكافية",
+      "price": 45
+    },
+    {
+      "name": "كانز",
+      "price": 35
+    },
+    {
+      "name": "شاي بحليب",
+      "price": 45
     }
   ],
   "members": [
     {
       "name": "لؤي",
-      "isPresent": true,
-      "hasLeft": false,
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        }
-      ],
+      "isPresent": false,
+      "orders": [],
       "isPaid": false
     },
     {
       "name": "فرج",
-      "isPresent": true,
-      "hasLeft": false,
-      "orders": [
-        {
-          "name": "قهوة سادة",
-          "price": 25
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        }
-      ],
+      "isPresent": false,
+      "orders": [],
       "isPaid": false
     },
     {
       "name": "تركي",
-      "isPresent": true,
-      "hasLeft": false,
-      "orders": [
-        {
-          "name": "قهوة سادة",
-          "price": 25
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        }
-      ],
-      "isPaid": true
+      "isPresent": false,
+      "orders": [],
+      "isPaid": false
     },
     {
       "name": "اسامة",
       "isPresent": false,
-      "hasLeft": false,
       "orders": [],
       "isPaid": false
     },
     {
       "name": "عصام",
-      "isPresent": true,
-      "hasLeft": true,
-      "orders": [
-        {
-          "name": "قهوة تركي دوبل",
-          "price": 35
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        }
-      ],
-      "isPaid": true
-    },
-    {
-      "name": "خضر",
       "isPresent": false,
-      "hasLeft": false,
       "orders": [],
       "isPaid": false
     },
     {
       "name": "عاصم",
       "isPresent": false,
-      "hasLeft": false,
+      "orders": [],
+      "isPaid": false
+    },
+    {
+      "name": "خضر",
+      "isPresent": false,
+      "orders": [],
+      "isPaid": false
+    },
+    {
+      "name": "حازم",
+      "isPresent": false,
       "orders": [],
       "isPaid": false
     },
     {
       "name": "كريم",
       "isPresent": false,
-      "hasLeft": false,
       "orders": [],
       "isPaid": false
     },
     {
       "name": "بكر",
       "isPresent": false,
-      "hasLeft": false,
       "orders": [],
       "isPaid": false
     }
   ],
-  "history": []
+  "sessionStartedAt": null
 }
