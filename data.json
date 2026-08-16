@@ -230,11 +230,15 @@
         {
           "name": "قهوة تركي",
           "price": 30
+        },
+        {
+          "name": "شاي كرك",
+          "price": 50
         }
       ],
       "isPaid": false
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786915074350
+  "lastModified": 1786915084552
 }
