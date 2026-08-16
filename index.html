@@ -91,6 +91,18 @@ header{
   padding:3px 10px;border-radius:100px;font-size:.74rem;font-weight:700;
 }
 .header-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:520px;justify-content:flex-end;}
+.sync-pill{
+  display:none;align-items:center;gap:6px;background:var(--surface-2);color:var(--text-dim);
+  border:1px solid var(--line);padding:5px 11px;border-radius:100px;font-size:.74rem;font-weight:700;
+}
+.sync-pill.syncing{color:var(--sky);border-color:rgba(59,127,166,0.4);}
+.sync-pill.syncing .sync-dot{background:var(--sky);animation:pulseDot 1s infinite;}
+.sync-pill.synced{color:var(--mint);border-color:rgba(78,149,117,0.4);}
+.sync-pill.synced .sync-dot{background:var(--mint);}
+.sync-pill.error{color:var(--danger);border-color:rgba(182,71,47,0.4);}
+.sync-pill.error .sync-dot{background:var(--danger);}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--text-faint);flex-shrink:0;}
+@keyframes pulseDot{0%,100%{opacity:1;}50%{opacity:.3;}}
 
 .stats-board{
   background:linear-gradient(180deg,var(--surface),var(--surface-2));
@@ -173,11 +185,11 @@ header{
 .drink-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:9px;}
 .drink-tile{
   background:var(--bg-2);border:1.5px solid var(--line);border-radius:11px;padding:11px 10px;
-  display:flex;flex-direction:column;gap:5px;text-align:right;transition:.12s ease;
+  display:flex;flex-direction:column;gap:5px;text-align:right;transition:.12s ease;color:var(--text);
 }
 .drink-tile:hover{border-color:var(--brass);transform:translateY(-2px);}
 .drink-tile:active{transform:scale(.95);}
-.drink-tile .d-name{font-weight:800;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.drink-tile .d-name{color:var(--text);font-weight:800;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .drink-tile .d-price{color:var(--brass-hover);font-size:.78rem;font-weight:700;}
 
 .session-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;}
@@ -310,6 +322,7 @@ header{
       </div>
     </div>
     <div class="header-actions">
+      <div class="sync-pill" id="syncStatusPill"><span class="sync-dot" id="syncStatusDot"></span><span id="syncStatusText">مزامنة سحابية</span></div>
       <button class="btn-ghost btn-sm" onclick="openHistoryModal()">📚 أرشيف القعدات</button>
       <button class="btn-ghost btn-sm" onclick="exportBillPdf()">📄 شيك PDF</button>
       <button class="btn-ghost btn-sm" onclick="exportBillImage()">🖼️ شيك صورة</button>
@@ -383,7 +396,9 @@ header{
         <div class="row-group">
           <input type="password" id="ghTokenInput" placeholder="github_pat_...">
           <button class="btn-mint btn-sm" onclick="saveGhToken()">حفظ ومزامنة</button>
+          <button class="btn-ghost btn-sm" onclick="manualSyncNow()">🔄 زامن دلوقتي</button>
         </div>
+        <p style="font-size:.72rem;color:var(--text-faint);">التوكن بيتحفظ على جهازك بس ومش بيتبعت جوه ملف الداتا، والمزامنة بتحصل تلقائي كل شوية طول ما الصفحة فاتحة.</p>
       </div>
 
       <div class="form-group">
@@ -537,10 +552,11 @@ let sessionFilter = 'all';
 let syncTimeout = null;
 
 function saveData(){
+  appData.lastModified = Date.now();
   localStorage.setItem(STORE_KEY, JSON.stringify(appData));
   renderAll();
-  
-  // Debounce syncing to GitHub API
+
+  // Debounce syncing to GitHub API - يستنى ثانية بعد آخر تعديل عشان ميبعتش طلب مع كل ضغطة
   clearTimeout(syncTimeout);
   syncTimeout = setTimeout(() => {
     pushDataToGitHub();
@@ -557,80 +573,168 @@ function renderAll(){
 
 /* =========================================================
    محرك المزامنة التلقائية مع GitHub
+   - التوكن نفسه بيتحفظ محلي بس (localStorage) ومش بيتبعت جوه الداتا
+     المتزامنة، عشان لو الريبو عام حد ميقدرش يشوف التوكن بتاعك.
+   - كل جهاز بيسحب كل شوية (poll) وكمان لما تفتح التاب تاني، فبتفضل
+     الداتا متزامنة بين الموبايل واللابتوب من غير ما تعمل حاجة.
 ========================================================= */
-async function pullDataFromGitHub() {
-  const token = appData.ghToken || localStorage.getItem('gh_sync_token');
-  if (!token) return;
+let isSyncBusy = false;
+let syncIntervalHandle = null;
+let lastSyncedAt = null;
+
+function getGhToken(){
+  return (appData.ghToken || localStorage.getItem('gh_sync_token') || '').trim();
+}
+
+function setSyncStatus(state){
+  const pill = document.getElementById('syncStatusPill');
+  const dot = document.getElementById('syncStatusDot');
+  const text = document.getElementById('syncStatusText');
+  if (!pill) return;
+  if (!getGhToken()) { pill.style.display = 'none'; return; }
+  pill.style.display = 'inline-flex';
+  pill.className = 'sync-pill ' + (state || '');
+  if (state === 'syncing') text.innerText = 'بيتزامن...';
+  else if (state === 'synced') {
+    const t = lastSyncedAt ? new Date(lastSyncedAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
+    text.innerText = t ? `متزامن - ${t}` : 'متزامن';
+  }
+  else if (state === 'error') text.innerText = 'هنعيد المحاولة تاني...';
+  else text.innerText = 'مزامنة سحابية';
+}
+
+// بيرجع نسخة من الداتا بدون أي توكنات سرية قبل ما نبعتها لـ GitHub
+function buildSyncPayload(){
+  const clone = JSON.parse(JSON.stringify(appData));
+  delete clone.ghToken;
+  delete clone.botToken;
+  return clone;
+}
+
+async function pullDataFromGitHub(silent){
+  const token = getGhToken();
+  if (!token || isSyncBusy) return;
+  isSyncBusy = true;
+  if (!silent) setSyncStatus('syncing');
 
   try {
     const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json'
-      }
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
     });
+
+    if (res.status === 404) {
+      // الملف لسه مش موجود على GitHub - ابعت نسخة الداتا المحلية كأول نسخة
+      isSyncBusy = false;
+      await pushDataToGitHub();
+      return;
+    }
 
     if (res.ok) {
       const fileData = await res.json();
+      sessionStorage.setItem('gh_file_sha', fileData.sha);
       const content = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
       const remoteData = JSON.parse(content);
 
       if (remoteData.menu && remoteData.members) {
-        remoteData.ghToken = token;
-        appData = remoteData;
-        localStorage.setItem(STORE_KEY, JSON.stringify(appData));
-        sessionStorage.setItem('gh_file_sha', fileData.sha);
-        renderAll();
-        toast('تم تحديث البيانات من GitHub ☁️', 'success');
+        const remoteModified = remoteData.lastModified || 0;
+        const localModified = appData.lastModified || 0;
+        if (remoteModified > localModified) {
+          const keepGhToken = appData.ghToken;
+          const keepBotToken = appData.botToken;
+          appData = Object.assign({}, remoteData, { ghToken: keepGhToken, botToken: keepBotToken });
+          localStorage.setItem(STORE_KEY, JSON.stringify(appData));
+          renderAll();
+          if (!silent) toast('جاتلك تحديثات من جهاز تاني ☁️', 'success');
+        }
       }
+      lastSyncedAt = Date.now();
+      setSyncStatus('synced');
+    } else if (res.status === 401 || res.status === 403) {
+      setSyncStatus('error');
+      if (!silent) toast('التوكن مش شغال أو مالوش صلاحية كافية', 'error');
+    } else {
+      setSyncStatus('error');
     }
   } catch (err) {
     console.error('GitHub Pull Error:', err);
+    setSyncStatus('error');
+  } finally {
+    isSyncBusy = false;
   }
 }
 
-async function pushDataToGitHub() {
-  const token = appData.ghToken || localStorage.getItem('gh_sync_token');
-  if (!token) return;
+async function pushDataToGitHub(isRetry){
+  const token = getGhToken();
+  if (!token || isSyncBusy) return;
+  isSyncBusy = true;
+  setSyncStatus('syncing');
 
   try {
     let sha = sessionStorage.getItem('gh_file_sha');
-
     if (!sha) {
       const getRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
       });
-      if (getRes.ok) {
-        const currentFile = await getRes.json();
-        sha = currentFile.sha;
-      }
+      if (getRes.ok) { const currentFile = await getRes.json(); sha = currentFile.sha; }
     }
 
     const payload = {
       message: `Sync session data: ${new Date().toISOString()}`,
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(appData, null, 2)))),
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(buildSyncPayload(), null, 2)))),
       branch: GITHUB_CONFIG.branch,
       ...(sha ? { sha } : {})
     };
 
     const putRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`, {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
 
     if (putRes.ok) {
       const result = await putRes.json();
       sessionStorage.setItem('gh_file_sha', result.content.sha);
-      toast('تم حفظ التعديلات سحابياً ☁️', 'success');
+      lastSyncedAt = Date.now();
+      setSyncStatus('synced');
+    } else if (putRes.status === 409 && !isRetry) {
+      // حد تاني عدّل الملف قبلنا بلحظة - نجيب النسخة الجديدة ونحاول تاني مرة واحدة
+      sessionStorage.removeItem('gh_file_sha');
+      isSyncBusy = false;
+      await pushDataToGitHub(true);
+      return;
+    } else if (putRes.status === 401 || putRes.status === 403) {
+      setSyncStatus('error');
+      toast('التوكن مش شغال أو مالوش صلاحية الكتابة على الريبو', 'error');
+    } else {
+      setSyncStatus('error');
     }
   } catch (err) {
     console.error('GitHub Push Error:', err);
+    setSyncStatus('error');
+  } finally {
+    isSyncBusy = false;
   }
+}
+
+// مزامنة دورية كل شوية طول ما التاب فاتح، عشان أي تعديل من جهاز تاني يوصلك تلقائي
+function startAutoSync(){
+  if (syncIntervalHandle) clearInterval(syncIntervalHandle);
+  if (!getGhToken()) return;
+  syncIntervalHandle = setInterval(() => {
+    if (document.visibilityState === 'visible') pullDataFromGitHub(true);
+  }, 20000);
+}
+
+function stopAutoSync(){
+  if (syncIntervalHandle) clearInterval(syncIntervalHandle);
+  syncIntervalHandle = null;
+}
+
+async function manualSyncNow(){
+  if (!getGhToken()) return toast('حط توكن GitHub الأول', 'error');
+  await pullDataFromGitHub();
+  await pushDataToGitHub();
+  toast('اتزامنت الداتا دلوقتي ☁️', 'success');
 }
 
 function saveGhToken() {
@@ -638,9 +742,21 @@ function saveGhToken() {
   appData.ghToken = val;
   localStorage.setItem('gh_sync_token', val);
   saveData();
-  pullDataFromGitHub();
-  toast(val ? 'تم حفظ التوكن، جاري المزامنة...' : 'تم مسح التوكن', 'success');
+  setSyncStatus('idle');
+  if (val) {
+    toast('تم حفظ التوكن، جاري المزامنة...', 'success');
+    pullDataFromGitHub();
+    startAutoSync();
+  } else {
+    stopAutoSync();
+    toast('تم مسح التوكن، المزامنة السحابية واقفة دلوقتي', 'info');
+  }
 }
+
+// يعيد المزامنة فورًا لما ترجع تفتح التاب أو ترجعلك النت، بدل ما تستنى الـ 20 ثانية
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullDataFromGitHub(true); });
+window.addEventListener('focus', () => pullDataFromGitHub(true));
+window.addEventListener('online', () => { toast('رجع النت! بنزامن دلوقتي...', 'info'); pullDataFromGitHub(true); });
 
 /* =========================================================
    أدوات الواجهة والمساعدات
@@ -1876,9 +1992,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (appData.botToken) { document.getElementById('botToken').value = appData.botToken; toggleTelegramPolling(); }
   if (appData.instaPay) document.getElementById('instaPayAccount').value = appData.instaPay;
   renderAll();
-  
-  // مزامنة تلقائية فور فتح الموقع
+  setSyncStatus('idle');
+
+  // مزامنة تلقائية فور فتح الموقع، وبعدين بيفضل يسحب كل شوية طول ما الصفحة فاتحة
   await pullDataFromGitHub();
+  startAutoSync();
 });
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
