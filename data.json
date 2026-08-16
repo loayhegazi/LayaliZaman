@@ -53,7 +53,12 @@
     {
       "name": "فرج",
       "isPresent": true,
-      "orders": [],
+      "orders": [
+        {
+          "name": "شاي كشري",
+          "price": 15
+        }
+      ],
       "isPaid": false
     },
     {
@@ -111,5 +116,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786900523361
+  "lastModified": 1786900530747
 }
