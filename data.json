@@ -64,7 +64,7 @@
     },
     {
       "name": "اسامة",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false
     },
@@ -106,5 +106,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786900470941
+  "lastModified": 1786900519061
 }
