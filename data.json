@@ -86,6 +86,10 @@
         {
           "name": "مياه معدنية",
           "price": 10
+        },
+        {
+          "name": "قهوة تركي",
+          "price": 30
         }
       ],
       "isPaid": true
@@ -175,13 +179,9 @@
     {
       "name": "خضر",
       "isPresent": true,
-      "orders": [
-        {
-          "name": "قهوة تركي",
-          "price": 30
-        }
-      ],
-      "isPaid": false
+      "orders": [],
+      "isPaid": true,
+      "hasLeft": true
     },
     {
       "name": "حازم",
@@ -215,5 +215,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786912758249
+  "lastModified": 1786912792221
 }
