@@ -40,6 +40,10 @@
     {
       "name": "قرفة بحليب",
       "price": 45
+    },
+    {
+      "name": "كاكاو",
+      "price": 45
     }
   ],
   "members": [
@@ -133,5 +137,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786902420720
+  "lastModified": 1786902426005
 }
