@@ -124,10 +124,6 @@
         {
           "name": "شاي كشري",
           "price": 15
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
         }
       ],
       "isPaid": false
@@ -200,8 +196,15 @@
       "isPresent": false,
       "orders": [],
       "isPaid": false
+    },
+    {
+      "name": "حماد",
+      "isPresent": true,
+      "hasLeft": false,
+      "orders": [],
+      "isPaid": false
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786909220194
+  "lastModified": 1786910388654
 }
