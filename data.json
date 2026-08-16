@@ -141,6 +141,10 @@
         {
           "name": "شاي كشري",
           "price": 15
+        },
+        {
+          "name": "شاي بحليب",
+          "price": 45
         }
       ],
       "isPaid": false
@@ -224,5 +228,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786915057927
+  "lastModified": 1786915060552
 }
