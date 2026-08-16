@@ -201,10 +201,15 @@
       "name": "حماد",
       "isPresent": true,
       "hasLeft": false,
-      "orders": [],
+      "orders": [
+        {
+          "name": "قهوة تركي",
+          "price": 30
+        }
+      ],
       "isPaid": false
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786910388654
+  "lastModified": 1786910394105
 }
