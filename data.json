@@ -1,120 +1,70 @@
 {
   "instaPay": "",
+  "sessionStartedAt": null,
   "menu": [
     {
       "name": "شاي كشري",
       "price": 15
     },
     {
-      "name": "قهوة تركي",
-      "price": 30
+      "name": "قهوة مظبوط",
+      "price": 25
+    },
+    {
+      "name": "قهوة سادة",
+      "price": 25
     },
     {
       "name": "قهوة تركي دوبل",
-      "price": 50
+      "price": 35
+    },
+    {
+      "name": "شيشة قص",
+      "price": 30
+    },
+    {
+      "name": "سحلب بالمكسرات",
+      "price": 40
+    },
+    {
+      "name": "كانز بيبسي",
+      "price": 20
     },
     {
       "name": "مياه معدنية",
       "price": 10
-    },
-    {
-      "name": "قهوة فرنساوي",
-      "price": 40
-    },
-    {
-      "name": "نسكافية",
-      "price": 45
-    },
-    {
-      "name": "كانز",
-      "price": 35
-    },
-    {
-      "name": "شاي بحليب",
-      "price": 45
     }
   ],
   "members": [
     {
-      "name": "لؤي",
+      "name": "أحمد",
       "isPresent": true,
-      "orders": [
-        {
-          "name": "قهوة تركي",
-          "price": 30
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        }
-      ],
+      "hasLeft": false,
+      "orders": [],
       "isPaid": false
     },
     {
-      "name": "فرج",
+      "name": "محمود",
       "isPresent": true,
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        }
-      ],
-      "isPaid": false
-    },
-    {
-      "name": "تركي",
-      "isPresent": true,
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        }
-      ],
-      "isPaid": false
-    },
-    {
-      "name": "اسامة",
-      "isPresent": true,
+      "hasLeft": false,
       "orders": [],
       "isPaid": false
     },
     {
-      "name": "عصام",
+      "name": "إسلام",
       "isPresent": false,
+      "hasLeft": false,
       "orders": [],
       "isPaid": false
     },
     {
-      "name": "عاصم",
+      "name": "حسين",
       "isPresent": false,
-      "orders": [],
-      "isPaid": false
-    },
-    {
-      "name": "خضر",
-      "isPresent": false,
-      "orders": [],
-      "isPaid": false
-    },
-    {
-      "name": "حازم",
-      "isPresent": false,
-      "orders": [],
-      "isPaid": false
-    },
-    {
-      "name": "كريم",
-      "isPresent": false,
-      "orders": [],
-      "isPaid": false
-    },
-    {
-      "name": "بكر",
-      "isPresent": false,
+      "hasLeft": false,
       "orders": [],
       "isPaid": false
     }
   ],
-  "sessionStartedAt": 1786899594828,
-  "lastModified": 1786900530747
+  "history": [],
+  "lastModified": 1786900712937
 }
