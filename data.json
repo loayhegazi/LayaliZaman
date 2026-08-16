@@ -129,7 +129,7 @@
     },
     {
       "name": "عصام",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false
     },
@@ -165,5 +165,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786904835268
+  "lastModified": 1786907489697
 }
