@@ -118,6 +118,10 @@
         {
           "name": "مياه معدنية",
           "price": 10
+        },
+        {
+          "name": "شاي بحليب",
+          "price": 45
         }
       ],
       "isPaid": false
@@ -220,5 +224,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786915045991
+  "lastModified": 1786915057927
 }
