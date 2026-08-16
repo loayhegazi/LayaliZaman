@@ -1,5 +1,4 @@
 {
-  "botToken": "8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450",
   "instaPay": "",
   "menu": [
     {
@@ -39,7 +38,12 @@
     {
       "name": "لؤي",
       "isPresent": true,
-      "orders": [],
+      "orders": [
+        {
+          "name": "قهوة تركي",
+          "price": 30
+        }
+      ],
       "isPaid": false
     },
     {
@@ -97,5 +101,6 @@
       "isPaid": false
     }
   ],
-  "sessionStartedAt": 1786899594828
+  "sessionStartedAt": 1786899594828,
+  "lastModified": 1786900468542
 }
