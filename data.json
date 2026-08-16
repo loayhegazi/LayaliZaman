@@ -38,7 +38,7 @@
   "members": [
     {
       "name": "لؤي",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false
     },
@@ -97,5 +97,5 @@
       "isPaid": false
     }
   ],
-  "sessionStartedAt": null
+  "sessionStartedAt": 1786899594828
 }
