@@ -79,7 +79,12 @@
     {
       "name": "اسامة",
       "isPresent": true,
-      "orders": [],
+      "orders": [
+        {
+          "name": "قهوة فرنساوي",
+          "price": 40
+        }
+      ],
       "isPaid": false
     },
     {
@@ -120,5 +125,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786901504344
+  "lastModified": 1786902380856
 }
