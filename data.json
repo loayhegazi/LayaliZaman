@@ -42,6 +42,10 @@
         {
           "name": "قهوة تركي",
           "price": 30
+        },
+        {
+          "name": "مياه معدنية",
+          "price": 10
         }
       ],
       "isPaid": false
@@ -102,5 +106,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786900468542
+  "lastModified": 1786900470941
 }
