@@ -56,6 +56,10 @@
     {
       "name": "عناب",
       "price": 45
+    },
+    {
+      "name": "ليمون",
+      "price": 45
     }
   ],
   "members": [
@@ -149,5 +153,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786902472568
+  "lastModified": 1786902478584
 }
