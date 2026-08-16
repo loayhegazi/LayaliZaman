@@ -154,7 +154,16 @@
     {
       "name": "عصام",
       "isPresent": true,
-      "orders": [],
+      "orders": [
+        {
+          "name": "مياه معدنية",
+          "price": 10
+        },
+        {
+          "name": "قهوة تركي",
+          "price": 30
+        }
+      ],
       "isPaid": false
     },
     {
@@ -189,5 +198,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786907525953
+  "lastModified": 1786907539791
 }
