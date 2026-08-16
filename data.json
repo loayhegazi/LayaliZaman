@@ -48,6 +48,14 @@
     {
       "name": "شاي حليب",
       "price": 45
+    },
+    {
+      "name": "شاي اخضر",
+      "price": 25
+    },
+    {
+      "name": "عناب",
+      "price": 45
     }
   ],
   "members": [
@@ -141,5 +149,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786902432181
+  "lastModified": 1786902472568
 }
