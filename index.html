@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>دفتر قعدتنا ☕ - حساب القهوة يبقى سهل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#15100b;
+  --bg-2:#1b130c;
+  --surface:#241a11;
+  --surface-2:#2e2115;
+  --paper:#f3e6c8;
+  --brass:#cf9a3e;
+  --brass-hover:#e3b158;
+  --brass-dim:rgba(207,154,62,0.15);
+  --tea:#b6512f;
+  --tea-hover:#9c4227;
+  --mint:#4e9575;
+  --mint-hover:#3d7a5f;
+  --sky:#3b7fa6;
+  --sky-hover:#316b8c;
+  --danger:#b6472f;
+  --danger-hover:#9a3a26;
+  --text:#f2e4c6;
+  --text-dim:#b09b78;
+  --text-faint:#7c6b4e;
+  --line:#3a2b1a;
+  --line-soft:#2a1f14;
+  --radius:14px;
+  --radius-sm:9px;
+  --shadow:0 10px 26px rgba(0,0,0,0.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Tajawal','Segoe UI',Tahoma,sans-serif;}
+h1,h2,h3,.display{font-family:'Cairo','Tajawal',sans-serif;}
+body{
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(207,154,62,0.10), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 0%, rgba(182,81,47,0.08), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px 18px 70px;
+}
+::selection{background:var(--brass);color:#1a1206;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+button{cursor:pointer;border:none;border-radius:var(--radius-sm);font-weight:800;transition:.15s ease;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:.88rem;padding:9px 14px;}
+button:active{transform:scale(.96);}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+input,select{background:var(--bg-2);border:1px solid var(--line);color:var(--text);padding:10px 12px;border-radius:var(--radius-sm);outline:none;font-size:.92rem;width:100%;}
+input::placeholder{color:var(--text-faint);}
+input:focus,select:focus{border-color:var(--brass);}
+.btn-sm{padding:6px 10px;font-size:.78rem;}
+.btn-xs{padding:4px 8px;font-size:.72rem;border-radius:7px;}
+.btn-primary{background:var(--brass);color:#1a1206;}
+.btn-primary:hover{background:var(--brass-hover);}
+.btn-ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--line);}
+.btn-ghost:hover{background:var(--line-soft);border-color:var(--brass);}
+.btn-mint{background:var(--mint);color:#0d1b14;}
+.btn-mint:hover{background:var(--mint-hover);color:#fff;}
+.btn-sky{background:var(--sky);color:#08161f;}
+.btn-sky:hover{background:var(--sky-hover);color:#fff;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover{background:var(--danger-hover);}
+.btn-block{width:100%;}
+.icon{font-size:1em;line-height:1;}
+
+/* ===== Header ===== */
+.app-shell{max-width:1280px;margin:0 auto;}
+header{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+  padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-mark{
+  width:52px;height:52px;border-radius:14px;
+  background:linear-gradient(155deg,var(--brass),#8a5f20);
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+  box-shadow:0 6px 14px rgba(207,154,62,0.25);flex-shrink:0;
+}
+.brand h1{font-size:1.45rem;color:var(--paper);font-weight:900;}
+.brand p{color:var(--text-dim);font-size:.82rem;margin-top:3px;}
+.session-timer{
+  display:inline-flex;align-items:center;gap:6px;margin-top:6px;
+  background:var(--brass-dim);color:var(--brass-hover);border:1px solid rgba(207,154,62,0.35);
+  padding:3px 10px;border-radius:100px;font-size:.74rem;font-weight:700;
+}
+.header-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:520px;justify-content:flex-end;}
+
+/* ===== Tally / stats board ===== */
+.stats-board{
+  background:linear-gradient(180deg,var(--surface),var(--surface-2));
+  border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:18px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;
+  position:relative;overflow:hidden;
+}
+.stats-board::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle at 14px 14px, rgba(207,154,62,0.35) 2px, transparent 2.4px);
+  background-size:100% 28px;background-position:top;opacity:.5;
+}
+.stat-pin{
+  background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;
+  display:flex;flex-direction:column;gap:4px;position:relative;
+}
+.stat-pin::before{
+  content:"";position:absolute;top:-6px;right:14px;width:9px;height:9px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #f2cf8a, var(--brass) 70%);box-shadow:0 2px 4px rgba(0,0,0,0.4);
+}
+.stat-label{font-size:.72rem;color:var(--text-dim);}
+.stat-val{font-size:1.28rem;font-weight:900;color:var(--text);font-family:'Cairo',sans-serif;}
+.stat-val.mint{color:var(--mint);}
+.stat-val.brass{color:var(--brass-hover);}
+.stat-val.danger{color:var(--danger);}
+.stat-val.sky{color:var(--sky);}
+
+/* ===== Layout ===== */
+.layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start;}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);
+}
+.card-title{
+  font-size:1rem;font-weight:800;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px dashed var(--line);padding-bottom:9px;color:var(--brass-hover);font-family:'Cairo',sans-serif;
+}
+.card-title small{color:var(--text-faint);font-weight:500;font-size:.72rem;}
+.search-box{position:relative;}
+.search-box input{padding-left:32px;}
+.search-box .icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.6;font-size:.85rem;}
+.row-group{display:flex;gap:8px;}
+.row-group>*{flex:1;}
+.list-container{list-style:none;display:flex;flex-direction:column;gap:7px;max-height:190px;overflow-y:auto;padding-left:2px;}
+.list-item{
+  display:flex;align-items:center;justify-content:space-between;background:var(--bg-2);
+  padding:8px 10px;border-radius:9px;border:1px solid var(--line);
+}
+.chip-avatar{
+  width:26px;height:26px;border-radius:50%;background:var(--brass-dim);color:var(--brass-hover);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem;flex-shrink:0;
+}
+.item-info{display:flex;align-items:center;gap:8px;font-size:.9rem;min-width:0;}
+.item-info strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:110px;}
+.price-badge{color:var(--brass-hover);font-weight:800;background:var(--brass-dim);padding:2px 7px;border-radius:6px;font-size:.78rem;}
+.actions-group{display:flex;gap:4px;flex-shrink:0;}
+.empty-hint{text-align:center;color:var(--text-faint);padding:18px 8px;font-size:.85rem;}
+
+/* toggle status pill in roster */
+.status-pill{font-size:.68rem;padding:2px 7px;border-radius:100px;font-weight:800;white-space:nowrap;}
+.status-pill.on{background:rgba(78,149,117,0.18);color:var(--mint);}
+.status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
+.status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
+
+/* ===== POS ordering ===== */
+.pos-select-bar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
+  border-radius:10px;padding:10px;min-height:48px;
+}
+.pos-select-bar .hint{color:var(--text-faint);font-size:.82rem;}
+.person-chip{
+  display:flex;align-items:center;gap:7px;background:var(--surface-2);border:1.5px solid var(--line);
+  border-radius:100px;padding:6px 12px 6px 8px;font-weight:700;font-size:.86rem;color:var(--text);
+}
+.person-chip:hover{border-color:var(--brass);}
+.person-chip.active{border-color:var(--brass);background:var(--brass-dim);color:var(--brass-hover);box-shadow:0 0 0 3px var(--brass-dim);}
+.person-chip .chip-avatar{width:22px;height:22px;font-size:.68rem;}
+.active-order-pill{
+  display:flex;align-items:center;gap:8px;background:var(--brass-dim);border:1px solid rgba(207,154,62,0.4);
+  color:var(--brass-hover);padding:8px 12px;border-radius:10px;font-weight:800;font-size:.88rem;
+}
+.active-order-pill button{padding:2px 8px;font-size:.7rem;}
+.drink-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:9px;}
+.drink-tile{
+  background:var(--bg-2);border:1.5px solid var(--line);border-radius:11px;padding:11px 10px;
+  display:flex;flex-direction:column;gap:5px;text-align:right;transition:.12s ease;
+}
+.drink-tile:hover{border-color:var(--brass);transform:translateY(-2px);}
+.drink-tile:active{transform:scale(.95);}
+.drink-tile .d-name{font-weight:800;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.drink-tile .d-price{color:var(--brass-hover);font-size:.78rem;font-weight:700;}
+
+/* ===== session grid ===== */
+.session-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;}
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-tab{
+  background:var(--bg-2);border:1px solid var(--line);color:var(--text-dim);padding:6px 12px;border-radius:100px;font-size:.78rem;font-weight:700;
+}
+.filter-tab.active{background:var(--brass-dim);border-color:var(--brass);color:var(--brass-hover);}
+.session-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.person-card{
+  background:var(--bg-2);border-radius:12px;border:1.5px solid var(--line);padding:14px;
+  display:flex;flex-direction:column;gap:9px;position:relative;overflow:hidden;
+}
+.person-card.paid{border-color:var(--mint);}
+.person-card.left{opacity:.72;border-style:dashed;background:var(--bg);}
+.stamp{
+  position:absolute;top:10px;left:-6px;font-family:'Cairo',sans-serif;font-weight:900;font-size:.72rem;
+  padding:3px 12px;border:2.5px solid; border-radius:6px;transform:rotate(-14deg);letter-spacing:1px;opacity:.9;
+  pointer-events:none;
+}
+.stamp.mint{color:var(--mint);border-color:var(--mint);}
+.stamp.sky{color:var(--sky);border-color:var(--sky);}
+.person-header{display:flex;justify-content:space-between;align-items:center;font-size:1rem;font-weight:800;font-family:'Cairo',sans-serif;}
+.person-name{display:flex;align-items:center;gap:8px;}
+.payment-badge{font-size:.7rem;padding:3px 9px;border-radius:100px;font-weight:800;}
+.badge-pending{background:rgba(182,71,47,0.18);color:var(--danger);}
+.badge-paid{background:rgba(78,149,117,0.2);color:var(--mint);}
+.badge-left{background:rgba(59,127,166,0.2);color:var(--sky);}
+.order-list{list-style:none;display:flex;flex-direction:column;gap:5px;font-size:.85rem;max-height:150px;overflow-y:auto;}
+.order-item{
+  display:flex;justify-content:space-between;align-items:center;color:var(--text-dim);
+  background:var(--surface);padding:6px 9px;border-radius:7px;gap:8px;
+}
+.qty-ctrl{display:flex;align-items:center;gap:6px;}
+.qty-ctrl button{width:22px;height:22px;padding:0;border-radius:6px;font-size:.8rem;background:var(--surface-2);color:var(--text);}
+.qty-ctrl button:hover{background:var(--brass);color:#1a1206;}
+.qty-ctrl span{min-width:14px;text-align:center;font-weight:800;}
+.person-total-box{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding-top:9px;border-top:1px dashed var(--line);}
+.person-total{display:flex;justify-content:space-between;align-items:center;font-weight:900;color:var(--brass-hover);font-family:'Cairo',sans-serif;}
+.payment-actions{display:flex;flex-wrap:wrap;gap:6px;}
+.payment-actions button{flex:1 1 45%;}
+
+/* advanced settings trigger */
+.gear-btn{width:38px;height:38px;padding:0;border-radius:50%;font-size:1.05rem;background:var(--surface-2);border:1px solid var(--line);color:var(--text);}
+.gear-btn:hover{border-color:var(--brass);}
+
+/* ===== modals ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(10,7,4,0.78);backdrop-filter:blur(2px);
+  display:none;justify-content:center;align-items:center;z-index:1000;padding:16px;
+}
+.modal-overlay.show{display:flex;}
+.modal-box{
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;width:100%;max-width:640px;
+  max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.55);
+}
+.modal-box.small{max-width:400px;}
+.modal-header{
+  padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;
+  color:var(--brass-hover);font-weight:800;font-size:1.05rem;font-family:'Cairo',sans-serif;
+}
+.modal-close{background:transparent;color:var(--text-dim);font-size:1.1rem;padding:4px 8px;}
+.modal-close:hover{color:var(--text);}
+.modal-body{padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
+.modal-footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;}
+.modal-text{color:var(--text-dim);font-size:.92rem;line-height:1.7;}
+.history-card{background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:13px;display:flex;flex-direction:column;gap:7px;}
+.history-card-header{display:flex;justify-content:space-between;font-weight:800;color:var(--text);border-bottom:1px dashed var(--line);padding-bottom:6px;font-size:.9rem;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:.8rem;color:var(--text-dim);}
+
+/* toasts */
+#toastStack{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:2000;width:min(92vw,380px);}
+.toast{
+  background:var(--surface-2);border:1px solid var(--line);border-right:4px solid var(--brass);color:var(--text);
+  padding:11px 14px;border-radius:10px;font-size:.87rem;box-shadow:0 8px 20px rgba(0,0,0,0.4);
+  animation:toastIn .18s ease;display:flex;align-items:center;gap:8px;
+}
+.toast.success{border-right-color:var(--mint);}
+.toast.error{border-right-color:var(--danger);}
+.toast.info{border-right-color:var(--sky);}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.console-log{background:var(--bg);font-family:monospace;padding:9px;border-radius:8px;height:70px;overflow-y:auto;font-size:.72rem;color:#d9b25f;border:1px solid var(--line);}
+.bot-status-container{display:flex;align-items:center;gap:8px;background:var(--bg-2);padding:5px 12px;border-radius:100px;border:1px solid var(--line);font-size:.78rem;}
+.status-dot{width:9px;height:9px;border-radius:50%;background:var(--danger);flex-shrink:0;}
+.status-dot.active{background:var(--mint);box-shadow:0 0 8px var(--mint);}
+
+/* ===== ledger bill (export target) ===== */
+#billCaptureTarget{
+  position:fixed;top:-9999px;left:-9999px;width:520px;background:var(--paper);color:#2c2113;
+  border:1px solid #d9c6a0;border-radius:10px;padding:0 24px 22px;font-family:'Tajawal','Segoe UI',sans-serif;
+  box-shadow:0 4px 20px rgba(0,0,0,0.15);
+}
+.ledger-spiral{height:16px;margin:0 -24px 14px;background-image:radial-gradient(circle,#cbb27e 3px,transparent 3.6px);background-size:22px 100%;background-position:top;opacity:.8;}
+.bill-header{border-bottom:2px dashed #cbb27e;padding-bottom:14px;margin-bottom:14px;position:relative;}
+.bill-header h2{font-size:1.5rem;color:#3a2a12;margin-bottom:4px;font-family:'Cairo',sans-serif;font-weight:900;}
+.bill-meta{display:flex;justify-content:space-between;font-size:.82rem;color:#8a7550;margin-top:8px;}
+.bill-person-section{margin-bottom:13px;border:1px solid #e3d3ac;border-radius:9px;overflow:hidden;position:relative;background:#fbf5e6;}
+.bill-person-header{background:#f0e2bf;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;font-weight:800;border-bottom:1px solid #e3d3ac;font-size:.92rem;}
+.bill-table{width:100%;border-collapse:collapse;font-size:.83rem;}
+.bill-table th,.bill-table td{padding:6px 12px;text-align:right;}
+.bill-table th{color:#8a7550;font-weight:700;border-bottom:1px solid #ecdfbb;}
+.bill-table tr:not(:last-child) td{border-bottom:1px solid #f3e9cc;}
+.bill-summary-box{background:#f0e2bf;border-radius:9px;padding:12px;border:1px solid #e3d3ac;display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+.bill-summary-row{display:flex;justify-content:space-between;font-size:.94rem;}
+.bill-summary-row.total{font-size:1.15rem;font-weight:900;color:#2c2113;border-top:1px dashed #cbb27e;padding-top:6px;margin-top:3px;font-family:'Cairo',sans-serif;}
+.bill-footer{text-align:center;font-size:.78rem;color:#a3906a;margin-top:14px;border-top:1px solid #ecdfbb;padding-top:8px;}
+.bill-stamp{
+  position:absolute;top:8px;left:8px;font-family:'Cairo',sans-serif;font-weight:900;font-size:.85rem;
+  padding:4px 14px;border:3px solid;border-radius:7px;transform:rotate(-13deg);letter-spacing:1px;opacity:.85;
+}
+.bill-stamp.paid{color:#3d7a5f;border-color:#3d7a5f;}
+.bill-stamp.left{color:#316b8c;border-color:#316b8c;}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  body{padding:12px 12px 60px;}
+  header{flex-direction:column;}
+  .header-actions{justify-content:flex-start;max-width:none;}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">☕</div>
+      <div>
+        <h1>دفتر قعدتنا</h1>
+        <p>حساب القهوة والشلة… يتسجل بضغطة، ويتقسم من غير زعل</p>
+        <div class="session-timer" id="sessionTimer" style="display:none;">⏱️ <span id="sessionTimerText"></span></div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-ghost btn-sm" onclick="openHistoryModal()">📚 أرشيف القعدات</button>
+      <button class="btn-ghost btn-sm" onclick="exportBillPdf()">📄 شيك PDF</button>
+      <button class="btn-ghost btn-sm" onclick="exportBillImage()">🖼️ شيك صورة</button>
+      <button class="btn-primary btn-sm" onclick="copySessionSummary()">📋 شير واتساب</button>
+      <button class="btn-danger btn-sm" onclick="resetSessionOrders()">🔄 قعدة جديدة</button>
+      <button class="gear-btn" title="إعدادات متقدمة" onclick="openSettingsModal()">⚙️</button>
+    </div>
+  </header>
+
+  <div class="stats-board" id="statsBoard"></div>
+
+  <div class="layout">
+    <!-- العمود الجانبي: الشلة والمنيو -->
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div class="card">
+        <div class="card-title"><span>👥 شلة القهوة</span><small>حضور وغياب بضغطة</small></div>
+        <div class="row-group">
+          <input type="text" id="newMemberName" placeholder="اسم صاحبك الجديد" onkeydown="if(event.key==='Enter')addPermanentMember()">
+          <button class="btn-primary btn-sm" onclick="addPermanentMember()">ضيفه</button>
+        </div>
+        <div class="search-box"><span class="icon">🔎</span><input type="text" id="memberSearch" placeholder="دور على حد في الشلة..." oninput="renderMembers()"></div>
+        <ul class="list-container" id="membersListUi"></ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>☕ منيو المشاريب</span><small id="menuCountHint"></small></div>
+        <div class="row-group">
+          <input type="text" id="menuItemName" placeholder="اسم المشروب" onkeydown="if(event.key==='Enter')document.getElementById('menuItemPrice').focus()">
+          <input type="number" id="menuItemPrice" placeholder="السعر" style="max-width:80px;" onkeydown="if(event.key==='Enter')addOrUpdateMenuItem()">
+        </div>
+        <button class="btn-primary btn-block" onclick="addOrUpdateMenuItem()">➕ نزّل في المنيو</button>
+        <div class="search-box"><span class="icon">🔎</span><input type="text" id="menuSearch" placeholder="دور على مشروب..." oninput="renderMenu()"></div>
+        <ul class="list-container" id="menuListUi"></ul>
+      </div>
+    </div>
+
+    <!-- العمود الرئيسي: الطلبات والحسابات -->
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div class="card">
+        <div class="card-title"><span>☕ سجّل الطلب بضغطتين</span><small>اختار المعلم، بعدين اضغط ع المشروب</small></div>
+        <div class="pos-select-bar" id="posPersonBar"></div>
+        <div class="drink-grid" id="posDrinkGrid"></div>
+      </div>
+
+      <div class="card" style="flex:1;">
+        <div class="session-toolbar">
+          <div class="card-title" style="border:none;padding:0;flex:1;">كشوفات حسابات القعدة الحالية</div>
+        </div>
+        <div class="filter-tabs" id="sessionFilterTabs"></div>
+        <div class="session-grid" id="peopleGridUi"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة سجل الأرشيف -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal-box">
+    <div class="modal-header"><span>📚 أرشيف وسجل القعدات السابقة</span><button class="modal-close" onclick="closeModal('historyModal')">✕</button></div>
+    <div class="modal-body" id="historyModalBody"></div>
+  </div>
+</div>
+
+<!-- نافذة الإعدادات المتقدمة -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-box">
+    <div class="modal-header"><span>⚙️ إعدادات متقدمة</span><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>عنوان / رقم InstaPay بتاعك (بيظهر في الشيك)</label>
+        <div class="row-group">
+          <input type="text" id="instaPayAccount" placeholder="username@instapay">
+          <button class="btn-mint btn-sm" onclick="saveInstaPay()">حفظ</button>
+          <button class="btn-ghost btn-sm" onclick="copyInstaPay()">📋 نسخ</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>نسخة احتياطية من كل الداتا (المنيو، الشلة، الأرشيف)</label>
+        <div class="row-group">
+          <button class="btn-primary btn-sm" onclick="exportDataJson()">💾 احفظ نسخة</button>
+          <button class="btn-ghost btn-sm" onclick="document.getElementById('importJsonInput').click()">📥 رجّع نسخة</button>
+          <input type="file" id="importJsonInput" style="display:none" accept=".json" onchange="importDataJson(event)">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>بوت تيليجرام (اختياري - يسمح للشلة إنهم يسجلوا طلباتهم بنفسهم)</label>
+        <div class="row-group">
+          <input type="password" id="botToken" placeholder="حط توكن تيليجرام هنا">
+          <button id="toggleBotBtn" class="btn-mint btn-sm" onclick="toggleTelegramPolling()">صحّي البوت</button>
+        </div>
+        <div class="bot-status-container">
+          <div class="status-dot" id="botStatusDot"></div>
+          <span id="botStatusText">البوت مأنتخ (واقف)</span>
+        </div>
+        <div class="console-log" id="botLog">مستني البوت يصحى...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة تعديل مشروب -->
+<div class="modal-overlay" id="editItemModal">
+  <div class="modal-box small">
+    <div class="modal-header"><span>✏️ تعديل مشروب</span><button class="modal-close" onclick="closeModal('editItemModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>اسم المشروب</label><input type="text" id="editItemName"></div>
+      <div class="form-group"><label>السعر (جنيه)</label><input type="number" id="editItemPrice"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger btn-sm" id="editItemDeleteBtn">🗑️ امسحه</button>
+      <button class="btn-ghost btn-sm" onclick="closeModal('editItemModal')">إلغاء</button>
+      <button class="btn-primary btn-sm" id="editItemSaveBtn">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة تأكيد عامة -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box small">
+    <div class="modal-header"><span id="confirmModalTitle">تأكيد</span><button class="modal-close" onclick="resolveConfirm(false)">✕</button></div>
+    <div class="modal-body"><p class="modal-text" id="confirmModalText"></p></div>
+    <div class="modal-footer">
+      <button class="btn-ghost btn-sm" onclick="resolveConfirm(false)">لأ رجّعني</button>
+      <button class="btn-danger btn-sm" onclick="resolveConfirm(true)">أه أكيد</button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة اختيار مين هيستلم الفلوس -->
+<div class="modal-overlay" id="transferModal">
+  <div class="modal-box small">
+    <div class="modal-header"><span>💸 ساب فلوسه لحد</span><button class="modal-close" onclick="closeModal('transferModal')">✕</button></div>
+    <div class="modal-body">
+      <p class="modal-text" id="transferModalText"></p>
+      <ul class="list-container" id="transferModalList" style="max-height:260px;"></ul>
+    </div>
+  </div>
+</div>
+
+<div id="toastStack"></div>
+
+<!-- كارت الفاتورة (لتصدير PDF / صورة) -->
+<div id="billCaptureTarget">
+  <div class="ledger-spiral"></div>
+  <div class="bill-header">
+    <h2>☕ شيك حساب القعدة</h2>
+    <div class="bill-meta">
+      <span id="billInvoiceNo">رقم الشيك: #1001</span>
+      <span id="billDateText">التاريخ: -</span>
+    </div>
+  </div>
+  <div id="billItemsContainer"></div>
+  <div class="bill-summary-box">
+    <div class="bill-summary-row"><span>إجمالي مشاريب القعدة:</span><span id="billTotalAmountText">0.00 ج</span></div>
+    <div class="bill-summary-row" style="color:#3d7a5f;"><span>الفلوس اللي اتلمت (خالص):</span><span id="billPaidAmountText">0.00 ج</span></div>
+    <div class="bill-summary-row" style="color:#b6472f;"><span>اللي باقي في ذمة الشباب:</span><span id="billRemainAmountText">0.00 ج</span></div>
+    <div class="bill-summary-row total"><span>حساب الطاولة الكلي:</span><span id="billGrandTotalText">0.00 ج</span></div>
+  </div>
+  <div id="billInstaPayBox" style="margin-top:12px;background:#f2ecff;border:1px solid #ddd0f7;border-radius:8px;padding:8px 12px;font-size:.85rem;color:#6032a6;text-align:center;"></div>
+  <div class="bill-footer">قعدة ما تنقطعش ولمة دايماً عامرة يا رجالة! ☕</div>
+</div>
+
+<script>
+/* =========================================================
+   الداتا والتخزين
+========================================================= */
+const OLD_KEY = 'cafe_egypt_keep_left_v5';
+const STORE_KEY = 'cafe_egypt_ledger_v6';
+
+function defaultData(){
+  return {
+    botToken: '',
+    instaPay: '',
+    sessionStartedAt: null,
+    menu: [
+      { name: 'شاي كشري', price: 15 },
+      { name: 'قهوة مظبوط', price: 25 },
+      { name: 'قهوة سادة', price: 25 },
+      { name: 'قهوة تركي دوبل', price: 35 },
+      { name: 'شيشة قص', price: 30 },
+      { name: 'سحلب بالمكسرات', price: 40 },
+      { name: 'كانز بيبسي', price: 20 },
+      { name: 'مياه معدنية', price: 10 }
+    ],
+    members: [
+      { name: 'أحمد', isPresent: true, hasLeft: false, orders: [], isPaid: false },
+      { name: 'محمود', isPresent: true, hasLeft: false, orders: [], isPaid: false },
+      { name: 'إسلام', isPresent: false, hasLeft: false, orders: [], isPaid: false },
+      { name: 'حسين', isPresent: false, hasLeft: false, orders: [], isPaid: false }
+    ],
+    history: []
+  };
+}
+
+function loadAppData(){
+  const fresh = localStorage.getItem(STORE_KEY);
+  if (fresh) {
+    try { return JSON.parse(fresh); } catch(e){ return defaultData(); }
+  }
+  const legacy = localStorage.getItem(OLD_KEY);
+  if (legacy) {
+    try {
+      const parsed = JSON.parse(legacy);
+      if (parsed.sessionStartedAt === undefined) parsed.sessionStartedAt = null;
+      return parsed;
+    } catch(e){ /* fall through */ }
+  }
+  return defaultData();
+}
+
+let appData = loadAppData();
+const userStates = {};
+let isPolling = false;
+let lastUpdateId = 0;
+let selectedPersonIndex = null;
+let sessionFilter = 'all';
+
+function saveData(){
+  localStorage.setItem(STORE_KEY, JSON.stringify(appData));
+  renderAll();
+}
+
+function renderAll(){
+  renderMembers();
+  renderMenu();
+  renderPos();
+  renderSession();
+  renderStats();
+}
+
+/* =========================================================
+   أدوات مساعدة: توست، تأكيد، تنسيق
+========================================================= */
+function toast(msg, type='info', ms=3200){
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icon = type === 'success' ? '✅' : type === 'error' ? '⚠️' : '☕';
+  el.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  stack.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = '.25s'; setTimeout(() => el.remove(), 250); }, ms);
+}
+
+let confirmResolver = null;
+function showConfirm(text, title='تأكيد'){
+  document.getElementById('confirmModalTitle').innerText = title;
+  document.getElementById('confirmModalText').innerText = text;
+  openModal('confirmModal');
+  return new Promise(resolve => { confirmResolver = resolve; });
+}
+function resolveConfirm(val){
+  closeModal('confirmModal');
+  if (confirmResolver) { confirmResolver(val); confirmResolver = null; }
+}
+
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+function initials(name){ return (name || '?').trim().charAt(0).toUpperCase(); }
+function money(n){ return `${(n||0).toFixed(2)} ج`; }
+
+function markSessionStarted(){
+  if (!appData.sessionStartedAt) appData.sessionStartedAt = Date.now();
+}
+
+function updateSessionTimer(){
+  const box = document.getElementById('sessionTimer');
+  if (!appData.sessionStartedAt) { box.style.display = 'none'; return; }
+  box.style.display = 'inline-flex';
+  const diffMin = Math.max(1, Math.floor((Date.now() - appData.sessionStartedAt) / 60000));
+  let text;
+  if (diffMin < 60) text = `القعدة شغالة من ${diffMin} دقيقة`;
+  else {
+    const h = Math.floor(diffMin / 60), m = diffMin % 60;
+    text = `القعدة شغالة من ${h} ساعة${m ? ' و' + m + ' دقيقة' : ''}`;
+  }
+  document.getElementById('sessionTimerText').innerText = text;
+}
+setInterval(updateSessionTimer, 30000);
+
+/* =========================================================
+   شلة القهوة (الأعضاء)
+========================================================= */
+function renderMembers(){
+  const list = document.getElementById('membersListUi');
+  const q = (document.getElementById('memberSearch').value || '').trim().toLowerCase();
+  list.innerHTML = '';
+  const filtered = appData.members
+    .map((m, index) => ({ m, index }))
+    .filter(({ m }) => !q || m.name.toLowerCase().includes(q));
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-hint">${appData.members.length === 0 ? 'الشلة لسه فاضية.. ضيف صاحبك الأول!' : 'مفيش حد بالاسم ده في الشلة'}</div>`;
+    return;
+  }
+
+  filtered.forEach(({ m, index }) => {
+    const li = document.createElement('li');
+    li.className = 'list-item';
+    let pillClass = 'off', pillText = 'مأنتخ';
+    if (m.isPresent && !m.hasLeft) { pillClass = 'on'; pillText = 'قاعد'; }
+    if (m.hasLeft) { pillClass = 'left'; pillText = 'حاسب ومشى'; }
+
+    li.innerHTML = `
+      <div class="item-info">
+        <div class="chip-avatar">${initials(m.name)}</div>
+        <strong title="${m.name}">${m.name}</strong>
+        <span class="status-pill ${pillClass}">${pillText}</span>
+      </div>
+      <div class="actions-group">
+        <button class="${m.isPresent && !m.hasLeft ? 'btn-mint' : 'btn-primary'} btn-xs" onclick="toggleMemberPresence(${index})">
+          ${m.isPresent && !m.hasLeft ? '✔ نوّر' : '🏃 جه'}
+        </button>
+        <button class="btn-danger btn-xs" title="مسح من الشلة" onclick="deleteMember(${index})">🗑️</button>
+      </div>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function addPermanentMember(){
+  const input = document.getElementById('newMemberName');
+  const name = input.value.trim();
+  if (!name) return toast('اكتب اسم صاحبك الأول', 'error');
+  if (appData.members.some(m => m.name.toLowerCase() === name.toLowerCase())) {
+    return toast('صاحبك ده متسجل في الشلة قبل كده!', 'error');
+  }
+  appData.members.push({ name, isPresent: true, hasLeft: false, orders: [], isPaid: false });
+  input.value = '';
+  saveData();
+  toast(`${name} اتضاف للشلة ونوّر القعدة`, 'success');
+}
+
+function toggleMemberPresence(index){
+  const member = appData.members[index];
+  if (member.hasLeft) {
+    member.hasLeft = false;
+    member.isPresent = true;
+  } else {
+    member.isPresent = !member.isPresent;
+    if (!member.isPresent) {
+      member.orders = [];
+      member.isPaid = false;
+      member.hasLeft = false;
+      if (selectedPersonIndex === index) selectedPersonIndex = null;
+    } else {
+      markSessionStarted();
+    }
+  }
+  saveData();
+}
+
+async function deleteMember(index){
+  const m = appData.members[index];
+  const ok = await showConfirm(`عايز تمسح (${m.name}) من الشلة خالص؟`, 'مسح من الشلة');
+  if (!ok) return;
+  appData.members.splice(index, 1);
+  if (selectedPersonIndex === index) selectedPersonIndex = null;
+  saveData();
+  toast('اتمسح من الشلة', 'success');
+}
+
+/* =========================================================
+   منيو المشاريب
+========================================================= */
+function renderMenu(){
+  const list = document.getElementById('menuListUi');
+  const q = (document.getElementById('menuSearch').value || '').trim().toLowerCase();
+  list.innerHTML = '';
+  document.getElementById('menuCountHint').innerText = `${appData.menu.length} صنف`;
+
+  const filtered = appData.menu
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => !q || item.name.toLowerCase().includes(q));
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-hint">${appData.menu.length === 0 ? 'المنيو فاضي.. نزّل أول مشروب!' : 'مفيش مشروب بالاسم ده'}</div>`;
+    return;
+  }
+
+  filtered.forEach(({ item, index }) => {
+    const li = document.createElement('li');
+    li.className = 'list-item';
+    li.innerHTML = `
+      <div class="item-info">
+        <strong title="${item.name}">${item.name}</strong>
+        <span class="price-badge">${item.price.toFixed(2)} ج</span>
+      </div>
+      <div class="actions-group">
+        <button class="btn-ghost btn-xs" title="تعديل" onclick="openEditItemModal(${index})">✏️</button>
+        <button class="btn-danger btn-xs" title="مسح" onclick="deleteMenuItem(${index})">🗑️</button>
+      </div>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function addOrUpdateMenuItem(){
+  const nameInput = document.getElementById('menuItemName');
+  const priceInput = document.getElementById('menuItemPrice');
+  const name = nameInput.value.trim();
+  const price = parseFloat(priceInput.value);
+  if (!name || isNaN(price) || price < 0) return toast('اكتب اسم المشروب وسعره صح يا باشا', 'error');
+
+  const existingIndex = appData.menu.findIndex(m => m.name.toLowerCase() === name.toLowerCase());
+  if (existingIndex !== -1) appData.menu[existingIndex].price = price;
+  else appData.menu.push({ name, price });
+
+  nameInput.value = '';
+  priceInput.value = '';
+  saveData();
+  toast(`${name} في المنيو دلوقتي`, 'success');
+}
+
+let editingItemIndex = null;
+function openEditItemModal(index){
+  editingItemIndex = index;
+  const item = appData.menu[index];
+  document.getElementById('editItemName').value = item.name;
+  document.getElementById('editItemPrice').value = item.price;
+  openModal('editItemModal');
+}
+document.getElementById('editItemSaveBtn').addEventListener('click', () => {
+  if (editingItemIndex === null) return;
+  const item = appData.menu[editingItemIndex];
+  const newName = document.getElementById('editItemName').value.trim();
+  const newPrice = parseFloat(document.getElementById('editItemPrice').value);
+  if (!newName) return toast('اسم المشروب مينفعش يبقى فاضي', 'error');
+  if (isNaN(newPrice) || newPrice < 0) return toast('السعر مش مظبوط', 'error');
+
+  const oldName = item.name;
+  appData.members.forEach(p => p.orders.forEach(o => { if (o.name === oldName) o.name = newName; }));
+  item.name = newName;
+  item.price = newPrice;
+  saveData();
+  closeModal('editItemModal');
+  toast('اتعدل بنجاح', 'success');
+});
+document.getElementById('editItemDeleteBtn').addEventListener('click', async () => {
+  if (editingItemIndex === null) return;
+  const item = appData.menu[editingItemIndex];
+  const ok = await showConfirm(`عايز تمسح (${item.name}) من المنيو خالص؟`, 'مسح مشروب');
+  if (!ok) return;
+  appData.menu.splice(editingItemIndex, 1);
+  saveData();
+  closeModal('editItemModal');
+  toast('اتمسح من المنيو', 'success');
+});
+
+async function deleteMenuItem(index){
+  const item = appData.menu[index];
+  const ok = await showConfirm(`عايز تمسح (${item.name}) من المنيو خالص؟`, 'مسح مشروب');
+  if (!ok) return;
+  appData.menu.splice(index, 1);
+  saveData();
+  toast('اتمسح من المنيو', 'success');
+}
+
+/* =========================================================
+   تسجيل الطلبات - نظام الضغطتين (POS)
+========================================================= */
+function renderPos(){
+  const bar = document.getElementById('posPersonBar');
+  const grid = document.getElementById('posDrinkGrid');
+  const activeMembers = appData.members
+    .map((m, idx) => ({ ...m, idx }))
+    .filter(m => m.isPresent && !m.hasLeft);
+
+  if (selectedPersonIndex !== null && !activeMembers.some(m => m.idx === selectedPersonIndex)) {
+    selectedPersonIndex = null;
+  }
+
+  if (activeMembers.length === 0) {
+    bar.innerHTML = `<span class="hint">علّم على الحاضرين من قايمة الشلة الأول عشان تقدر تسجل طلب ☝️</span>`;
+  } else if (selectedPersonIndex === null) {
+    bar.innerHTML = `<span class="hint">مين هيشرب؟</span>` + activeMembers.map(m => `
+      <button class="person-chip" onclick="selectPosPerson(${m.idx})">
+        <span class="chip-avatar">${initials(m.name)}</span>${m.name}
+      </button>
+    `).join('');
+  } else {
+    const person = appData.members[selectedPersonIndex];
+    bar.innerHTML = `
+      <div class="active-order-pill">☕ بيطلب لـ: ${person.name} <button class="btn-ghost btn-xs" onclick="selectPosPerson(null)">✕ إلغاء</button></div>
+      ` + activeMembers.filter(m => m.idx !== selectedPersonIndex).map(m => `
+        <button class="person-chip" onclick="selectPosPerson(${m.idx})"><span class="chip-avatar">${initials(m.name)}</span>${m.name}</button>
+      `).join('');
+  }
+
+  if (appData.menu.length === 0) {
+    grid.innerHTML = `<div class="empty-hint">نزّل مشروبات في المنيو الأول عشان تقدر تطلب</div>`;
+  } else {
+    grid.innerHTML = appData.menu.map((item, idx) => `
+      <button class="drink-tile" onclick="posOrder(${idx})">
+        <span class="d-name">☕ ${item.name}</span>
+        <span class="d-price">${item.price.toFixed(2)} ج</span>
+      </button>
+    `).join('');
+  }
+}
+
+function selectPosPerson(idx){
+  selectedPersonIndex = idx;
+  renderPos();
+}
+
+function posOrder(menuIndex){
+  if (selectedPersonIndex === null) return toast('اختار مين هيشرب الأول ☝️', 'error');
+  const person = appData.members[selectedPersonIndex];
+  const item = appData.menu[menuIndex];
+  if (!person || !item) return;
+  markSessionStarted();
+  person.orders.push({ name: item.name, price: item.price });
+  person.isPaid = false;
+  saveData();
+  toast(`☕ ${item.name} اتضافت لحساب ${person.name}`, 'success', 1800);
+}
+
+function addQtyOrder(personIndex, itemName){
+  const person = appData.members[personIndex];
+  const menuItem = appData.menu.find(m => m.name === itemName);
+  const price = menuItem ? menuItem.price : (person.orders.find(o => o.name === itemName) || {}).price || 0;
+  person.orders.push({ name: itemName, price });
+  person.isPaid = false;
+  saveData();
+}
+
+function removeOneOrder(personIndex, itemName){
+  const person = appData.members[personIndex];
+  const idx = person.orders.map((o, i) => ({ o, i })).reverse().find(x => x.o.name === itemName);
+  if (idx) person.orders.splice(idx.i, 1);
+  saveData();
+}
+
+/* =========================================================
+   حسابات القعدة (كروت الأشخاص)
+========================================================= */
+function togglePersonPayment(index){
+  const person = appData.members[index];
+  person.isPaid = !person.isPaid;
+  saveData();
+  toast(person.isPaid ? `${person.name} خالص ومروّق ✅` : `${person.name} رجع لسه مدفعش`, person.isPaid ? 'success' : 'info');
+}
+
+async function markPersonLeft(index){
+  const person = appData.members[index];
+  const ok = await showConfirm(`المعلم (${person.name}) هيحسب ويمشي؟ حسابه هيفضل متسجل في القعدة.`, 'حاسب ومشي');
+  if (!ok) return;
+  person.hasLeft = true;
+  person.isPaid = true;
+  if (selectedPersonIndex === index) selectedPersonIndex = null;
+  saveData();
+  toast(`${person.name} حاسب ومشى 🚶`, 'success');
+}
+
+function returnPersonToTable(index){
+  appData.members[index].hasLeft = false;
+  saveData();
+}
+
+async function transferAccountAndLeave(fromIndex){
+  const fromPerson = appData.members[fromIndex];
+  if (!fromPerson.orders || fromPerson.orders.length === 0) return toast(`المعلم (${fromPerson.name}) معندوش مشاريب أصلاً!`, 'error');
+
+  const presentOthers = appData.members
+    .map((m, idx) => (m.isPresent && !m.hasLeft && idx !== fromIndex) ? { name: m.name, idx } : null)
+    .filter(Boolean);
+
+  if (presentOthers.length === 0) return toast('مفيش حد تاني قاعد عشان يستلم الفلوس!', 'error');
+
+  const total = fromPerson.orders.reduce((s, i) => s + i.price, 0);
+  document.getElementById('transferModalText').innerText = `حساب المعلم (${fromPerson.name}) عامل ${total.toFixed(2)} ج. ساب الفلوس لمين؟`;
+  const listEl = document.getElementById('transferModalList');
+  listEl.innerHTML = presentOthers.map(p => `
+    <li class="list-item" style="cursor:pointer;" onclick="confirmTransfer(${fromIndex}, ${p.idx})">
+      <div class="item-info"><div class="chip-avatar">${initials(p.name)}</div><strong>${p.name}</strong></div>
+      <span class="btn-sky btn-xs" style="pointer-events:none;">اختار</span>
+    </li>
+  `).join('');
+  openModal('transferModal');
+}
+
+function confirmTransfer(fromIndex, toIndex){
+  const fromPerson = appData.members[fromIndex];
+  const toPerson = appData.members[toIndex];
+  const total = fromPerson.orders.reduce((s, i) => s + i.price, 0);
+
+  toPerson.orders.push(...fromPerson.orders);
+  toPerson.isPaid = false;
+  fromPerson.orders = [];
+  fromPerson.hasLeft = true;
+  fromPerson.isPaid = true;
+  if (selectedPersonIndex === fromIndex) selectedPersonIndex = null;
+
+  saveData();
+  closeModal('transferModal');
+  toast(`اتنقل حساب ${fromPerson.name} (${total.toFixed(2)} ج) لحساب ${toPerson.name}`, 'success');
+}
+
+function groupOrders(orders){
+  const counts = {};
+  orders.forEach(o => {
+    if (!counts[o.name]) counts[o.name] = { qty: 0, price: o.price };
+    counts[o.name].qty += 1;
+  });
+  return counts;
+}
+
+function renderSession(){
+  const grid = document.getElementById('peopleGridUi');
+  const tabsEl = document.getElementById('sessionFilterTabs');
+  grid.innerHTML = '';
+
+  const sessionMembers = appData.members
+    .map((m, idx) => ({ m, idx }))
+    .filter(({ m }) => m.isPresent || m.hasLeft || m.orders.length > 0);
+
+  const counts = { all: sessionMembers.length, pending: 0, paid: 0, left: 0 };
+  sessionMembers.forEach(({ m }) => {
+    if (m.hasLeft) counts.left++;
+    else if (m.isPaid) counts.paid++;
+    else counts.pending++;
+  });
+
+  const tabs = [
+    { key: 'all', label: `الكل (${counts.all})` },
+    { key: 'pending', label: `🔴 لسه مدفعش (${counts.pending})` },
+    { key: 'paid', label: `🟢 خالص (${counts.paid})` },
+    { key: 'left', label: `🚶 حاسب ومشى (${counts.left})` }
+  ];
+  tabsEl.innerHTML = tabs.map(t => `<button class="filter-tab ${sessionFilter === t.key ? 'active' : ''}" onclick="setSessionFilter('${t.key}')">${t.label}</button>`).join('');
+
+  let visible = sessionMembers;
+  if (sessionFilter === 'pending') visible = sessionMembers.filter(({ m }) => !m.hasLeft && !m.isPaid);
+  if (sessionFilter === 'paid') visible = sessionMembers.filter(({ m }) => !m.hasLeft && m.isPaid);
+  if (sessionFilter === 'left') visible = sessionMembers.filter(({ m }) => m.hasLeft);
+
+  // رتب: مدفعش الأول، بعدين خالص، بعدين اللي مشوا
+  visible = visible.slice().sort((a, b) => {
+    const rank = p => p.m.hasLeft ? 2 : (p.m.isPaid ? 1 : 0);
+    return rank(a) - rank(b);
+  });
+
+  if (sessionMembers.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:36px 0;">مفيش حد قاعد ع القهوة دلوقتي.. علّم على اللي حضروا من قايمة الشلة على الجنب!</div>`;
+    return;
+  }
+  if (visible.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:36px 0;">مفيش حد في القسم ده دلوقتي</div>`;
+    return;
+  }
+
+  visible.forEach(({ m: person, idx: pIndex }) => {
+    const total = person.orders.reduce((sum, item) => sum + item.price, 0);
+    const isPaid = person.isPaid || false;
+    const hasLeft = person.hasLeft || false;
+
+    let badgeHtml = `<span class="payment-badge badge-pending">🔴 لسه مدفعش</span>`;
+    let stampHtml = '';
+    if (hasLeft) { badgeHtml = `<span class="payment-badge badge-left">🚶 حاسب ومشى</span>`; stampHtml = `<div class="stamp sky">حاسب ومشى</div>`; }
+    else if (isPaid) { badgeHtml = `<span class="payment-badge badge-paid">🟢 خالص ومروّق</span>`; stampHtml = `<div class="stamp mint">مدفوع ✓</div>`; }
+
+    const grouped = groupOrders(person.orders);
+    const orderRows = Object.entries(grouped).map(([name, d]) => `
+      <li class="order-item">
+        <span>☕ ${name} <strong>(${(d.qty * d.price).toFixed(2)} ج)</strong></span>
+        ${!hasLeft ? `
+          <div class="qty-ctrl">
+            <button onclick="removeOneOrder(${pIndex}, '${name.replace(/'/g, "\\'")}')">−</button>
+            <span>${d.qty}</span>
+            <button onclick="addQtyOrder(${pIndex}, '${name.replace(/'/g, "\\'")}')">+</button>
+          </div>` : `<span>×${d.qty}</span>`}
+      </li>
+    `).join('');
+
+    const card = document.createElement('div');
+    card.className = `person-card ${isPaid ? 'paid' : ''} ${hasLeft ? 'left' : ''}`;
+    card.innerHTML = `
+      ${stampHtml}
+      <div class="person-header">
+        <span class="person-name"><span class="chip-avatar">${initials(person.name)}</span>${person.name}</span>
+        ${badgeHtml}
+      </div>
+      <ul class="order-list">
+        ${person.orders.length === 0 ? '<li style="color:var(--text-faint);">منزلش مشاريب لسه</li>' : orderRows}
+      </ul>
+      <div class="person-total-box">
+        <div class="person-total"><span>حسابه:</span><span>${money(total)}</span></div>
+        <div class="payment-actions">
+          ${!hasLeft ? `
+            <button class="${isPaid ? 'btn-ghost' : 'btn-mint'} btn-sm" onclick="togglePersonPayment(${pIndex})">${isPaid ? '↩️ رجعه مدفعش' : '✅ دفع وخالص'}</button>
+            <button class="btn-sky btn-sm" onclick="transferAccountAndLeave(${pIndex})">💸 ساب فلوسه لحد</button>
+            <button class="btn-danger btn-sm" onclick="markPersonLeft(${pIndex})">🚶 حاسب ومشي</button>
+          ` : `
+            <button class="btn-primary btn-sm" style="flex:1 1 100%;" onclick="returnPersonToTable(${pIndex})">↩️ رجع قعد تاني ع الترابيزة</button>
+          `}
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function setSessionFilter(key){ sessionFilter = key; renderSession(); }
+
+/* =========================================================
+   الإحصائيات (لوحة التالي)
+========================================================= */
+function renderStats(){
+  let grandTotal = 0, collectedTotal = 0;
+  const drinkCounts = {};
+  const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+  const presentCount = appData.members.filter(m => m.isPresent && !m.hasLeft).length;
+
+  sessionMembers.forEach(person => {
+    const pTotal = person.orders.reduce((sum, item) => sum + item.price, 0);
+    grandTotal += pTotal;
+    if (person.isPaid || person.hasLeft) collectedTotal += pTotal;
+    person.orders.forEach(o => { drinkCounts[o.name] = (drinkCounts[o.name] || 0) + 1; });
+  });
+
+  const remaining = grandTotal - collectedTotal;
+  let topDrink = '-', topDrinkCount = 0;
+  Object.entries(drinkCounts).forEach(([name, count]) => { if (count > topDrinkCount) { topDrinkCount = count; topDrink = `${name} (${count})`; } });
+
+  const splitCount = sessionMembers.length;
+  const perHead = splitCount > 0 ? grandTotal / splitCount : 0;
+
+  const board = document.getElementById('statsBoard');
+  board.innerHTML = `
+    <div class="stat-pin"><div class="stat-label">حساب الطاولة كلها</div><div class="stat-val brass">${money(grandTotal)}</div></div>
+    <div class="stat-pin"><div class="stat-label">الفلوس اللي اتلمت</div><div class="stat-val mint">${money(collectedTotal)}</div></div>
+    <div class="stat-pin"><div class="stat-label">لسه في ذمة الشباب</div><div class="stat-val danger">${money(remaining)}</div></div>
+    <div class="stat-pin"><div class="stat-label">عدد الحاضرين دلوقتي</div><div class="stat-val">${presentCount}</div></div>
+    <div class="stat-pin"><div class="stat-label">مشروب القعدة الرسمي</div><div class="stat-val">${topDrink}</div></div>
+    <div class="stat-pin"><div class="stat-label">لو هتقسموها بالتساوي</div><div class="stat-val sky">${money(perHead)} / فرد</div></div>
+  `;
+  updateSessionTimer();
+}
+
+/* =========================================================
+   أرشيف القعدات
+========================================================= */
+function openHistoryModal(){
+  const body = document.getElementById('historyModalBody');
+  body.innerHTML = '';
+  if (!appData.history || appData.history.length === 0) {
+    body.innerHTML = `<div class="empty-hint">لا يوجد قعدات مؤرشفة حتى الآن.</div>`;
+  } else {
+    appData.history.slice().reverse().forEach((session, idx) => {
+      const realIdx = appData.history.length - 1 - idx;
+      const card = document.createElement('div');
+      card.className = 'history-card';
+      const membersDetails = session.members.map(m => {
+        const total = m.orders.reduce((s, i) => s + i.price, 0);
+        const ordersStr = m.orders.map(o => `${o.name} (${o.price}ج)`).join('، ') || 'بدون مشاريب';
+        return `<div style="font-size:.82rem;color:var(--text-dim);">• <strong>${m.name}</strong> (${total.toFixed(2)} ج): ${ordersStr}</div>`;
+      }).join('');
+      card.innerHTML = `
+        <div class="history-card-header"><span>📅 ${session.date}</span><span style="color:var(--brass-hover);">إجمالي: ${session.grandTotal.toFixed(2)} ج</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin:4px 0;">${membersDetails}</div>
+        <div style="display:flex;justify-content:flex-end;"><button class="btn-danger btn-xs" onclick="deleteHistoryItem(${realIdx})">🗑️ حذف من السجل</button></div>
+      `;
+      body.appendChild(card);
+    });
+  }
+  openModal('historyModal');
+}
+
+async function deleteHistoryItem(index){
+  const ok = await showConfirm('حذف هذه القعدة من الأرشيف نهائياً؟', 'حذف من الأرشيف');
+  if (!ok) return;
+  appData.history.splice(index, 1);
+  saveData();
+  openHistoryModal();
+}
+
+async function resetSessionOrders(){
+  const activeSessionMembers = appData.members.filter(m => (m.isPresent || m.hasLeft) && m.orders.length > 0);
+  const ok = await showConfirm('هل تريد أرشفة القعدة الحالية وبدء قعدة جديدة؟ (هيتصفروا المشاريب وتتحفظ في السجل)', 'قعدة جديدة');
+  if (!ok) return;
+
+  if (activeSessionMembers.length > 0) {
+    const grandTotal = activeSessionMembers.reduce((sum, m) => sum + m.orders.reduce((s, o) => s + o.price, 0), 0);
+    if (!appData.history) appData.history = [];
+    appData.history.push({
+      date: new Date().toLocaleString('ar-EG'),
+      grandTotal,
+      members: JSON.parse(JSON.stringify(activeSessionMembers))
+    });
+  }
+
+  appData.members.forEach(m => { m.orders = []; m.isPaid = false; m.hasLeft = false; });
+  appData.sessionStartedAt = null;
+  selectedPersonIndex = null;
+  saveData();
+  toast('اتأرشفت القعدة وجاهزين لقعدة جديدة! ☕', 'success');
+}
+
+/* =========================================================
+   الشيك (الفاتورة) - PDF / صورة / نص
+========================================================= */
+function populateBillData(){
+  const container = document.getElementById('billItemsContainer');
+  container.innerHTML = '';
+  let grandTotal = 0, paidTotal = 0;
+  const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+
+  document.getElementById('billInvoiceNo').innerText = `رقم الشيك: #${Math.floor(1000 + Math.random() * 9000)}`;
+  document.getElementById('billDateText').innerText = `التاريخ: ${new Date().toLocaleString('ar-EG')}`;
+
+  sessionMembers.forEach(p => {
+    const total = p.orders.reduce((s, i) => s + i.price, 0);
+    grandTotal += total;
+    if (p.isPaid || p.hasLeft) paidTotal += total;
+
+    const counts = groupOrders(p.orders);
+    let tableRows = Object.entries(counts).map(([name, d]) => `
+      <tr><td>${name}</td><td style="text-align:center;">${d.qty}</td><td style="text-align:center;">${d.price.toFixed(2)}</td><td style="text-align:left;font-weight:700;">${(d.qty * d.price).toFixed(2)} ج</td></tr>
+    `).join('');
+    if (!tableRows) tableRows = `<tr><td colspan="4" style="text-align:center;color:#a3906a;">منزلش مشاريب لسه</td></tr>`;
+
+    let statusTag = `<span style="color:#b6472f;font-size:.78rem;background:#fbe1da;padding:2px 8px;border-radius:4px;">🔴 متبقي عليه</span>`;
+    let stampHtml = '';
+    if (p.hasLeft) { statusTag = `<span style="color:#8a7550;font-size:.78rem;background:#efe6d0;padding:2px 8px;border-radius:4px;">🚶 حاسب ومشى</span>`; stampHtml = `<div class="bill-stamp left">حاسب ومشى</div>`; }
+    else if (p.isPaid) { statusTag = `<span style="color:#3d7a5f;font-size:.78rem;background:#dcf0e6;padding:2px 8px;border-radius:4px;">🟢 خالص ومسدد</span>`; stampHtml = `<div class="bill-stamp paid">مدفوع ✓</div>`; }
+
+    const personDiv = document.createElement('div');
+    personDiv.className = 'bill-person-section';
+    personDiv.innerHTML = `
+      ${stampHtml}
+      <div class="bill-person-header"><span>👤 المعلم ${p.name} ${statusTag}</span><span style="color:#2c2113;">${total.toFixed(2)} ج</span></div>
+      <table class="bill-table"><thead><tr><th>المشروب</th><th style="text-align:center;">العدد</th><th style="text-align:center;">السعر</th><th style="text-align:left;">الإجمالي</th></tr></thead><tbody>${tableRows}</tbody></table>
+    `;
+    container.appendChild(personDiv);
+  });
+
+  const remainTotal = grandTotal - paidTotal;
+  document.getElementById('billTotalAmountText').innerText = money(grandTotal);
+  document.getElementById('billPaidAmountText').innerText = money(paidTotal);
+  document.getElementById('billRemainAmountText').innerText = money(remainTotal);
+  document.getElementById('billGrandTotalText').innerText = money(grandTotal);
+
+  const instaBox = document.getElementById('billInstaPayBox');
+  if (appData.instaPay) { instaBox.style.display = 'block'; instaBox.innerHTML = `📱 حول فلوسك إنستاباي على: <strong>${appData.instaPay}</strong>`; }
+  else instaBox.style.display = 'none';
+}
+
+async function exportBillImage(){
+  const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+  if (sessionMembers.length === 0) return toast('مفيش حد في القعدة!', 'error');
+  populateBillData();
+  const target = document.getElementById('billCaptureTarget');
+  target.style.top = '0'; target.style.left = '0';
+  try {
+    const canvas = await html2canvas(target, { backgroundColor: '#f3e6c8', scale: 2 });
+    target.style.top = '-9999px'; target.style.left = '-9999px';
+    const link = document.createElement('a');
+    link.download = `شيك_القهوة_${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('اتحفظت الصورة! 🖼️', 'success');
+  } catch (err) {
+    target.style.top = '-9999px'; target.style.left = '-9999px';
+    toast('حصلت مشكلة في عمل الصورة: ' + err.message, 'error');
+  }
+}
+
+async function exportBillPdf(){
+  const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+  if (sessionMembers.length === 0) return toast('مفيش حد في القعدة!', 'error');
+  populateBillData();
+  const target = document.getElementById('billCaptureTarget');
+  target.style.top = '0'; target.style.left = '0';
+  try {
+    const canvas = await html2canvas(target, { backgroundColor: '#f3e6c8', scale: 2 });
+    target.style.top = '-9999px'; target.style.left = '-9999px';
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdfWidth = 140;
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pdfWidth, pdfHeight] });
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`شيك_القهوة_${Date.now()}.pdf`);
+    toast('اتحفظ الـ PDF! 📄', 'success');
+  } catch (err) {
+    target.style.top = '-9999px'; target.style.left = '-9999px';
+    toast('حصلت مشكلة في عمل الـ PDF: ' + err.message, 'error');
+  }
+}
+
+async function sendPdfToTelegram(chatId){
+  const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+  if (sessionMembers.length === 0) { await sendTelegramMessage(chatId, '❌ مفيش مشاريب مسجلة في القعدة دلوقتي.'); return; }
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) return;
+  await sendTelegramMessage(chatId, '⏳ دقيقة واحدة.. بنرفعلك الشيك PDF...');
+  populateBillData();
+  const target = document.getElementById('billCaptureTarget');
+  target.style.top = '0'; target.style.left = '0';
+  try {
+    const canvas = await html2canvas(target, { backgroundColor: '#f3e6c8', scale: 2 });
+    target.style.top = '-9999px'; target.style.left = '-9999px';
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdfWidth = 140;
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pdfWidth, pdfHeight] });
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    const pdfBlob = pdf.output('blob');
+    const formData = new FormData();
+    formData.append('chat_id', chatId);
+    formData.append('document', pdfBlob, `شيك_القهوة_${Date.now()}.pdf`);
+    formData.append('caption', '📄 شيك حساب القعدة الرسمي المعتمد يا رجالة! ☕');
+    await fetch(`https://api.telegram.org/bot${token}/sendDocument`, { method: 'POST', body: formData });
+  } catch (err) {
+    target.style.top = '-9999px'; target.style.left = '-9999px';
+    await sendTelegramMessage(chatId, '❌ حصل عطل وإحنا بنبعت ملف الـ PDF.');
+  }
+}
+
+function generateSessionSummaryText(){
+  const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+  if (sessionMembers.length === 0) return 'مفيش حد في القعدة حالياً.';
+
+  let grandTotal = 0, paidTotal = 0;
+  let report = `🧾 *شيك وكشف حساب قعدة القهوة* ☕\n📅 التاريخ: ${new Date().toLocaleDateString('ar-EG')}\n━━━━━━━━━━━━━━━━━━\n\n`;
+
+  sessionMembers.forEach(p => {
+    const total = p.orders.reduce((sum, item) => sum + item.price, 0);
+    grandTotal += total;
+    if (p.isPaid || p.hasLeft) paidTotal += total;
+    const counts = groupOrders(p.orders);
+    const details = Object.entries(counts).map(([name, data]) => `  ├ ☕ ${name} : ${data.qty} × ${data.price} = *${(data.qty * data.price).toFixed(2)} ج*`).join('\n');
+    let statusTag = '🔴 [مطلوب منه]';
+    if (p.hasLeft) statusTag = '🚶 [حاسب ومشي]';
+    else if (p.isPaid) statusTag = '🟢 [خالص ومروّق]';
+    report += `👤 *المعلم ${p.name}* ${statusTag}\n${details || '  ├ منزلوش مشاريب'}\n  └ 💵 حسابه: *${total.toFixed(2)} جنيه*\n\n`;
+  });
+
+  const remainTotal = grandTotal - paidTotal;
+  const splitCount = sessionMembers.length;
+  report += `━━━━━━━━━━━━━━━━━━\n📊 *ملخص حساب الترابيزة كلها:*\n• الحساب الكلي: *${grandTotal.toFixed(2)} ج*\n• اللي اتلم: *${paidTotal.toFixed(2)} ج*\n• اللي لسه في ذمة الحبايب: *${remainTotal.toFixed(2)} ج*\n• لو قسمتوها بالتساوي: *${(splitCount ? grandTotal / splitCount : 0).toFixed(2)} ج* للفرد\n`;
+
+  if (appData.instaPay) report += `\n📱 *حول فلوسك إنستاباي على:*\n\`${appData.instaPay}\`\n`;
+  return report;
+}
+
+function copySessionSummary(){
+  navigator.clipboard.writeText(generateSessionSummaryText()).then(() => toast('اتنسخ الشيك، جاهز تشيره على الواتس! 📋', 'success'))
+    .catch(() => toast('مقدرناش ننسخ، جرب تاني', 'error'));
+}
+
+/* =========================================================
+   الإعدادات المتقدمة: إنستاباي والنسخ الاحتياطي
+========================================================= */
+function openSettingsModal(){
+  document.getElementById('instaPayAccount').value = appData.instaPay || '';
+  document.getElementById('botToken').value = appData.botToken || '';
+  openModal('settingsModal');
+}
+
+function saveInstaPay(){
+  const val = document.getElementById('instaPayAccount').value.trim();
+  appData.instaPay = val;
+  saveData();
+  toast(val ? `اتحفظ عنوان إنستاباي: ${val}` : 'اتمسح عنوان إنستاباي', 'success');
+}
+
+function copyInstaPay(){
+  const val = document.getElementById('instaPayAccount').value.trim();
+  if (!val) return toast('معندكش عنوان إنستاباي متسجل', 'error');
+  navigator.clipboard.writeText(val).then(() => toast('اتنسخ عنوان الإنستاباي', 'success'));
+}
+
+function exportDataJson(){
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", `داتا_القهوة_${Date.now()}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+  toast('اتحفظت نسخة احتياطية 💾', 'success');
+}
+
+function importDataJson(event){
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.menu && imported.members) {
+        if (imported.sessionStartedAt === undefined) imported.sessionStartedAt = null;
+        appData = imported;
+        saveData();
+        toast('رجّعنا كل الداتا والأرشيف بنجاح!', 'success');
+      } else {
+        toast('الملف ده مش نسخة بيانات صحيحة', 'error');
+      }
+    } catch (err) { toast('الملف فيه مشكلة', 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+/* =========================================================
+   محرك بوت تيليجرام
+========================================================= */
+function log(msg){
+  const logBox = document.getElementById('botLog');
+  const time = new Date().toLocaleTimeString('ar-EG');
+  logBox.innerHTML = `[${time}] ${msg}<br>` + logBox.innerHTML;
+}
+
+async function sendTelegramMessage(chatId, text, replyMarkup = null){
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) return;
+  const payload = { chat_id: chatId, text, parse_mode: 'Markdown' };
+  if (replyMarkup) payload.reply_markup = replyMarkup;
+  try { await fetch(`https://api.telegram.org/bot${token}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
+}
+
+async function editTelegramMessage(chatId, messageId, text, replyMarkup = null){
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) return;
+  const payload = { chat_id: chatId, message_id: messageId, text, parse_mode: 'Markdown' };
+  if (replyMarkup) payload.reply_markup = replyMarkup;
+  try { await fetch(`https://api.telegram.org/bot${token}/editMessageText`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
+}
+
+async function answerCallbackQuery(callbackQueryId, text = '', showAlert = false){
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) return;
+  try { fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ callback_query_id: callbackQueryId, text, show_alert: showAlert }) }); } catch (err) {}
+}
+
+function getPersistentReplyKeyboard(){
+  return {
+    keyboard: [
+      [{ text: '👥 مين قاعد ومين مأنتخ؟' }, { text: '📜 منيو المشاريب' }],
+      [{ text: '💰 كشوفات حساب الشباب' }, { text: '☕ اطلب مشروب لمعلم' }],
+      [{ text: '💸 ساب فلوسه لحد ومشي' }, { text: '📚 سجل القعدات القديمة' }],
+      [{ text: '📄 ابعتلي الشيك PDF' }, { text: '🧾 شيك القعدة نصياً' }]
+    ],
+    resize_keyboard: true
+  };
+}
+
+function getMainMenuInline(){
+  return {
+    inline_keyboard: [
+      [{ text: '👥 كشف الحضور', callback_data: 'nav_presence' }, { text: '📜 منيو المشاريب', callback_data: 'nav_menu' }],
+      [{ text: '💰 كشوفات الحساب', callback_data: 'nav_checks' }, { text: '☕ اطلب مشروب', callback_data: 'nav_order' }],
+      [{ text: '💸 ساب فلوسه لحد', callback_data: 'nav_trans_all_from' }, { text: '📚 أرشيف القعدات', callback_data: 'nav_history' }],
+      [{ text: '⚙️ تظبيط المنيو', callback_data: 'nav_manage_menu' }, { text: '📄 شيك القعدة PDF', callback_data: 'nav_send_pdf' }]
+    ]
+  };
+}
+
+function getPresenceInline(){
+  const keyboard = [];
+  for (let i = 0; i < appData.members.length; i += 2) {
+    const m1 = appData.members[i];
+    let tag1 = '⚪'; if (m1.isPresent && !m1.hasLeft) tag1 = '🟢'; if (m1.hasLeft) tag1 = '🚶';
+    const row = [{ text: `${tag1} ${m1.name}`, callback_data: `togp_${i}` }];
+    if (i + 1 < appData.members.length) {
+      const m2 = appData.members[i + 1];
+      let tag2 = '⚪'; if (m2.isPresent && !m2.hasLeft) tag2 = '🟢'; if (m2.hasLeft) tag2 = '🚶';
+      row.push({ text: `${tag2} ${m2.name}`, callback_data: `togp_${i + 1}` });
+    }
+    keyboard.push(row);
+  }
+  keyboard.push([{ text: '🔙 رجوع للقائمة الرئيسية', callback_data: 'nav_main' }]);
+  return { inline_keyboard: keyboard };
+}
+
+function getMenuInline(){
+  const keyboard = [];
+  for (let i = 0; i < appData.menu.length; i += 2) {
+    const item1 = appData.menu[i];
+    const row = [{ text: `☕ ${item1.name} (${item1.price} ج)`, callback_data: `price_${i}` }];
+    if (i + 1 < appData.menu.length) {
+      const item2 = appData.menu[i + 1];
+      row.push({ text: `☕ ${item2.name} (${item2.price} ج)`, callback_data: `price_${i + 1}` });
+    }
+    keyboard.push(row);
+  }
+  keyboard.push([{ text: '🔙 رجوع للقائمة الرئيسية', callback_data: 'nav_main' }]);
+  return { inline_keyboard: keyboard };
+}
+
+function getChecksInline(){
+  const keyboard = [];
+  const sessionMembers = appData.members.map((m, idx) => ({ ...m, origIdx: idx })).filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+  for (let i = 0; i < sessionMembers.length; i += 2) {
+    const p1 = sessionMembers[i];
+    let tag1 = '🔴'; if (p1.hasLeft) tag1 = '🚶'; else if (p1.isPaid) tag1 = '🟢';
+    const row = [{ text: `${tag1} ${p1.name}`, callback_data: `check_${p1.origIdx}` }];
+    if (i + 1 < sessionMembers.length) {
+      const p2 = sessionMembers[i + 1];
+      let tag2 = '🔴'; if (p2.hasLeft) tag2 = '🚶'; else if (p2.isPaid) tag2 = '🟢';
+      row.push({ text: `${tag2} ${p2.name}`, callback_data: `check_${p2.origIdx}` });
+    }
+    keyboard.push(row);
+  }
+  keyboard.push([{ text: '🔙 رجوع للقائمة الرئيسية', callback_data: 'nav_main' }]);
+  return { inline_keyboard: keyboard };
+}
+
+function getManageMenuInline(){
+  const keyboard = [];
+  for (let i = 0; i < appData.menu.length; i++) {
+    const item = appData.menu[i];
+    keyboard.push([{ text: `✏️ ${item.name} (${item.price} ج)`, callback_data: `itemopt_${i}` }]);
+  }
+  keyboard.push([{ text: '🔙 رجوع للقائمة الرئيسية', callback_data: 'nav_main' }]);
+  return { inline_keyboard: keyboard };
+}
+
+async function handleCallbackQuery(cb){
+  const chatId = cb.message.chat.id;
+  const messageId = cb.message.message_id;
+  const data = cb.data;
+
+  if (data.startsWith('togp_')) {
+    const idx = parseInt(data.split('_')[1]);
+    const member = appData.members[idx];
+    if (member) {
+      if (member.hasLeft) { member.hasLeft = false; member.isPresent = true; }
+      else {
+        member.isPresent = !member.isPresent;
+        if (!member.isPresent) { member.orders = []; member.isPaid = false; member.hasLeft = false; }
+        else markSessionStarted();
+      }
+      saveData();
+      answerCallbackQuery(cb.id, `${member.name}: ${member.isPresent ? '🟢 نوّر القعدة' : '⚪ مأنتخ'}`);
+      editTelegramMessage(chatId, messageId, '👥 *كشف حضور وغياب الشلة:*\n\n🟢 = قاعد ومنوّر\n⚪ = مأنتخ\n🚶 = حاسب ومشي\n\nاضغط لتغيير الحالة فوراً:', getPresenceInline());
+    }
+    return;
+  }
+
+  answerCallbackQuery(cb.id);
+
+  if (data === 'nav_main') { editTelegramMessage(chatId, messageId, '☕ أهلاً بيك يا كبير في دفتر قعدتنا!\nاختار اللي محتاجه:', getMainMenuInline()); return; }
+
+  if (data === 'nav_history') {
+    if (!appData.history || appData.history.length === 0) {
+      editTelegramMessage(chatId, messageId, '❌ مفيش أي قعدات متسجلة في الأرشيف لحد دلوقتي.', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+      return;
+    }
+    let histTxt = `📚 *أرشيف وسجل آخر القعدات:*\n\n`;
+    appData.history.slice(-5).reverse().forEach((h) => { histTxt += `🗓️ *${h.date}*\n💵 إجمالي الحساب: *${h.grandTotal.toFixed(2)} ج*\n👥 الحاضرين: ${h.members.map(m => m.name).join('، ')}\n━━━━━━━━━━━━━━\n`; });
+    editTelegramMessage(chatId, messageId, histTxt, { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+    return;
+  }
+
+  if (data === 'nav_presence') { editTelegramMessage(chatId, messageId, '👥 *كشف حضور وغياب الشلة:*\n\n🟢 = قاعد ومنوّر\n⚪ = مأنتخ\n🚶 = حاسب ومشي\n\nاضغط لتغيير الحالة فوراً:', getPresenceInline()); return; }
+
+  if (data === 'nav_menu') { editTelegramMessage(chatId, messageId, '📜 قائمة المنيو والأسعار يا باشا:', getMenuInline()); return; }
+
+  if (data.startsWith('price_')) {
+    const index = parseInt(data.split('_')[1]);
+    const item = appData.menu[index];
+    if (item) editTelegramMessage(chatId, messageId, `☕ مشروب: *${item.name}*\n💵 سعره: *${item.price.toFixed(2)} جنيه* يا غالي.`, { inline_keyboard: [[{ text: '🔙 رجوع للمنيو', callback_data: 'nav_menu' }], [{ text: '🏠 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+    return;
+  }
+
+  if (data === 'nav_trans_all_from') {
+    const presentWithOrders = appData.members.map((m, idx) => (m.isPresent && !m.hasLeft && m.orders.length > 0) ? { ...m, origIdx: idx } : null).filter(Boolean);
+    if (presentWithOrders.length === 0) { editTelegramMessage(chatId, messageId, '❌ مفيش حد قاعد وعنده مشاريب عشان يسيب فلوسها لحد!', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
+    const keyboard = presentWithOrders.map(p => { const total = p.orders.reduce((s, i) => s + i.price, 0); return [{ text: `🧔 ${p.name} (حسابه ${total} ج)`, callback_data: `tr_all_from_${p.origIdx}` }]; });
+    keyboard.push([{ text: '🔙 إلغاء', callback_data: 'nav_main' }]);
+    editTelegramMessage(chatId, messageId, '💸 *مين المعلم اللي هيمشي ويسيب حسابه لحد في القعدة؟*', { inline_keyboard: keyboard });
+    return;
+  }
+
+  if (data.startsWith('tr_all_from_')) {
+    const fromIdx = parseInt(data.split('_')[3]);
+    const fromPerson = appData.members[fromIdx];
+    const fromTotal = fromPerson.orders.reduce((s, i) => s + i.price, 0);
+    const presentOthers = appData.members.map((m, idx) => (m.isPresent && !m.hasLeft && idx !== fromIdx) ? { ...m, origIdx: idx } : null).filter(Boolean);
+    if (presentOthers.length === 0) { editTelegramMessage(chatId, messageId, '❌ مفيش حد تاني قاعد عشان يستلم الفلوس!', { inline_keyboard: [[{ text: '🔙 رجوع', callback_data: 'nav_trans_all_from' }]] }); return; }
+    const keyboard = presentOthers.map(p => [{ text: `🧔 حط الحساب على: ${p.name}`, callback_data: `tr_all_to_${fromIdx}_${p.origIdx}` }]);
+    keyboard.push([{ text: '🔙 إلغاء', callback_data: 'nav_main' }]);
+    editTelegramMessage(chatId, messageId, `💸 حساب المعلم *${fromPerson.name}* عامل *${fromTotal} ج*.\n\nمين اللي هيستلم الفلوس ويشيل الحساب بداله؟`, { inline_keyboard: keyboard });
+    return;
+  }
+
+  if (data.startsWith('tr_all_to_')) {
+    const [, , , fromIdx, toIdx] = data.split('_').map(Number);
+    const fromPerson = appData.members[fromIdx];
+    const toPerson = appData.members[toIdx];
+    if (fromPerson && toPerson) {
+      const total = fromPerson.orders.reduce((s, i) => s + i.price, 0);
+      toPerson.orders.push(...fromPerson.orders);
+      toPerson.isPaid = false;
+      fromPerson.orders = [];
+      fromPerson.hasLeft = true;
+      fromPerson.isPaid = true;
+      saveData();
+      editTelegramMessage(chatId, messageId, `✅ *تمام يا باشا!*\n\nتم نقل حساب المعلم *${fromPerson.name}* بالكامل (*${total} ج*) لحساب المعلم *${toPerson.name}*، والمعلم *${fromPerson.name}* مشي ونوّر القعدة!`, { inline_keyboard: [[{ text: '💰 كشوفات الحساب', callback_data: 'nav_checks' }], [{ text: '🏠 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+    }
+    return;
+  }
+
+  if (data === 'nav_manage_menu') {
+    if (appData.menu.length === 0) { editTelegramMessage(chatId, messageId, '❌ المنيو فاضي حالياً.', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
+    editTelegramMessage(chatId, messageId, '⚙️ اختار المشروب اللي عايز تعدل اسمه أو سعره أو تمسحه خالص:', getManageMenuInline());
+    return;
+  }
+
+  if (data.startsWith('itemopt_')) {
+    const index = parseInt(data.split('_')[1]);
+    const item = appData.menu[index];
+    if (item) editTelegramMessage(chatId, messageId, `☕ المشروب: *${item.name}*\n💵 السعر: *${item.price} ج*\n\nعايز تعمل فيه إيه؟`, { inline_keyboard: [[{ text: '✏️ عدل السعر', callback_data: `editp_${index}` }, { text: '📝 عدل الاسم', callback_data: `editn_${index}` }], [{ text: '🗑️ امسحه خالص', callback_data: `delitem_${index}` }], [{ text: '🔙 رجوع لقائمة المنيو', callback_data: 'nav_manage_menu' }]] });
+    return;
+  }
+
+  if (data.startsWith('editp_')) {
+    const index = parseInt(data.split('_')[1]);
+    const item = appData.menu[index];
+    if (item) { userStates[chatId] = { action: 'WAITING_EDIT_PRICE', itemIndex: index }; editTelegramMessage(chatId, messageId, `✏️ تعديل سعر *${item.name}*\n\n✍️ ابعتلي دلوقتي *السعر الجديد* بكام جنيه؟ (أرقام بس):`); }
+    return;
+  }
+
+  if (data.startsWith('editn_')) {
+    const index = parseInt(data.split('_')[1]);
+    const item = appData.menu[index];
+    if (item) { userStates[chatId] = { action: 'WAITING_EDIT_NAME', itemIndex: index }; editTelegramMessage(chatId, messageId, `📝 تعديل اسم *${item.name}*\n\n✍️ ابعتلي دلوقتي *الاسم الجديد* في رسالة:`); }
+    return;
+  }
+
+  if (data.startsWith('delitem_')) {
+    const index = parseInt(data.split('_')[1]);
+    const item = appData.menu[index];
+    if (item) {
+      const deletedName = item.name;
+      appData.menu.splice(index, 1);
+      saveData();
+      editTelegramMessage(chatId, messageId, `🗑️ مسحنا *${deletedName}* خالص من المنيو!`, { inline_keyboard: [[{ text: '⚙️ إدارة المنيو', callback_data: 'nav_manage_menu' }], [{ text: '🏠 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+    }
+    return;
+  }
+
+  if (data === 'nav_checks') {
+    const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+    if (sessionMembers.length === 0) { editTelegramMessage(chatId, messageId, '❌ مفيش حد في القعدة دلوقتي.', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
+    editTelegramMessage(chatId, messageId, '💰 اختار اسم المعلم عشان تشوف حسابه ومشاريبه:', getChecksInline());
+    return;
+  }
+
+  if (data.startsWith('check_')) {
+    const index = parseInt(data.split('_')[1]);
+    const person = appData.members[index];
+    if (person) {
+      const total = person.orders.reduce((s, i) => s + i.price, 0);
+      const counts = groupOrders(person.orders);
+      const summary = Object.entries(counts).map(([name, d]) => `• ${name} : (${d.qty} × ${d.price} ج) = *${(d.qty * d.price).toFixed(2)} ج*`).join('\n');
+      let statusTag = '🔴 لسه مدفعش';
+      if (person.hasLeft) statusTag = '🚶 حاسب ومشي'; else if (person.isPaid) statusTag = '🟢 دافع وخالص ومروّق';
+      let replyText = `📋 كشف حساب المعلم: *${person.name}*\nحالة الدفع: *${statusTag}*\n\n${summary || '• منزلوش أي مشاريب خالص'}\n\n💵 حسابه كله: *${total.toFixed(2)} جنيه*`;
+      const actionButtons = [];
+      if (!person.hasLeft) actionButtons.push([{ text: person.isPaid ? '↩️ رجعه لسه مدفعش' : '✅ علم عليه إنه دفع وخالص', callback_data: `payperson_${index}` }]);
+      if (appData.instaPay) {
+        replyText += `\n\n📱 حساب InstaPay للدفع:\n\`${appData.instaPay}\``;
+        if (appData.instaPay.startsWith('http')) actionButtons.push([{ text: `💳 ادفع ${total} ج بـ InstaPay`, url: appData.instaPay }]);
+      }
+      actionButtons.push([{ text: '🔙 رجوع لكشف الحسابات', callback_data: 'nav_checks' }, { text: '🏠 الرئيسية', callback_data: 'nav_main' }]);
+      editTelegramMessage(chatId, messageId, replyText, { inline_keyboard: actionButtons });
+    }
+    return;
+  }
+
+  if (data.startsWith('payperson_')) {
+    const index = parseInt(data.split('_')[1]);
+    const person = appData.members[index];
+    if (person) {
+      person.isPaid = !person.isPaid;
+      saveData();
+      const statusMsg = person.isPaid ? `✅ تمام! تم تأكيد دفع حساب *${person.name}* وخصمه من باقي الفلوس.` : `⚠️ تم إرجاع حساب *${person.name}* لمطلوب دفعه.`;
+      editTelegramMessage(chatId, messageId, statusMsg, { inline_keyboard: [[{ text: '💰 رجوع لحسابه', callback_data: `check_${index}` }], [{ text: '🏠 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+    }
+    return;
+  }
+
+  if (data === 'nav_send_pdf') { sendPdfToTelegram(chatId); return; }
+
+  if (data === 'nav_export_bill') {
+    const bill = generateSessionSummaryText();
+    editTelegramMessage(chatId, messageId, bill, { inline_keyboard: [[{ text: '📄 ابعتلي الشيك كملف PDF', callback_data: 'nav_send_pdf' }], [{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+    return;
+  }
+
+  if (data === 'nav_order') {
+    const presentMembers = appData.members.map((m, idx) => ({ ...m, origIdx: idx })).filter(m => m.isPresent && !m.hasLeft);
+    if (presentMembers.length === 0) { editTelegramMessage(chatId, messageId, '❌ مفيش حد قاعد ع القهوة، علم على الحاضرين الأول!', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
+    const keyboard = presentMembers.map(p => [{ text: `🧔 ${p.name}`, callback_data: `selperson_${p.origIdx}` }]);
+    keyboard.push([{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]);
+    editTelegramMessage(chatId, messageId, 'مين اللي هيشرب من الحاضرين؟ اختار الاسم:', { inline_keyboard: keyboard });
+    return;
+  }
+
+  if (data.startsWith('selperson_')) {
+    const pIndex = parseInt(data.split('_')[1]);
+    const person = appData.members[pIndex];
+    if (person) {
+      const keyboard = appData.menu.map((m, mIndex) => [{ text: `${m.name} (${m.price} ج)`, callback_data: `doorder_${pIndex}_${mIndex}` }]);
+      keyboard.push([{ text: '🔙 رجوع', callback_data: 'nav_order' }]);
+      editTelegramMessage(chatId, messageId, `هتنزل إيه للمعلم *${person.name}*؟`, { inline_keyboard: keyboard });
+    }
+    return;
+  }
+
+  if (data.startsWith('doorder_')) {
+    const [, pIndex, mIndex] = data.split('_').map(Number);
+    const person = appData.members[pIndex];
+    const item = appData.menu[mIndex];
+    if (person && item) {
+      markSessionStarted();
+      person.orders.push({ name: item.name, price: item.price });
+      person.isPaid = false;
+      saveData();
+      editTelegramMessage(chatId, messageId, `✅ نزلنا *${item.name}* (${item.price} ج) لحساب المعلم *${person.name}* بنجاح!`, { inline_keyboard: [[{ text: '☕ نزل مشروب تاني', callback_data: 'nav_order' }], [{ text: '💰 كشف الحسابات', callback_data: 'nav_checks' }], [{ text: '🏠 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+    }
+    return;
+  }
+}
+
+async function handleTelegramMessage(chatId, text){
+  const cleanText = text.trim();
+  log(`رسالة: "${cleanText}"`);
+
+  // استكمال حالة تعديل اسم/سعر مشروب لو المستخدم في نص عملية تعديل
+  const state = userStates[chatId];
+  if (state) {
+    if (state.action === 'WAITING_EDIT_PRICE') {
+      const newPrice = parseFloat(cleanText.replace(',', '.'));
+      if (isNaN(newPrice) || newPrice < 0) { sendTelegramMessage(chatId, '❌ ابعت رقم صحيح للسعر بس.'); return; }
+      const item = appData.menu[state.itemIndex];
+      if (item) { item.price = newPrice; saveData(); sendTelegramMessage(chatId, `✅ اتعدل سعر *${item.name}* بقى *${newPrice} ج*.`, { inline_keyboard: [[{ text: '🏠 القائمة الرئيسية', callback_data: 'nav_main' }]] }); }
+      delete userStates[chatId];
+      return;
+    }
+    if (state.action === 'WAITING_EDIT_NAME') {
+      const item = appData.menu[state.itemIndex];
+      if (item) {
+        const oldName = item.name;
+        appData.members.forEach(p => p.orders.forEach(o => { if (o.name === oldName) o.name = cleanText; }));
+        item.name = cleanText;
+        saveData();
+        sendTelegramMessage(chatId, `✅ اتعدل اسم المشروب بقى *${cleanText}*.`, { inline_keyboard: [[{ text: '🏠 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+      }
+      delete userStates[chatId];
+      return;
+    }
+  }
+
+  if (cleanText === '👥 مين قاعد ومين مأنتخ؟') { sendTelegramMessage(chatId, '👥 *كشف حضور وغياب الشلة:*\n\n🟢 = قاعد ومنوّر\n⚪ = مأنتخ\n🚶 = حاسب ومشي\n\nاضغط لتغيير الحالة فوراً:', getPresenceInline()); return; }
+
+  if (cleanText === '📜 منيو المشاريب') {
+    let menuListTxt = `📜 *منيو المشاريب والأسعار يا باشا:*\n\n`;
+    appData.menu.forEach(m => { menuListTxt += `• *${m.name}*: ${m.price.toFixed(2)} ج.م\n`; });
+    menuListTxt += `\nاضغط على أي مشروب للتفاصيل:`;
+    sendTelegramMessage(chatId, menuListTxt, getMenuInline());
+    return;
+  }
+
+  if (cleanText === '💰 كشوفات حساب الشباب') {
+    const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+    if (sessionMembers.length === 0) sendTelegramMessage(chatId, '❌ مفيش حد في القعدة دلوقتي.', getPersistentReplyKeyboard());
+    else sendTelegramMessage(chatId, '💰 اختار اسم المعلم عشان تشوف حسابه ومشاريبه:', getChecksInline());
+    return;
+  }
+
+  if (cleanText === '☕ اطلب مشروب لمعلم') {
+    const presentMembers = appData.members.map((m, idx) => ({ ...m, origIdx: idx })).filter(m => m.isPresent && !m.hasLeft);
+    if (presentMembers.length === 0) sendTelegramMessage(chatId, '❌ مفيش حد قاعد ع القهوة، علم على الحاضرين الأول.', getPersistentReplyKeyboard());
+    else {
+      const keyboard = presentMembers.map(p => [{ text: `🧔 ${p.name}`, callback_data: `selperson_${p.origIdx}` }]);
+      keyboard.push([{ text: '🔙 إلغاء', callback_data: 'nav_main' }]);
+      sendTelegramMessage(chatId, 'مين اللي هيشرب؟ اختار الاسم:', { inline_keyboard: keyboard });
+    }
+    return;
+  }
+
+  if (cleanText === '💸 ساب فلوسه لحد ومشي') {
+    const presentWithOrders = appData.members.map((m, idx) => (m.isPresent && !m.hasLeft && m.orders.length > 0) ? { ...m, origIdx: idx } : null).filter(Boolean);
+    if (presentWithOrders.length === 0) { sendTelegramMessage(chatId, '❌ مفيش حد قاعد وعنده مشاريب عشان يسيب فلوسها لحد!', getPersistentReplyKeyboard()); return; }
+    const keyboard = presentWithOrders.map(p => { const total = p.orders.reduce((s, i) => s + i.price, 0); return [{ text: `🧔 ${p.name} (حسابه ${total} ج)`, callback_data: `tr_all_from_${p.origIdx}` }]; });
+    keyboard.push([{ text: '🔙 إلغاء', callback_data: 'nav_main' }]);
+    sendTelegramMessage(chatId, '💸 *مين المعلم اللي هيمشي ويسيب حسابه لحد في القعدة؟*', { inline_keyboard: keyboard });
+    return;
+  }
+
+  if (cleanText === '📚 سجل القعدات القديمة') {
+    if (!appData.history || appData.history.length === 0) { sendTelegramMessage(chatId, '❌ مفيش أي قعدات متسجلة في الأرشيف لحد دلوقتي.', getPersistentReplyKeyboard()); return; }
+    let histTxt = `📚 *أرشيف وسجل آخر القعدات:*\n\n`;
+    appData.history.slice(-5).reverse().forEach((h) => { histTxt += `🗓️ *${h.date}*\n💵 إجمالي الحساب: *${h.grandTotal.toFixed(2)} ج*\n👥 الحاضرين: ${h.members.map(m => m.name).join('، ')}\n━━━━━━━━━━━━━━\n`; });
+    sendTelegramMessage(chatId, histTxt, getPersistentReplyKeyboard());
+    return;
+  }
+
+  if (cleanText === '📄 ابعتلي الشيك PDF') { sendPdfToTelegram(chatId); return; }
+
+  if (cleanText === '🧾 شيك القعدة نصياً') {
+    sendTelegramMessage(chatId, generateSessionSummaryText(), { inline_keyboard: [[{ text: '📄 ابعتلي الشيك كملف PDF', callback_data: 'nav_send_pdf' }]] });
+    return;
+  }
+
+  sendTelegramMessage(chatId, '☕ أهلاً بيك يا معلم في دفتر قعدتنا!\nاختار من الأزرار اللي تحت أو من القائمة دي:', getMainMenuInline());
+}
+
+async function pollTelegramUpdates(){
+  if (!isPolling) return;
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) { toggleTelegramPolling(); return; }
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${lastUpdateId + 1}&timeout=5`);
+    const data = await res.json();
+    if (data.ok && data.result.length > 0) {
+      for (const update of data.result) {
+        lastUpdateId = update.update_id;
+        if (update.callback_query) handleCallbackQuery(update.callback_query);
+        else if (update.message && update.message.text) handleTelegramMessage(update.message.chat.id, update.message.text);
+      }
+    }
+  } catch (e) {}
+  if (isPolling) setTimeout(pollTelegramUpdates, 500);
+}
+
+function toggleTelegramPolling(){
+  const token = document.getElementById('botToken').value.trim();
+  const dot = document.getElementById('botStatusDot');
+  const statusText = document.getElementById('botStatusText');
+  const btn = document.getElementById('toggleBotBtn');
+
+  if (!isPolling) {
+    if (!token) return toast('حط توكن البوت الأول يا باشا', 'error');
+    appData.botToken = token;
+    localStorage.setItem(STORE_KEY, JSON.stringify(appData));
+    isPolling = true;
+    dot.classList.add('active');
+    statusText.innerText = 'البوت صاحي ومنوّر';
+    btn.innerText = 'ريّح البوت';
+    btn.className = 'btn-danger btn-sm';
+    log('البوت بدأ يراقب العمليات...');
+    pollTelegramUpdates();
+  } else {
+    isPolling = false;
+    dot.classList.remove('active');
+    statusText.innerText = 'البوت مأنتخ (واقف)';
+    btn.innerText = 'صحّي البوت';
+    btn.className = 'btn-mint btn-sm';
+    log('تم إيقاف البوت.');
+  }
+}
+
+/* =========================================================
+   بداية التشغيل
+========================================================= */
+window.addEventListener('DOMContentLoaded', () => {
+  if (appData.botToken) { document.getElementById('botToken').value = appData.botToken; toggleTelegramPolling(); }
+  if (appData.instaPay) document.getElementById('instaPayAccount').value = appData.instaPay;
+  renderAll();
+});
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
+});
+</script>
+</body>
+</html>
