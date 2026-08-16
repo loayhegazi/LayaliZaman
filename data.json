@@ -189,7 +189,7 @@
           "price": 50
         }
       ],
-      "isPaid": false
+      "isPaid": true
     },
     {
       "name": "عاصم",
@@ -240,5 +240,5 @@
     }
   ],
   "sessionStartedAt": 1786899594828,
-  "lastModified": 1786915084552
+  "lastModified": 1786918017203
 }
