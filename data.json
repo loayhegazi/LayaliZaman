@@ -122,21 +122,21 @@
     },
     {
       "name": "حازم",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "كريم",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "بكر",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
@@ -149,8 +149,8 @@
       "isPaid": false
     }
   ],
-  "sessionStartedAt": null,
-  "lastModified": 1787059716483,
+  "sessionStartedAt": 1787059725132,
+  "lastModified": 1787059726344,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
