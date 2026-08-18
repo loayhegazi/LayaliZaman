@@ -74,14 +74,24 @@
     {
       "name": "لؤي",
       "isPresent": true,
-      "orders": [],
+      "orders": [
+        {
+          "name": "شاي كشري",
+          "price": 15
+        }
+      ],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "فرج",
       "isPresent": true,
-      "orders": [],
+      "orders": [
+        {
+          "name": "شاي كشري",
+          "price": 15
+        }
+      ],
       "isPaid": false,
       "hasLeft": false
     },
@@ -150,7 +160,7 @@
     }
   ],
   "sessionStartedAt": 1787061757703,
-  "lastModified": 1787061796748,
+  "lastModified": 1787061799731,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
