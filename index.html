@@ -165,6 +165,7 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
+/* POS Multi-Select Toolbar */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -173,13 +174,17 @@ header{
 .person-chip{
   display:flex;align-items:center;gap:7px;background:var(--surface-2);border:1.5px solid var(--line);
   border-radius:100px;padding:6px 12px 6px 8px;font-weight:700;font-size:.86rem;color:var(--text);
+  cursor:pointer;user-select:none;
 }
 .person-chip:hover{border-color:var(--brass);}
-.person-chip.active{border-color:var(--brass);background:var(--brass-dim);color:var(--brass-hover);box-shadow:0 0 0 3px var(--brass-dim);}
+.person-chip.active{
+  border-color:var(--brass);background:var(--brass-dim);color:var(--brass-hover);
+  box-shadow:0 0 0 2px var(--brass);font-weight:900;
+}
 .person-chip .chip-avatar{width:22px;height:22px;font-size:.68rem;}
 .active-order-pill{
   display:flex;align-items:center;gap:8px;background:var(--brass-dim);border:1px solid rgba(207,154,62,0.4);
-  color:var(--brass-hover);padding:8px 12px;border-radius:10px;font-weight:800;font-size:.88rem;
+  color:var(--brass-hover);padding:6px 12px;border-radius:100px;font-weight:800;font-size:.84rem;
 }
 .active-order-pill button{padding:2px 8px;font-size:.7rem;}
 .drink-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:9px;}
@@ -360,7 +365,7 @@ header{
 
     <div style="display:flex;flex-direction:column;gap:18px;">
       <div class="card">
-        <div class="card-title"><span>☕ سجّل الطلب بضغطتين</span><small>اختار المعلم، بعدين اضغط ع المشروب</small></div>
+        <div class="card-title"><span>☕ سجّل الطلب (تحديد فردي أو جماعي)</span><small>علّم على الشباب واضغط ع المشروب</small></div>
         <div class="pos-select-bar" id="posPersonBar"></div>
         <div class="drink-grid" id="posDrinkGrid"></div>
       </div>
@@ -368,6 +373,7 @@ header{
       <div class="card" style="flex:1;">
         <div class="session-toolbar">
           <div class="card-title" style="border:none;padding:0;flex:1;">كشوفات حسابات القعدة الحالية</div>
+          <button class="btn-ghost btn-xs" style="color:var(--danger); border-color:rgba(182,71,47,0.4);" title="تصفير القعدة الحالية وإرجاع الجميع لمأنتخ" onclick="hardResetCurrentSession()">💥 تصفير القعدة</button>
         </div>
         <div class="filter-tabs" id="sessionFilterTabs"></div>
         <div class="session-grid" id="peopleGridUi"></div>
@@ -389,7 +395,6 @@ header{
   <div class="modal-box">
     <div class="modal-header"><span>⚙️ إعدادات المزامنة السحابية & الداتا</span><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
     <div class="modal-body">
-      <!-- مزامنة GitHub السحابية -->
       <div class="form-group" style="background:var(--bg-2); padding:12px; border-radius:10px; border:1px solid var(--brass);">
         <label style="color:var(--brass-hover); font-weight:bold;">☁️ المزامنة السحابية الدائمة (GitHub Token)</label>
         <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">حط التوكن هنا مرة واحدة عشان الداتا تتسجل وتتزامن تلقائياً بين الموبايل واللابتوب.</p>
@@ -499,7 +504,7 @@ header{
 
 <script>
 /* =========================================================
-   إعدادات GitHub السحابية والداتا
+   إعدادات GitHub والداتا
 ========================================================= */
 const STORE_KEY = 'cafe_egypt_ledger_v6';
 const GITHUB_CONFIG = {
@@ -547,7 +552,9 @@ let appData = loadAppData();
 const userStates = {};
 let isPolling = false;
 let lastUpdateId = 0;
-let selectedPersonIndex = null;
+
+// دعم التحديد المتعدد للأشخاص
+let selectedPersonIndices = [];
 let sessionFilter = 'all';
 let syncTimeout = null;
 
@@ -556,7 +563,6 @@ function saveData(){
   localStorage.setItem(STORE_KEY, JSON.stringify(appData));
   renderAll();
 
-  // Debounce syncing to GitHub API - يستنى ثانية بعد آخر تعديل عشان ميبعتش طلب مع كل ضغطة
   clearTimeout(syncTimeout);
   syncTimeout = setTimeout(() => {
     pushDataToGitHub();
@@ -573,10 +579,6 @@ function renderAll(){
 
 /* =========================================================
    محرك المزامنة التلقائية مع GitHub
-   - التوكن نفسه بيتحفظ محلي بس (localStorage) ومش بيتبعت جوه الداتا
-     المتزامنة، عشان لو الريبو عام حد ميقدرش يشوف التوكن بتاعك.
-   - كل جهاز بيسحب كل شوية (poll) وكمان لما تفتح التاب تاني، فبتفضل
-     الداتا متزامنة بين الموبايل واللابتوب من غير ما تعمل حاجة.
 ========================================================= */
 let isSyncBusy = false;
 let syncIntervalHandle = null;
@@ -603,7 +605,6 @@ function setSyncStatus(state){
   else text.innerText = 'مزامنة سحابية';
 }
 
-// بيرجع نسخة من الداتا بدون أي توكنات سرية قبل ما نبعتها لـ GitHub
 function buildSyncPayload(){
   const clone = JSON.parse(JSON.stringify(appData));
   delete clone.ghToken;
@@ -623,7 +624,6 @@ async function pullDataFromGitHub(silent){
     });
 
     if (res.status === 404) {
-      // الملف لسه مش موجود على GitHub - ابعت نسخة الداتا المحلية كأول نسخة
       isSyncBusy = false;
       await pushDataToGitHub();
       return;
@@ -697,7 +697,6 @@ async function pushDataToGitHub(isRetry){
       lastSyncedAt = Date.now();
       setSyncStatus('synced');
     } else if (putRes.status === 409 && !isRetry) {
-      // حد تاني عدّل الملف قبلنا بلحظة - نجيب النسخة الجديدة ونحاول تاني مرة واحدة
       sessionStorage.removeItem('gh_file_sha');
       isSyncBusy = false;
       await pushDataToGitHub(true);
@@ -716,7 +715,6 @@ async function pushDataToGitHub(isRetry){
   }
 }
 
-// مزامنة دورية كل شوية طول ما التاب فاتح، عشان أي تعديل من جهاز تاني يوصلك تلقائي
 function startAutoSync(){
   if (syncIntervalHandle) clearInterval(syncIntervalHandle);
   if (!getGhToken()) return;
@@ -753,13 +751,12 @@ function saveGhToken() {
   }
 }
 
-// يعيد المزامنة فورًا لما ترجع تفتح التاب أو ترجعلك النت، بدل ما تستنى الـ 20 ثانية
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullDataFromGitHub(true); });
 window.addEventListener('focus', () => pullDataFromGitHub(true));
 window.addEventListener('online', () => { toast('رجع النت! بنزامن دلوقتي...', 'info'); pullDataFromGitHub(true); });
 
 /* =========================================================
-   أدوات الواجهة والمساعدات
+   أدوات الواجهة
 ========================================================= */
 function toast(msg, type='info', ms=3200){
   const stack = document.getElementById('toastStack');
@@ -872,7 +869,7 @@ function toggleMemberPresence(index){
       member.orders = [];
       member.isPaid = false;
       member.hasLeft = false;
-      if (selectedPersonIndex === index) selectedPersonIndex = null;
+      selectedPersonIndices = selectedPersonIndices.filter(i => i !== index);
     } else {
       markSessionStarted();
     }
@@ -885,7 +882,7 @@ async function deleteMember(index){
   const ok = await showConfirm(`عايز تمسح (${m.name}) من الشلة خالص؟`, 'مسح من الشلة');
   if (!ok) return;
   appData.members.splice(index, 1);
-  if (selectedPersonIndex === index) selectedPersonIndex = null;
+  selectedPersonIndices = selectedPersonIndices.filter(i => i !== index);
   saveData();
   toast('اتمسح من الشلة', 'success');
 }
@@ -987,7 +984,7 @@ async function deleteMenuItem(index){
 }
 
 /* =========================================================
-   نظام الطلبات السريع (POS)
+   نظام الطلبات السريع (POS) - التحديد المتعدد
 ========================================================= */
 function renderPos(){
   const bar = document.getElementById('posPersonBar');
@@ -996,25 +993,43 @@ function renderPos(){
     .map((m, idx) => ({ ...m, idx }))
     .filter(m => m.isPresent && !m.hasLeft);
 
-  if (selectedPersonIndex !== null && !activeMembers.some(m => m.idx === selectedPersonIndex)) {
-    selectedPersonIndex = null;
-  }
+  // تنظيف أي محددين مش موجودين في القعدة حالياً
+  selectedPersonIndices = selectedPersonIndices.filter(i => activeMembers.some(m => m.idx === i));
 
   if (activeMembers.length === 0) {
     bar.innerHTML = `<span class="hint">علّم على الحاضرين من قايمة الشلة الأول عشان تقدر تسجل طلب ☝️</span>`;
-  } else if (selectedPersonIndex === null) {
-    bar.innerHTML = `<span class="hint">مين هيشرب؟</span>` + activeMembers.map(m => `
-      <button class="person-chip" onclick="selectPosPerson(${m.idx})">
-        <span class="chip-avatar">${initials(m.name)}</span>${m.name}
-      </button>
-    `).join('');
   } else {
-    const person = appData.members[selectedPersonIndex];
-    bar.innerHTML = `
-      <div class="active-order-pill">☕ بيطلب لـ: ${person.name} <button class="btn-ghost btn-xs" onclick="selectPosPerson(null)">✕ إلغاء</button></div>
-      ` + activeMembers.filter(m => m.idx !== selectedPersonIndex).map(m => `
-        <button class="person-chip" onclick="selectPosPerson(${m.idx})"><span class="chip-avatar">${initials(m.name)}</span>${m.name}</button>
-      `).join('');
+    let toolbarHtml = '';
+    
+    // شريط ملخص التحديد وأزرار التحكم
+    if (selectedPersonIndices.length > 0) {
+      const selectedNames = selectedPersonIndices.map(i => appData.members[i].name).join('، ');
+      toolbarHtml = `
+        <div class="active-order-pill" style="width:100%; justify-content:space-between; margin-bottom:4px;">
+          <span>☕ محدد (${selectedPersonIndices.length}): <strong>${selectedNames}</strong></span>
+          <button class="btn-ghost btn-xs" onclick="clearPosSelection()">✕ إلغاء التحديد</button>
+        </div>
+      `;
+    }
+
+    const selectAllBtn = `
+      <button class="btn-ghost btn-xs" style="border-radius:100px; padding:6px 12px;" onclick="selectAllPosPersons()">
+        ${selectedPersonIndices.length === activeMembers.length ? '✕ إلغاء تحديد الكل' : '👥 الكل قاعدين'}
+      </button>
+    `;
+
+    const chipsHtml = activeMembers.map(m => {
+      const isSelected = selectedPersonIndices.includes(m.idx);
+      return `
+        <button class="person-chip ${isSelected ? 'active' : ''}" onclick="togglePosPerson(${m.idx})">
+          <span class="chip-avatar">${initials(m.name)}</span>
+          <span>${m.name}</span>
+          ${isSelected ? '<span style="font-size:0.75rem;">✔</span>' : ''}
+        </button>
+      `;
+    }).join('');
+
+    bar.innerHTML = toolbarHtml + selectAllBtn + chipsHtml;
   }
 
   if (appData.menu.length === 0) {
@@ -1029,21 +1044,53 @@ function renderPos(){
   }
 }
 
-function selectPosPerson(idx){
-  selectedPersonIndex = idx;
+function togglePosPerson(idx){
+  if (selectedPersonIndices.includes(idx)) {
+    selectedPersonIndices = selectedPersonIndices.filter(i => i !== idx);
+  } else {
+    selectedPersonIndices.push(idx);
+  }
   renderPos();
 }
 
+function selectAllPosPersons(){
+  const activeMembers = appData.members
+    .map((m, idx) => ({ ...m, idx }))
+    .filter(m => m.isPresent && !m.hasLeft);
+
+  if (selectedPersonIndices.length === activeMembers.length) {
+    selectedPersonIndices = [];
+  } else {
+    selectedPersonIndices = activeMembers.map(m => m.idx);
+  }
+  renderPos();
+}
+
+function clearPosSelection(){
+  selectedPersonIndices = [];
+  renderPos();
+}
+
+// تنفيذ الطلب لجميع الأشخاص المحددين معاً
 function posOrder(menuIndex){
-  if (selectedPersonIndex === null) return toast('اختار مين هيشرب الأول ☝️', 'error');
-  const person = appData.members[selectedPersonIndex];
+  if (selectedPersonIndices.length === 0) {
+    return toast('اختار مين هيشرب الأول (تقدر تختار أكتر من واحد) ☝️', 'error');
+  }
+  
   const item = appData.menu[menuIndex];
-  if (!person || !item) return;
+  if (!item) return;
   markSessionStarted();
-  person.orders.push({ name: item.name, price: item.price });
-  person.isPaid = false;
+
+  selectedPersonIndices.forEach(pIdx => {
+    const person = appData.members[pIdx];
+    if (person && person.isPresent && !person.hasLeft) {
+      person.orders.push({ name: item.name, price: item.price });
+      person.isPaid = false;
+    }
+  });
+
   saveData();
-  toast(`☕ ${item.name} اتضافت لحساب ${person.name}`, 'success', 1800);
+  toast(`☕ ${item.name} اتضافت لحساب (${selectedPersonIndices.length}) أفراد بنجاح!`, 'success', 2000);
 }
 
 function addQtyOrder(personIndex, itemName){
@@ -1078,7 +1125,7 @@ async function markPersonLeft(index){
   if (!ok) return;
   person.hasLeft = true;
   person.isPaid = true;
-  if (selectedPersonIndex === index) selectedPersonIndex = null;
+  selectedPersonIndices = selectedPersonIndices.filter(i => i !== index);
   saveData();
   toast(`${person.name} حاسب ومشى 🚶`, 'success');
 }
@@ -1120,7 +1167,7 @@ function confirmTransfer(fromIndex, toIndex){
   fromPerson.orders = [];
   fromPerson.hasLeft = true;
   fromPerson.isPaid = true;
-  if (selectedPersonIndex === fromIndex) selectedPersonIndex = null;
+  selectedPersonIndices = selectedPersonIndices.filter(i => i !== fromIndex);
 
   saveData();
   closeModal('transferModal');
@@ -1268,7 +1315,7 @@ function renderStats(){
 }
 
 /* =========================================================
-   الأرشيف
+   الأرشيف والتصفير (Reset)
 ========================================================= */
 function openHistoryModal(){
   const body = document.getElementById('historyModalBody');
@@ -1321,9 +1368,25 @@ async function resetSessionOrders(){
 
   appData.members.forEach(m => { m.orders = []; m.isPaid = false; m.hasLeft = false; });
   appData.sessionStartedAt = null;
-  selectedPersonIndex = null;
+  selectedPersonIndices = [];
   saveData();
   toast('اتأرشفت القعدة وجاهزين لقعدة جديدة! ☕', 'success');
+}
+
+async function hardResetCurrentSession(){
+  const ok = await showConfirm('هل أنت متأكد من تصفير وإلغاء حضور كل اللي قاعدين ومسح مشاريبهم بالكامل؟', '💥 تصفير القعدة الحالية');
+  if (!ok) return;
+
+  appData.members.forEach(m => {
+    m.orders = [];
+    m.isPaid = false;
+    m.hasLeft = false;
+    m.isPresent = false;
+  });
+  appData.sessionStartedAt = null;
+  selectedPersonIndices = [];
+  saveData();
+  toast('تم تصفير القعدة وإخلاء الترابيزة بالكامل! 💥', 'success');
 }
 
 /* =========================================================
@@ -1535,7 +1598,7 @@ function importDataJson(event){
 }
 
 /* =========================================================
-   تيليجرام
+   محرك وقوائم تيليجرام المتطابقة (Inline & Reply)
 ========================================================= */
 function log(msg){
   const logBox = document.getElementById('botLog');
@@ -1568,10 +1631,11 @@ async function answerCallbackQuery(callbackQueryId, text = '', showAlert = false
 function getPersistentReplyKeyboard(){
   return {
     keyboard: [
-      [{ text: '👥 مين قاعد ومين مأنتخ؟' }, { text: '📜 منيو المشاريب' }],
-      [{ text: '💰 كشوفات حساب الشباب' }, { text: '☕ اطلب مشروب لمعلم' }],
-      [{ text: '💸 ساب فلوسه لحد ومشي' }, { text: '📚 سجل القعدات القديمة' }],
-      [{ text: '📄 ابعتلي الشيك PDF' }, { text: '🧾 شيك القعدة نصياً' }]
+      [{ text: '📜 منيو المشاريب' }, { text: '👥 كشف الحضور' }],
+      [{ text: '☕ اطلب مشروب' }, { text: '💰 كشوفات الحساب' }],
+      [{ text: '📚 أرشيف القعدات' }, { text: '💸 ساب فلوسه لحد' }],
+      [{ text: '🧾 شيك القعدة نصياً' }, { text: '📄 شيك القعدة PDF' }],
+      [{ text: '📊 فلوس الخزينة' }, { text: '⚙️ تظبيط المنيو' }]
     ],
     resize_keyboard: true
   };
@@ -1580,12 +1644,55 @@ function getPersistentReplyKeyboard(){
 function getMainMenuInline(){
   return {
     inline_keyboard: [
-      [{ text: '👥 كشف الحضور', callback_data: 'nav_presence' }, { text: '📜 منيو المشاريب', callback_data: 'nav_menu' }],
-      [{ text: '💰 كشوفات الحساب', callback_data: 'nav_checks' }, { text: '☕ اطلب مشروب', callback_data: 'nav_order' }],
-      [{ text: '💸 ساب فلوسه لحد', callback_data: 'nav_trans_all_from' }, { text: '📚 أرشيف القعدات', callback_data: 'nav_history' }],
-      [{ text: '⚙️ تظبيط المنيو', callback_data: 'nav_manage_menu' }, { text: '📄 شيك القعدة PDF', callback_data: 'nav_send_pdf' }]
+      [
+        { text: '📜 منيو المشاريب', callback_data: 'nav_menu' },
+        { text: '👥 كشف الحضور', callback_data: 'nav_presence' }
+      ],
+      [
+        { text: '☕ اطلب مشروب', callback_data: 'nav_order' },
+        { text: '💰 كشوفات الحساب', callback_data: 'nav_checks' }
+      ],
+      [
+        { text: '📚 أرشيف القعدات', callback_data: 'nav_history' },
+        { text: '💸 ساب فلوسه لحد', callback_data: 'nav_trans_all_from' }
+      ],
+      [
+        { text: '🧾 شيك نصياً', callback_data: 'nav_export_bill' },
+        { text: '📄 شيك القعدة PDF', callback_data: 'nav_send_pdf' }
+      ],
+      [
+        { text: '📊 فلوس الخزينة', callback_data: 'nav_treasury' },
+        { text: '⚙️ تظبيط المنيو', callback_data: 'nav_manage_menu' }
+      ]
     ]
   };
+}
+
+function getTreasurySummaryText() {
+  let grandTotal = 0, collectedTotal = 0;
+  const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+  const presentCount = appData.members.filter(m => m.isPresent && !m.hasLeft).length;
+
+  sessionMembers.forEach(person => {
+    const pTotal = person.orders.reduce((sum, item) => sum + item.price, 0);
+    grandTotal += pTotal;
+    if (person.isPaid || person.hasLeft) collectedTotal += pTotal;
+  });
+
+  const remaining = grandTotal - collectedTotal;
+  const splitCount = sessionMembers.length;
+  const perHead = splitCount > 0 ? grandTotal / splitCount : 0;
+
+  let txt = `📊 *ملخص خزينة القعدة الحالية* ☕\n━━━━━━━━━━━━━━━━━━\n`;
+  txt += `💵 *حساب الطاولة كلها:* \`${grandTotal.toFixed(2)} ج\`\n`;
+  txt += `🟢 *الفلوس اللي اتلمت (خالص):* \`${collectedTotal.toFixed(2)} ج\`\n`;
+  txt += `🔴 *اللي لسه في ذمة الشباب:* \`${remaining.toFixed(2)} ج\`\n`;
+  txt += `👥 *عدد الحاضرين دلوقتي:* \`${presentCount} فرد\`\n`;
+  txt += `⚖️ *لو هتقسموها بالتساوي:* \`${perHead.toFixed(2)} ج / فرد\`\n`;
+  if (appData.instaPay) {
+    txt += `\n📱 *إنستاباي:* \`${appData.instaPay}\``;
+  }
+  return txt;
 }
 
 function getPresenceInline(){
@@ -1672,7 +1779,17 @@ async function handleCallbackQuery(cb){
 
   answerCallbackQuery(cb.id);
 
-  if (data === 'nav_main') { editTelegramMessage(chatId, messageId, '☕ أهلاً بيك يا كبير في دفتر قعدتنا!\nاختار اللي محتاجه:', getMainMenuInline()); return; }
+  if (data === 'nav_main') {
+    editTelegramMessage(chatId, messageId, '☕ أهلاً بيك يا كبير في دفتر قعدتنا!\nاختار اللي محتاجه:', getMainMenuInline());
+    return;
+  }
+
+  if (data === 'nav_treasury') {
+    editTelegramMessage(chatId, messageId, getTreasurySummaryText(), {
+      inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]]
+    });
+    return;
+  }
 
   if (data === 'nav_history') {
     if (!appData.history || appData.history.length === 0) {
@@ -1818,7 +1935,12 @@ async function handleCallbackQuery(cb){
 
   if (data === 'nav_export_bill') {
     const bill = generateSessionSummaryText();
-    editTelegramMessage(chatId, messageId, bill, { inline_keyboard: [[{ text: '📄 ابعتلي الشيك كملف PDF', callback_data: 'nav_send_pdf' }], [{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+    editTelegramMessage(chatId, messageId, bill, {
+      inline_keyboard: [
+        [{ text: '📄 ابعتلي الشيك كملف PDF', callback_data: 'nav_send_pdf' }],
+        [{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]
+      ]
+    });
     return;
   }
 
@@ -1885,7 +2007,10 @@ async function handleTelegramMessage(chatId, text){
     }
   }
 
-  if (cleanText === '👥 مين قاعد ومين مأنتخ؟') { sendTelegramMessage(chatId, '👥 *كشف حضور وغياب الشلة:*\n\n🟢 = قاعد ومنوّر\n⚪ = مأنتخ\n🚶 = حاسب ومشي\n\nاضغط لتغيير الحالة فوراً:', getPresenceInline()); return; }
+  if (cleanText === '👥 كشف الحضور' || cleanText === '👥 مين قاعد ومين مأنتخ؟') {
+    sendTelegramMessage(chatId, '👥 *كشف حضور وغياب الشلة:*\n\n🟢 = قاعد ومنوّر\n⚪ = مأنتخ\n🚶 = حاسب ومشي\n\nاضغط لتغيير الحالة فوراً:', getPresenceInline());
+    return;
+  }
 
   if (cleanText === '📜 منيو المشاريب') {
     let menuListTxt = `📜 *منيو المشاريب والأسعار يا باشا:*\n\n`;
@@ -1895,14 +2020,14 @@ async function handleTelegramMessage(chatId, text){
     return;
   }
 
-  if (cleanText === '💰 كشوفات حساب الشباب') {
+  if (cleanText === '💰 كشوفات الحساب' || cleanText === '💰 كشوفات حساب الشباب') {
     const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
     if (sessionMembers.length === 0) sendTelegramMessage(chatId, '❌ مفيش حد في القعدة دلوقتي.', getPersistentReplyKeyboard());
     else sendTelegramMessage(chatId, '💰 اختار اسم المعلم عشان تشوف حسابه ومشاريبه:', getChecksInline());
     return;
   }
 
-  if (cleanText === '☕ اطلب مشروب لمعلم') {
+  if (cleanText === '☕ اطلب مشروب' || cleanText === '☕ اطلب مشروب لمعلم') {
     const presentMembers = appData.members.map((m, idx) => ({ ...m, origIdx: idx })).filter(m => m.isPresent && !m.hasLeft);
     if (presentMembers.length === 0) sendTelegramMessage(chatId, '❌ مفيش حد قاعد ع القهوة، علم على الحاضرين الأول.', getPersistentReplyKeyboard());
     else {
@@ -1913,7 +2038,7 @@ async function handleTelegramMessage(chatId, text){
     return;
   }
 
-  if (cleanText === '💸 ساب فلوسه لحد ومشي') {
+  if (cleanText === '💸 ساب فلوسه لحد' || cleanText === '💸 ساب فلوسه لحد ومشي') {
     const presentWithOrders = appData.members.map((m, idx) => (m.isPresent && !m.hasLeft && m.orders.length > 0) ? { ...m, origIdx: idx } : null).filter(Boolean);
     if (presentWithOrders.length === 0) { sendTelegramMessage(chatId, '❌ مفيش حد قاعد وعنده مشاريب عشان يسيب فلوسها لحد!', getPersistentReplyKeyboard()); return; }
     const keyboard = presentWithOrders.map(p => { const total = p.orders.reduce((s, i) => s + i.price, 0); return [{ text: `🧔 ${p.name} (حسابه ${total} ج)`, callback_data: `tr_all_from_${p.origIdx}` }]; });
@@ -1922,7 +2047,23 @@ async function handleTelegramMessage(chatId, text){
     return;
   }
 
-  if (cleanText === '📚 سجل القعدات القديمة') {
+  if (cleanText === '📊 فلوس الخزينة') {
+    sendTelegramMessage(chatId, getTreasurySummaryText(), {
+      inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]]
+    });
+    return;
+  }
+
+  if (cleanText === '⚙️ تظبيط المنيو' || cleanText === '⚙️ تظبيط أسعار المنيو') {
+    if (appData.menu.length === 0) {
+      sendTelegramMessage(chatId, '❌ المنيو فاضي حالياً.', getPersistentReplyKeyboard());
+      return;
+    }
+    sendTelegramMessage(chatId, '⚙️ اختار المشروب اللي عايز تعدل اسمه أو سعره أو تمسحه خالص:', getManageMenuInline());
+    return;
+  }
+
+  if (cleanText === '📚 أرشيف القعدات' || cleanText === '📚 سجل القعدات القديمة') {
     if (!appData.history || appData.history.length === 0) { sendTelegramMessage(chatId, '❌ مفيش أي قعدات متسجلة في الأرشيف لحد دلوقتي.', getPersistentReplyKeyboard()); return; }
     let histTxt = `📚 *أرشيف وسجل آخر القعدات:*\n\n`;
     appData.history.slice(-5).reverse().forEach((h) => { histTxt += `🗓️ *${h.date}*\n💵 إجمالي الحساب: *${h.grandTotal.toFixed(2)} ج*\n👥 الحاضرين: ${h.members.map(m => m.name).join('، ')}\n━━━━━━━━━━━━━━\n`; });
@@ -1930,9 +2071,9 @@ async function handleTelegramMessage(chatId, text){
     return;
   }
 
-  if (cleanText === '📄 ابعتلي الشيك PDF') { sendPdfToTelegram(chatId); return; }
+  if (cleanText === '📄 شيك القعدة PDF' || cleanText === '📄 ابعتلي الشيك PDF') { sendPdfToTelegram(chatId); return; }
 
-  if (cleanText === '🧾 شيك القعدة نصياً') {
+  if (cleanText === '🧾 شيك القعدة نصياً' || cleanText === '🧾 شيك نصياً') {
     sendTelegramMessage(chatId, generateSessionSummaryText(), { inline_keyboard: [[{ text: '📄 ابعتلي الشيك كملف PDF', callback_data: 'nav_send_pdf' }]] });
     return;
   }
@@ -1994,7 +2135,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   renderAll();
   setSyncStatus('idle');
 
-  // مزامنة تلقائية فور فتح الموقع، وبعدين بيفضل يسحب كل شوية طول ما الصفحة فاتحة
   await pullDataFromGitHub();
   startAutoSync();
 });
