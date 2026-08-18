@@ -94,42 +94,42 @@
     },
     {
       "name": "اسامة",
-      "isPresent": true,
+      "isPresent": false,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "عصام",
-      "isPresent": true,
+      "isPresent": false,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "عاصم",
-      "isPresent": true,
+      "isPresent": false,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "خضر",
-      "isPresent": true,
+      "isPresent": false,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "حازم",
-      "isPresent": true,
+      "isPresent": false,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "كريم",
-      "isPresent": true,
+      "isPresent": false,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
@@ -150,7 +150,7 @@
     }
   ],
   "sessionStartedAt": 1787059725132,
-  "lastModified": 1787059727552,
+  "lastModified": 1787059730951,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
