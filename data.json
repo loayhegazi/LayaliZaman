@@ -82,6 +82,14 @@
         {
           "name": "شاي كشري",
           "price": 15
+        },
+        {
+          "name": "ليمون",
+          "price": 45
+        },
+        {
+          "name": "عناب",
+          "price": 45
         }
       ],
       "isPaid": false,
@@ -98,6 +106,14 @@
         {
           "name": "شاي كشري",
           "price": 15
+        },
+        {
+          "name": "ليمون",
+          "price": 45
+        },
+        {
+          "name": "عناب",
+          "price": 45
         }
       ],
       "isPaid": false,
@@ -114,6 +130,14 @@
         {
           "name": "شاي كشري",
           "price": 15
+        },
+        {
+          "name": "ليمون",
+          "price": 45
+        },
+        {
+          "name": "عناب",
+          "price": 45
         }
       ],
       "isPaid": false,
@@ -177,7 +201,7 @@
     }
   ],
   "sessionStartedAt": 1787059725132,
-  "lastModified": 1787061733138,
+  "lastModified": 1787061738059,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
