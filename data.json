@@ -73,14 +73,14 @@
   "members": [
     {
       "name": "لؤي",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "فرج",
-      "isPresent": false,
+      "isPresent": true,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
@@ -150,7 +150,7 @@
     }
   ],
   "sessionStartedAt": 1787059725132,
-  "lastModified": 1787059734023,
+  "lastModified": 1787061727951,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
