@@ -74,6 +74,13 @@
     {
       "name": "لؤي",
       "isPresent": true,
+      "orders": [],
+      "isPaid": true,
+      "hasLeft": true
+    },
+    {
+      "name": "فرج",
+      "isPresent": true,
       "orders": [
         {
           "name": "شاي كشري",
@@ -82,15 +89,7 @@
         {
           "name": "مياه معدنية",
           "price": 10
-        }
-      ],
-      "isPaid": false,
-      "hasLeft": false
-    },
-    {
-      "name": "فرج",
-      "isPresent": true,
-      "orders": [
+        },
         {
           "name": "شاي كشري",
           "price": 15
@@ -168,7 +167,7 @@
     }
   ],
   "sessionStartedAt": 1787061757703,
-  "lastModified": 1787061811866,
+  "lastModified": 1787061873756,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
