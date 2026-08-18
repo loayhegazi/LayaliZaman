@@ -136,21 +136,21 @@
     },
     {
       "name": "بكر",
-      "isPresent": true,
+      "isPresent": false,
       "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "حماد",
-      "isPresent": true,
+      "isPresent": false,
       "hasLeft": false,
       "orders": [],
       "isPaid": false
     }
   ],
   "sessionStartedAt": 1787059725132,
-  "lastModified": 1787059730951,
+  "lastModified": 1787059732439,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
