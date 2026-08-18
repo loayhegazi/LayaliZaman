@@ -73,73 +73,22 @@
   "members": [
     {
       "name": "لؤي",
-      "isPresent": true,
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "ليمون",
-          "price": 45
-        },
-        {
-          "name": "عناب",
-          "price": 45
-        }
-      ],
+      "isPresent": false,
+      "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "فرج",
-      "isPresent": true,
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "ليمون",
-          "price": 45
-        },
-        {
-          "name": "عناب",
-          "price": 45
-        }
-      ],
+      "isPresent": false,
+      "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
     {
       "name": "تركي",
-      "isPresent": true,
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "ليمون",
-          "price": 45
-        },
-        {
-          "name": "عناب",
-          "price": 45
-        }
-      ],
+      "isPresent": false,
+      "orders": [],
       "isPaid": false,
       "hasLeft": false
     },
@@ -200,8 +149,8 @@
       "isPaid": false
     }
   ],
-  "sessionStartedAt": 1787059725132,
-  "lastModified": 1787061738059,
+  "sessionStartedAt": null,
+  "lastModified": 1787061746148,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
