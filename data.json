@@ -74,188 +74,242 @@
     {
       "name": "لؤي",
       "isPresent": true,
-      "orders": [
-        {
-          "name": "قهوة تركي",
-          "price": 30
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
-          "name": "قهوة فرنساوي",
-          "price": 40
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
-          "name": "قهوة تركي",
-          "price": 30
-        }
-      ],
-      "isPaid": true,
-      "hasLeft": true
+      "orders": [],
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "فرج",
       "isPresent": true,
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "كانز",
-          "price": 35
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
-          "name": "شاي بحليب",
-          "price": 45
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        }
-      ],
-      "isPaid": false
+      "orders": [],
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "تركي",
       "isPresent": true,
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "كانز",
-          "price": 35
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "شاي بحليب",
-          "price": 45
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        }
-      ],
-      "isPaid": false
+      "orders": [],
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "اسامة",
       "isPresent": true,
-      "orders": [
-        {
-          "name": "قهوة فرنساوي",
-          "price": 40
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "شاي كرك",
-          "price": 50
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        }
-      ],
-      "isPaid": false
+      "orders": [],
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "عصام",
       "isPresent": true,
-      "orders": [
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
-          "name": "قهوة تركي",
-          "price": 30
-        },
-        {
-          "name": "شاي كرك",
-          "price": 50
-        }
-      ],
-      "isPaid": true,
-      "hasLeft": true
+      "orders": [],
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "عاصم",
       "isPresent": false,
       "orders": [],
-      "isPaid": false
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "خضر",
       "isPresent": true,
       "orders": [],
-      "isPaid": true,
-      "hasLeft": true
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "حازم",
       "isPresent": false,
       "orders": [],
-      "isPaid": false
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "كريم",
       "isPresent": false,
       "orders": [],
-      "isPaid": false
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "بكر",
       "isPresent": false,
       "orders": [],
-      "isPaid": false
+      "isPaid": false,
+      "hasLeft": false
     },
     {
       "name": "حماد",
       "isPresent": true,
-      "hasLeft": true,
-      "orders": [
-        {
-          "name": "قهوة تركي",
-          "price": 30
-        },
-        {
-          "name": "شاي كرك",
-          "price": 50
-        }
-      ],
-      "isPaid": true
+      "hasLeft": false,
+      "orders": [],
+      "isPaid": false
     }
   ],
-  "sessionStartedAt": 1786899594828,
-  "lastModified": 1786923285750
+  "sessionStartedAt": null,
+  "lastModified": 1787059716483,
+  "history": [
+    {
+      "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
+      "grandTotal": 690,
+      "members": [
+        {
+          "name": "لؤي",
+          "isPresent": true,
+          "orders": [
+            {
+              "name": "قهوة تركي",
+              "price": 30
+            },
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            },
+            {
+              "name": "قهوة فرنساوي",
+              "price": 40
+            },
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            },
+            {
+              "name": "قهوة تركي",
+              "price": 30
+            }
+          ],
+          "isPaid": true,
+          "hasLeft": true
+        },
+        {
+          "name": "فرج",
+          "isPresent": true,
+          "orders": [
+            {
+              "name": "شاي كشري",
+              "price": 15
+            },
+            {
+              "name": "كانز",
+              "price": 35
+            },
+            {
+              "name": "شاي كشري",
+              "price": 15
+            },
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            },
+            {
+              "name": "شاي بحليب",
+              "price": 45
+            },
+            {
+              "name": "شاي كشري",
+              "price": 15
+            }
+          ],
+          "isPaid": false
+        },
+        {
+          "name": "تركي",
+          "isPresent": true,
+          "orders": [
+            {
+              "name": "شاي كشري",
+              "price": 15
+            },
+            {
+              "name": "كانز",
+              "price": 35
+            },
+            {
+              "name": "شاي كشري",
+              "price": 15
+            },
+            {
+              "name": "شاي بحليب",
+              "price": 45
+            },
+            {
+              "name": "شاي كشري",
+              "price": 15
+            }
+          ],
+          "isPaid": false
+        },
+        {
+          "name": "اسامة",
+          "isPresent": true,
+          "orders": [
+            {
+              "name": "قهوة فرنساوي",
+              "price": 40
+            },
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            },
+            {
+              "name": "شاي كشري",
+              "price": 15
+            },
+            {
+              "name": "شاي كرك",
+              "price": 50
+            },
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            },
+            {
+              "name": "شاي كشري",
+              "price": 15
+            }
+          ],
+          "isPaid": false
+        },
+        {
+          "name": "عصام",
+          "isPresent": true,
+          "orders": [
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            },
+            {
+              "name": "قهوة تركي",
+              "price": 30
+            },
+            {
+              "name": "شاي كرك",
+              "price": 50
+            }
+          ],
+          "isPaid": true,
+          "hasLeft": true
+        },
+        {
+          "name": "حماد",
+          "isPresent": true,
+          "hasLeft": true,
+          "orders": [
+            {
+              "name": "قهوة تركي",
+              "price": 30
+            },
+            {
+              "name": "شاي كرك",
+              "price": 50
+            }
+          ],
+          "isPaid": true
+        }
+      ]
+    }
+  ]
 }
