@@ -92,9 +92,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--brass);}
 .login-card p{font-size:0.85rem;color:var(--text-dim);line-height:1.6;}
 .login-input-group{position:relative;display:flex;align-items:center;}
 .login-input-group input{
-  text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:monospace;
+  text-align:center;font-size:1.1rem;letter-spacing:1px;font-family:monospace, Tahoma, sans-serif;
   border:1.5px solid var(--line);background:var(--bg-2);padding:12px 40px 12px 12px;
-  direction:ltr !important;unicode-bidi:bidi-override;
+  direction:ltr !important;
 }
 .login-input-group input:focus{border-color:var(--brass);box-shadow:0 0 0 3px var(--brass-dim);}
 .login-toggle-btn{
@@ -202,6 +202,7 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
+/* POS Multi-Select Toolbar */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -352,7 +353,6 @@ header{
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول -->
 <div id="loginOverlay">
   <div class="login-card">
     <div class="login-mark">☕</div>
@@ -606,8 +606,7 @@ function defaultData(){
     ghToken: HARDCODED_CONFIG.ghToken,
     botToken: HARDCODED_CONFIG.botToken,
     instaPay: HARDCODED_CONFIG.instaPay,
-    notes: '8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450
-      _pat_11A6DHWCI0sa0mAf4j5Cd2_jjvTv5XVbNTD4sZ9vS6cOsTLzD4DE7H7o5JH2V5FYxs6QNDJ5DMeLPm0UwM',
+    notes: '',
     sessionStartedAt: null,
     menu: [
       { name: "شاي كشري", price: 15 },
@@ -749,7 +748,10 @@ async function checkAppLogin() {
   const input = document.getElementById('loginPassInput');
   const entered = (input.value || '').trim();
 
-  if (entered === APP_PASSWORD) {
+  // يقبل الباسورد سواء تم إدخاله بالإنجليزية مباشرة أو بتأثير الـ RTL
+  const isValid = (entered === '@hw@2022' || entered === 'hw@2022@' || entered === '2022@hw@');
+
+  if (isValid) {
     sessionStorage.setItem('ahwa_auth_session', 'authorized');
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainAppShell').style.display = 'block';
