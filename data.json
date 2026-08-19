@@ -147,10 +147,17 @@
       "hasLeft": false,
       "orders": [],
       "isPaid": false
+    },
+    {
+      "name": "يوسف",
+      "isPresent": true,
+      "hasLeft": false,
+      "orders": [],
+      "isPaid": false
     }
   ],
   "sessionStartedAt": null,
-  "lastModified": 1787125743622,
+  "lastModified": 1787125821676,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
