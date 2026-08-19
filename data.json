@@ -150,14 +150,14 @@
     },
     {
       "name": "يوسف",
-      "isPresent": true,
+      "isPresent": false,
       "hasLeft": false,
       "orders": [],
       "isPaid": false
     }
   ],
   "sessionStartedAt": null,
-  "lastModified": 1787125821676,
+  "lastModified": 1787125825194,
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
