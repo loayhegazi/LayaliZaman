@@ -441,10 +441,13 @@ header{
     <div class="modal-header"><span>⚙️ إعدادات المزامنة السحابية & الداتا</span><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
     <div class="modal-body">
       <div class="form-group" style="background:var(--bg-2); padding:12px; border-radius:10px; border:1px solid var(--brass);">
-        <label style="color:var(--brass-hover); font-weight:bold;">☁️ المزامنة السحابية الدائمة (GitHub Token)</label>
-        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">التوكن مثبت ومحفوظ تلقائياً في النظام للمزامنة اللحظية بين الأجهزة.</p>
+        <label style="color:var(--brass-hover); font-weight:bold;">☁️ المزامنة السحابية الدائمة (عن طريق Worker)</label>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">التوكنات الحقيقية محفوظة جوه الـ Worker مش هنا - ده أأمن وميتقفلش من جيت هب.</p>
         <div class="row-group">
-          <input type="password" id="ghTokenInput" placeholder="github_pat_...">
+          <input type="text" id="ghTokenInput" placeholder="رابط الـ Worker: https://xxx.workers.dev">
+        </div>
+        <div class="row-group" style="margin-top:6px;">
+          <input type="password" id="appSecretInput" placeholder="App Secret (زي ما حطيته في الـ Worker)">
           <button class="btn-mint btn-sm" onclick="saveGhToken()">حفظ ومزامنة</button>
           <button class="btn-ghost btn-sm" onclick="manualSyncNow()">🔄 زامن دلوقتي</button>
         </div>
@@ -470,8 +473,8 @@ header{
 
       <div class="form-group">
         <label>بوت تيليجرام (اختياري - للطلبات عن بعد)</label>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">توكن البوت محفوظ جوه الـ Worker برضه - مش محتاج تحطه هنا، بس لازم رابط الـ Worker يبقى متسجل فوق.</p>
         <div class="row-group">
-          <input type="password" id="botToken" placeholder="حط توكن تيليجرام هنا">
           <button id="toggleBotBtn" class="btn-mint btn-sm" onclick="toggleTelegramPolling()">صحّي البوت</button>
         </div>
         <div class="bot-status-container">
@@ -549,18 +552,14 @@ header{
 const APP_PASSWORD = '@hw@2022';
 
 const HARDCODED_CONFIG = {
-  ghToken: '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',       // حط توكن جيت هب هنا (github_pat_...)
-  botToken: '8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450',      // حط توكن بوت تيليجرام هنا
+  workerUrl: '',     // رابط الـ Cloudflare Worker بتاعك (مثال: https://qahwa-sync.YOURNAME.workers.dev)
+  appSecret: '',     // سر مخترعه إنت (مش توكن حقيقي - جيت هب مش هيلاحظه) لازم يطابق APP_SECRET في الـ Worker
   instaPay: ''       // عنوان أو رقم إنستاباي بتاعك
 };
 
 const STORE_KEY = 'cafe_egypt_ledger_v6';
-const GITHUB_CONFIG = {
-  owner: 'loayhegazi',
-  repo: 'LayaliZaman',
-  path: 'data.json',
-  branch: 'main'
-};
+// ملحوظة: توكن جيت هب وتوكن البوت بقوا محفوظين جوه الـ Cloudflare Worker نفسه
+// مش هنا خالص - عشان جيت هب ميقفلهمش تاني لو اتعملهم كوميت غلط.
 
 async function checkAppLogin() {
   const input = document.getElementById('loginPassInput');
@@ -595,8 +594,8 @@ function logoutApp() {
 
 function defaultData(){
   return {
-    ghToken: HARDCODED_CONFIG.ghToken,
-    botToken: HARDCODED_CONFIG.botToken,
+    workerUrl: HARDCODED_CONFIG.workerUrl,
+    appSecret: HARDCODED_CONFIG.appSecret,
     instaPay: HARDCODED_CONFIG.instaPay,
     sessionStartedAt: null,
     menu: [
@@ -625,8 +624,8 @@ function loadAppData(){
   if (fresh) {
     try { loaded = JSON.parse(fresh); } catch(e){}
   }
-  if (!loaded.ghToken && HARDCODED_CONFIG.ghToken) loaded.ghToken = HARDCODED_CONFIG.ghToken;
-  if (!loaded.botToken && HARDCODED_CONFIG.botToken) loaded.botToken = HARDCODED_CONFIG.botToken;
+  if (!loaded.workerUrl && HARDCODED_CONFIG.workerUrl) loaded.workerUrl = HARDCODED_CONFIG.workerUrl;
+  if (!loaded.appSecret && HARDCODED_CONFIG.appSecret) loaded.appSecret = HARDCODED_CONFIG.appSecret;
   if (!loaded.instaPay && HARDCODED_CONFIG.instaPay) loaded.instaPay = HARDCODED_CONFIG.instaPay;
   return loaded;
 }
@@ -662,12 +661,23 @@ let isSyncBusy = false;
 let syncIntervalHandle = null;
 let lastSyncedAt = null;
 
-function getGhToken(){
-  return (appData.ghToken || HARDCODED_CONFIG.ghToken || localStorage.getItem('gh_sync_token') || '').trim();
+function getWorkerUrl(){
+  return (appData.workerUrl || HARDCODED_CONFIG.workerUrl || '').trim().replace(/\/+$/, '');
 }
 
-function getBotToken(){
-  return (appData.botToken || HARDCODED_CONFIG.botToken || '').trim();
+function getAppSecret(){
+  return (appData.appSecret || HARDCODED_CONFIG.appSecret || '').trim();
+}
+
+// أسماء قديمة لسه مستخدمة كـ "هل المزامنة شغالة؟" في أماكن تانية بالكود
+function getGhToken(){ return getWorkerUrl(); }
+function getBotToken(){ return getWorkerUrl(); }
+
+async function tgFetch(method, options = {}){
+  const worker = getWorkerUrl();
+  if (!worker) return null;
+  const headers = Object.assign({}, options.headers || {}, { 'X-App-Secret': getAppSecret() });
+  return fetch(`${worker}/telegram/${method}`, Object.assign({}, options, { headers }));
 }
 
 function setSyncStatus(state){
@@ -675,7 +685,7 @@ function setSyncStatus(state){
   const dot = document.getElementById('syncStatusDot');
   const text = document.getElementById('syncStatusText');
   if (!pill) return;
-  if (!getGhToken()) { pill.style.display = 'none'; return; }
+  if (!getWorkerUrl()) { pill.style.display = 'none'; return; }
   pill.style.display = 'inline-flex';
   pill.className = 'sync-pill ' + (state || '');
   if (state === 'syncing') text.innerText = 'بيحفظ سحابياً...';
@@ -689,44 +699,40 @@ function setSyncStatus(state){
 
 function buildSyncPayload(){
   const clone = JSON.parse(JSON.stringify(appData));
-  delete clone.ghToken;
-  delete clone.botToken;
+  delete clone.workerUrl;
+  delete clone.appSecret;
   return clone;
 }
 
 async function pullDataFromGitHub(silent){
-  const token = getGhToken();
+  const worker = getWorkerUrl();
   if (isSyncBusy) return;
   isSyncBusy = true;
-  if (!silent && token) setSyncStatus('syncing');
+  if (!silent && worker) setSyncStatus('syncing');
 
   try {
-    const headers = { 'Accept': 'application/vnd.github+json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (!worker) { isSyncBusy = false; return; }
 
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
-      headers: headers
+    const res = await fetch(`${worker}/data?_t=${Date.now()}`, {
+      headers: { 'X-App-Secret': getAppSecret() }
     });
 
-    if (res.status === 404 && token) {
+    if (res.status === 404) {
       isSyncBusy = false;
       await pushDataToGitHub();
       return;
     }
 
     if (res.ok) {
-      const fileData = await res.json();
-      sessionStorage.setItem('gh_file_sha', fileData.sha);
-      const content = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
-      const remoteData = JSON.parse(content);
+      const remoteData = await res.json();
 
       if (remoteData.menu && remoteData.members) {
         const remoteModified = remoteData.lastModified || 0;
         const localModified = appData.lastModified || 0;
         if (remoteModified > localModified || !silent) {
-          const keepGhToken = getGhToken();
-          const keepBotToken = getBotToken();
-          appData = Object.assign({}, remoteData, { ghToken: keepGhToken, botToken: keepBotToken });
+          const keepWorkerUrl = getWorkerUrl();
+          const keepAppSecret = getAppSecret();
+          appData = Object.assign({}, remoteData, { workerUrl: keepWorkerUrl, appSecret: keepAppSecret });
           localStorage.setItem(STORE_KEY, JSON.stringify(appData));
           renderAll();
           if (!silent) toast('تم تحميل آخر تحديثات القعدة ☁️', 'success');
@@ -734,9 +740,11 @@ async function pullDataFromGitHub(silent){
       }
       lastSyncedAt = Date.now();
       setSyncStatus('synced');
+    } else {
+      setSyncStatus('error');
     }
   } catch (err) {
-    console.error('GitHub Pull Error:', err);
+    console.error('Sync Pull Error:', err);
     setSyncStatus('error');
   } finally {
     isSyncBusy = false;
@@ -744,41 +752,22 @@ async function pullDataFromGitHub(silent){
 }
 
 async function pushDataToGitHub(isRetry){
-  const token = getGhToken();
-  if (!token || isSyncBusy) return;
+  const worker = getWorkerUrl();
+  if (!worker || isSyncBusy) return;
   isSyncBusy = true;
   setSyncStatus('syncing');
 
   try {
-    let sha = sessionStorage.getItem('gh_file_sha');
-    const getRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
-    });
-    if (getRes.ok) {
-      const currentFile = await getRes.json();
-      sha = currentFile.sha;
-    }
-
-    const payload = {
-      message: `Update data.json: ${new Date().toISOString()}`,
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(buildSyncPayload(), null, 2)))),
-      branch: GITHUB_CONFIG.branch,
-      ...(sha ? { sha } : {})
-    };
-
-    const putRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`, {
+    const putRes = await fetch(`${worker}/data`, {
       method: 'PUT',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      headers: { 'X-App-Secret': getAppSecret(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildSyncPayload())
     });
 
     if (putRes.ok) {
-      const result = await putRes.json();
-      sessionStorage.setItem('gh_file_sha', result.content.sha);
       lastSyncedAt = Date.now();
       setSyncStatus('synced');
     } else if (putRes.status === 409 && !isRetry) {
-      sessionStorage.removeItem('gh_file_sha');
       isSyncBusy = false;
       await pushDataToGitHub(true);
       return;
@@ -787,7 +776,7 @@ async function pushDataToGitHub(isRetry){
       scheduleSyncRetry();
     }
   } catch (err) {
-    console.error('GitHub Push Error:', err);
+    console.error('Sync Push Error:', err);
     setSyncStatus('error');
     scheduleSyncRetry();
   } finally {
@@ -817,25 +806,26 @@ function stopAutoSync(){
 }
 
 async function manualSyncNow(){
-  if (!getGhToken()) return toast('حط توكن GitHub الأول', 'error');
+  if (!getWorkerUrl()) return toast('حط رابط الـ Worker الأول', 'error');
   await pullDataFromGitHub();
   await pushDataToGitHub();
-  toast('تم حفظ ومزامنة الداتا على GitHub ☁️', 'success');
+  toast('تم حفظ ومزامنة الداتا ☁️', 'success');
 }
 
 function saveGhToken() {
-  const val = document.getElementById('ghTokenInput').value.trim();
-  appData.ghToken = val;
-  localStorage.setItem('gh_sync_token', val);
+  const url = document.getElementById('ghTokenInput').value.trim();
+  const secret = document.getElementById('appSecretInput') ? document.getElementById('appSecretInput').value.trim() : appData.appSecret;
+  appData.workerUrl = url;
+  appData.appSecret = secret;
   saveData();
   setSyncStatus('idle');
-  if (val) {
-    toast('تم حفظ التوكن، جاري المزامنة مع data.json...', 'success');
+  if (url) {
+    toast('تم حفظ الإعدادات، جاري المزامنة...', 'success');
     pushDataToGitHub();
     startAutoSync();
   } else {
     stopAutoSync();
-    toast('تم مسح التوكن', 'info');
+    toast('تم مسح رابط المزامنة', 'info');
   }
 }
 
@@ -1554,8 +1544,7 @@ async function exportBillPdf(){
 async function sendPdfToTelegram(chatId){
   const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
   if (sessionMembers.length === 0) { await sendTelegramMessage(chatId, '❌ مفيش مشاريب مسجلة في القعدة دلوقتي.'); return; }
-  const token = getBotToken();
-  if (!token) return;
+  if (!getWorkerUrl()) return;
   await sendTelegramMessage(chatId, '⏳ دقيقة واحدة.. بنرفعلك الشيك PDF...');
   populateBillData();
   const target = document.getElementById('billCaptureTarget');
@@ -1574,7 +1563,7 @@ async function sendPdfToTelegram(chatId){
     formData.append('chat_id', chatId);
     formData.append('document', pdfBlob, `شيك_القهوة_${Date.now()}.pdf`);
     formData.append('caption', '📄 شيك حساب القعدة الرسمي المعتمد يا رجالة! ☕');
-    await fetch(`https://api.telegram.org/bot${token}/sendDocument`, { method: 'POST', body: formData });
+    await tgFetch('sendDocument', { method: 'POST', body: formData });
   } catch (err) {
     target.style.top = '-9999px'; target.style.left = '-9999px';
     await sendTelegramMessage(chatId, '❌ حصل عطل وإحنا بنبعت ملف الـ PDF.');
@@ -1615,8 +1604,8 @@ function copySessionSummary(){
 
 function openSettingsModal(){
   document.getElementById('instaPayAccount').value = appData.instaPay || '';
-  document.getElementById('botToken').value = getBotToken();
-  document.getElementById('ghTokenInput').value = getGhToken();
+  document.getElementById('ghTokenInput').value = getWorkerUrl();
+  if (document.getElementById('appSecretInput')) document.getElementById('appSecretInput').value = getAppSecret();
   openModal('settingsModal');
 }
 
@@ -1671,25 +1660,22 @@ function log(msg){
 }
 
 async function sendTelegramMessage(chatId, text, replyMarkup = null){
-  const token = getBotToken();
-  if (!token) return;
+  if (!getWorkerUrl()) return;
   const payload = { chat_id: chatId, text, parse_mode: 'Markdown' };
   if (replyMarkup) payload.reply_markup = replyMarkup;
-  try { await fetch(`https://api.telegram.org/bot${token}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
+  try { await tgFetch('sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
 }
 
 async function editTelegramMessage(chatId, messageId, text, replyMarkup = null){
-  const token = getBotToken();
-  if (!token) return;
+  if (!getWorkerUrl()) return;
   const payload = { chat_id: chatId, message_id: messageId, text, parse_mode: 'Markdown' };
   if (replyMarkup) payload.reply_markup = replyMarkup;
-  try { await fetch(`https://api.telegram.org/bot${token}/editMessageText`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
+  try { await tgFetch('editMessageText', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
 }
 
 async function answerCallbackQuery(callbackQueryId, text = '', showAlert = false){
-  const token = getBotToken();
-  if (!token) return;
-  try { fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ callback_query_id: callbackQueryId, text, show_alert: showAlert }) }); } catch (err) {}
+  if (!getWorkerUrl()) return;
+  try { tgFetch('answerCallbackQuery', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ callback_query_id: callbackQueryId, text, show_alert: showAlert }) }); } catch (err) {}
 }
 
 function getPersistentReplyKeyboard(){
@@ -2231,10 +2217,9 @@ async function handleTelegramMessage(chatId, text){
 
 async function pollTelegramUpdates(){
   if (!isPolling) return;
-  const token = getBotToken();
-  if (!token) { toggleTelegramPolling(); return; }
+  if (!getWorkerUrl()) { toggleTelegramPolling(); return; }
   try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${lastUpdateId + 1}&timeout=5`);
+    const res = await tgFetch(`getUpdates?offset=${lastUpdateId + 1}&timeout=5`);
     const data = await res.json();
     if (data.ok && data.result.length > 0) {
       for (const update of data.result) {
@@ -2248,15 +2233,13 @@ async function pollTelegramUpdates(){
 }
 
 function toggleTelegramPolling(){
-  const token = getBotToken();
+  const worker = getWorkerUrl();
   const dot = document.getElementById('botStatusDot');
   const statusText = document.getElementById('botStatusText');
   const btn = document.getElementById('toggleBotBtn');
 
   if (!isPolling) {
-    if (!token) return toast('حط توكن البوت الأول يا باشا', 'error');
-    appData.botToken = token;
-    localStorage.setItem(STORE_KEY, JSON.stringify(appData));
+    if (!worker) return toast('حط رابط الـ Worker الأول يا باشا', 'error');
     isPolling = true;
     dot.classList.add('active');
     statusText.innerText = 'البوت صاحي ومنوّر';
@@ -2275,10 +2258,8 @@ function toggleTelegramPolling(){
 }
 
 async function initApp() {
-  const bToken = getBotToken();
-  if (bToken) { 
-    document.getElementById('botToken').value = bToken; 
-    toggleTelegramPolling(); 
+  if (getWorkerUrl()) {
+    toggleTelegramPolling();
   }
   if (appData.instaPay) document.getElementById('instaPayAccount').value = appData.instaPay;
   renderAll();
