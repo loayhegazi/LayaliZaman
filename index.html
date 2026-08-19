@@ -1685,7 +1685,7 @@ function importDataJson(event){
 }
 
 /* =========================================================
-   محرك وقوائم تيليجرام المتطابقة مع إضافة المعلمين والمشاريب
+   محرك وقوائم تيليجرام المتطابقة
 ========================================================= */
 function log(msg){
   const logBox = document.getElementById('botLog');
@@ -1720,6 +1720,7 @@ function getPersistentReplyKeyboard(){
     keyboard: [
       [{ text: '📜 منيو المشاريب' }, { text: '👥 كشف الحضور' }],
       [{ text: '☕ اطلب مشروب' }, { text: '💰 كشوفات الحساب' }],
+      [{ text: '➕ ضيف صاحبك للشلة' }, { text: '➕ ضيف مشروب للمنيو' }],
       [{ text: '📚 أرشيف القعدات' }, { text: '💸 ساب فلوسه لحد' }],
       [{ text: '🧾 شيك القعدة نصياً' }, { text: '📄 شيك القعدة PDF' }],
       [{ text: '📊 فلوس الخزينة' }, { text: '⚙️ تظبيط المنيو' }]
@@ -1731,6 +1732,10 @@ function getPersistentReplyKeyboard(){
 function getMainMenuInline(){
   return {
     inline_keyboard: [
+      [
+        { text: '➕ ضيف صاحبك للشلة', callback_data: 'nav_add_person' },
+        { text: '➕ ضيف مشروب للمنيو', callback_data: 'nav_add_menu_item' }
+      ],
       [
         { text: '📜 منيو المشاريب', callback_data: 'nav_menu' },
         { text: '👥 كشف الحضور', callback_data: 'nav_presence' }
@@ -1750,9 +1755,6 @@ function getMainMenuInline(){
       [
         { text: '📊 فلوس الخزينة', callback_data: 'nav_treasury' },
         { text: '⚙️ تظبيط المنيو', callback_data: 'nav_manage_menu' }
-      ],
-      [
-        { text: '➕ ضيف حد جديد للشلة', callback_data: 'nav_add_person' }
       ]
     ]
   };
@@ -1880,7 +1882,6 @@ async function handleCallbackQuery(cb){
     return;
   }
 
-  // إضافة شخص جديد للشلة عبر تيليجرام
   if (data === 'nav_add_person') {
     userStates[chatId] = { action: 'WAITING_NEW_MEMBER_NAME' };
     editTelegramMessage(chatId, messageId, '👤 *إضافة صاحبك الجديد للشلة:*\n\n✍️ ابعتلي اسم المعلم الجديد في رسالة دلوقتي:', {
@@ -1889,7 +1890,6 @@ async function handleCallbackQuery(cb){
     return;
   }
 
-  // إضافة مشروب جديد للمنيو عبر تيليجرام
   if (data === 'nav_add_menu_item') {
     userStates[chatId] = { action: 'WAITING_NEW_ITEM_NAME' };
     editTelegramMessage(chatId, messageId, '☕ *إضافة مشروب جديد للمنيو:*\n\n✍️ ابعتلي اسم المشروب في رسالة دلوقتي:', {
@@ -2099,7 +2099,6 @@ async function handleTelegramMessage(chatId, text){
 
   const state = userStates[chatId];
   if (state) {
-    // إضافة شخص جديد للشلة
     if (state.action === 'WAITING_NEW_MEMBER_NAME') {
       const name = cleanText;
       delete userStates[chatId];
@@ -2116,7 +2115,6 @@ async function handleTelegramMessage(chatId, text){
       return;
     }
 
-    // إضافة مشروب جديد للمنيو - الخطوة 1: الاسم
     if (state.action === 'WAITING_NEW_ITEM_NAME') {
       const itemName = cleanText;
       if (!itemName) {
@@ -2129,7 +2127,6 @@ async function handleTelegramMessage(chatId, text){
       return;
     }
 
-    // إضافة مشروب جديد للمنيو - الخطوة 2: السعر
     if (state.action === 'WAITING_NEW_ITEM_PRICE') {
       const price = parseFloat(cleanText.replace(',', '.'));
       const itemName = state.itemName;
@@ -2171,6 +2168,18 @@ async function handleTelegramMessage(chatId, text){
       delete userStates[chatId];
       return;
     }
+  }
+
+  if (cleanText === '➕ ضيف صاحبك للشلة') {
+    userStates[chatId] = { action: 'WAITING_NEW_MEMBER_NAME' };
+    sendTelegramMessage(chatId, '👤 *إضافة صاحبك الجديد للشلة:*\n\n✍️ ابعتلي اسم المعلم الجديد في رسالة دلوقتي:');
+    return;
+  }
+
+  if (cleanText === '➕ ضيف مشروب للمنيو') {
+    userStates[chatId] = { action: 'WAITING_NEW_ITEM_NAME' };
+    sendTelegramMessage(chatId, '☕ *إضافة مشروب جديد للمنيو:*\n\n✍️ ابعتلي اسم المشروب في رسالة دلوقتي:');
+    return;
   }
 
   if (cleanText === '👥 كشف الحضور' || cleanText === '👥 مين قاعد ومين مأنتخ؟') {
