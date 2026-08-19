@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>دفتر قعدتنا ☕ - ليالي زمان</title>
+<title>دفتر قعدتنا ☕ - قعدة قهوة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -71,7 +71,7 @@ input:focus,select:focus{border-color:var(--brass);}
 .btn-block{width:100%;}
 .icon{font-size:1em;line-height:1;}
 
-/* ===== شاشة تسجيل الدخول الصايعة ===== */
+/* شاشة تسجيل الدخول */
 #loginOverlay{
   position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;justify-content:center;align-items:center;padding:20px;
   background:
@@ -103,7 +103,6 @@ input:focus,select:focus{border-color:var(--brass);}
 .login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(207,154,62,0.25);}
 .login-hint{font-size:0.75rem;color:var(--text-faint);}
 
-/* باقي الواجهة */
 .app-shell{max-width:1280px;margin:0 auto;display:none;}
 header{
   display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
@@ -349,7 +348,7 @@ header{
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول -->
+<!-- شاشة تسجيل الدخول الصايعة -->
 <div id="loginOverlay">
   <div class="login-card">
     <div class="login-mark">☕</div>
@@ -572,7 +571,6 @@ const GITHUB_CONFIG = {
   branch: 'main'
 };
 
-// فحص تسجيل الدخول
 function checkAppLogin() {
   const input = document.getElementById('loginPassInput');
   const entered = (input.value || '').trim();
@@ -1687,7 +1685,7 @@ function importDataJson(event){
 }
 
 /* =========================================================
-   محرك وقوائم تيليجرام المتطابقة
+   محرك وقوائم تيليجرام المتطابقة مع إضافة المعلمين والمشاريب
 ========================================================= */
 function log(msg){
   const logBox = document.getElementById('botLog');
@@ -1752,6 +1750,9 @@ function getMainMenuInline(){
       [
         { text: '📊 فلوس الخزينة', callback_data: 'nav_treasury' },
         { text: '⚙️ تظبيط المنيو', callback_data: 'nav_manage_menu' }
+      ],
+      [
+        { text: '➕ ضيف حد جديد للشلة', callback_data: 'nav_add_person' }
       ]
     ]
   };
@@ -1786,6 +1787,8 @@ function getTreasurySummaryText() {
 
 function getPresenceInline(){
   const keyboard = [];
+  keyboard.push([{ text: '➕ ضيف حد جديد للشلة', callback_data: 'nav_add_person' }]);
+  
   for (let i = 0; i < appData.members.length; i += 2) {
     const m1 = appData.members[i];
     let tag1 = '⚪'; if (m1.isPresent && !m1.hasLeft) tag1 = '🟢'; if (m1.hasLeft) tag1 = '🚶';
@@ -1803,6 +1806,8 @@ function getPresenceInline(){
 
 function getMenuInline(){
   const keyboard = [];
+  keyboard.push([{ text: '➕ ضيف مشروب جديد للمنيو', callback_data: 'nav_add_menu_item' }]);
+  
   for (let i = 0; i < appData.menu.length; i += 2) {
     const item1 = appData.menu[i];
     const row = [{ text: `☕ ${item1.name} (${item1.price} ج)`, callback_data: `price_${i}` }];
@@ -1836,6 +1841,8 @@ function getChecksInline(){
 
 function getManageMenuInline(){
   const keyboard = [];
+  keyboard.push([{ text: '➕ ضيف صنف جديد للمنيو', callback_data: 'nav_add_menu_item' }]);
+  
   for (let i = 0; i < appData.menu.length; i++) {
     const item = appData.menu[i];
     keyboard.push([{ text: `✏️ ${item.name} (${item.price} ج)`, callback_data: `itemopt_${i}` }]);
@@ -1870,6 +1877,24 @@ async function handleCallbackQuery(cb){
 
   if (data === 'nav_main') {
     editTelegramMessage(chatId, messageId, '☕ أهلاً بيك يا كبير في دفتر قعدتنا!\nاختار اللي محتاجه:', getMainMenuInline());
+    return;
+  }
+
+  // إضافة شخص جديد للشلة عبر تيليجرام
+  if (data === 'nav_add_person') {
+    userStates[chatId] = { action: 'WAITING_NEW_MEMBER_NAME' };
+    editTelegramMessage(chatId, messageId, '👤 *إضافة صاحبك الجديد للشلة:*\n\n✍️ ابعتلي اسم المعلم الجديد في رسالة دلوقتي:', {
+      inline_keyboard: [[{ text: '🔙 إلغاء والرجوع', callback_data: 'nav_presence' }]]
+    });
+    return;
+  }
+
+  // إضافة مشروب جديد للمنيو عبر تيليجرام
+  if (data === 'nav_add_menu_item') {
+    userStates[chatId] = { action: 'WAITING_NEW_ITEM_NAME' };
+    editTelegramMessage(chatId, messageId, '☕ *إضافة مشروب جديد للمنيو:*\n\n✍️ ابعتلي اسم المشروب في رسالة دلوقتي:', {
+      inline_keyboard: [[{ text: '🔙 إلغاء والرجوع', callback_data: 'nav_menu' }]]
+    });
     return;
   }
 
@@ -1941,7 +1966,7 @@ async function handleCallbackQuery(cb){
   }
 
   if (data === 'nav_manage_menu') {
-    if (appData.menu.length === 0) { editTelegramMessage(chatId, messageId, '❌ المنيو فاضي حالياً.', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
+    if (appData.menu.length === 0) { editTelegramMessage(chatId, messageId, '❌ المنيو فاضي حالياً.', { inline_keyboard: [[{ text: '➕ ضيف مشروب', callback_data: 'nav_add_menu_item' }], [{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
     editTelegramMessage(chatId, messageId, '⚙️ اختار المشروب اللي عايز تعدل اسمه أو سعره أو تمسحه خالص:', getManageMenuInline());
     return;
   }
@@ -2074,6 +2099,57 @@ async function handleTelegramMessage(chatId, text){
 
   const state = userStates[chatId];
   if (state) {
+    // إضافة شخص جديد للشلة
+    if (state.action === 'WAITING_NEW_MEMBER_NAME') {
+      const name = cleanText;
+      delete userStates[chatId];
+      if (!name) {
+        sendTelegramMessage(chatId, '❌ الاسم مينفعش يبقى فاضي يا باشا.', getPersistentReplyKeyboard());
+      } else if (appData.members.some(m => m.name.toLowerCase() === name.toLowerCase())) {
+        sendTelegramMessage(chatId, `⚠️ المعلم *${name}* متسجل في الشلة قبل كده!`, getPersistentReplyKeyboard());
+      } else {
+        appData.members.push({ name: name, isPresent: true, hasLeft: false, orders: [], isPaid: false });
+        markSessionStarted();
+        saveData();
+        sendTelegramMessage(chatId, `✅ تم إضافة المعلم *${name}* للشلة ونوّر القعدة دلوقتي! 🟢`, getPersistentReplyKeyboard());
+      }
+      return;
+    }
+
+    // إضافة مشروب جديد للمنيو - الخطوة 1: الاسم
+    if (state.action === 'WAITING_NEW_ITEM_NAME') {
+      const itemName = cleanText;
+      if (!itemName) {
+        delete userStates[chatId];
+        sendTelegramMessage(chatId, '❌ الاسم مينفعش يبقى فاضي.', getPersistentReplyKeyboard());
+        return;
+      }
+      userStates[chatId] = { action: 'WAITING_NEW_ITEM_PRICE', itemName: itemName };
+      sendTelegramMessage(chatId, `☕ مشروب: *${itemName}*\n\n✍️ ابعتلي دلوقتي *سعره كام جنيه*؟ (أرقام بس):`);
+      return;
+    }
+
+    // إضافة مشروب جديد للمنيو - الخطوة 2: السعر
+    if (state.action === 'WAITING_NEW_ITEM_PRICE') {
+      const price = parseFloat(cleanText.replace(',', '.'));
+      const itemName = state.itemName;
+      delete userStates[chatId];
+
+      if (isNaN(price) || price < 0) {
+        sendTelegramMessage(chatId, '❌ السعر مش مظبوط، جرب تضيف المشروب من الأول.', getPersistentReplyKeyboard());
+      } else {
+        const existingIdx = appData.menu.findIndex(m => m.name.toLowerCase() === itemName.toLowerCase());
+        if (existingIdx !== -1) {
+          appData.menu[existingIdx].price = price;
+        } else {
+          appData.menu.push({ name: itemName, price: price });
+        }
+        saveData();
+        sendTelegramMessage(chatId, `✅ نزلنا مشروب *${itemName}* بسعر *${price.toFixed(2)} ج* في المنيو بنجاح! ☕`, getPersistentReplyKeyboard());
+      }
+      return;
+    }
+
     if (state.action === 'WAITING_EDIT_PRICE') {
       const newPrice = parseFloat(cleanText.replace(',', '.'));
       if (isNaN(newPrice) || newPrice < 0) { sendTelegramMessage(chatId, '❌ ابعت رقم صحيح للسعر بس.'); return; }
@@ -2082,6 +2158,7 @@ async function handleTelegramMessage(chatId, text){
       delete userStates[chatId];
       return;
     }
+
     if (state.action === 'WAITING_EDIT_NAME') {
       const item = appData.menu[state.itemIndex];
       if (item) {
@@ -2144,11 +2221,7 @@ async function handleTelegramMessage(chatId, text){
   }
 
   if (cleanText === '⚙️ تظبيط المنيو' || cleanText === '⚙️ تظبيط أسعار المنيو') {
-    if (appData.menu.length === 0) {
-      sendTelegramMessage(chatId, '❌ المنيو فاضي حالياً.', getPersistentReplyKeyboard());
-      return;
-    }
-    sendTelegramMessage(chatId, '⚙️ اختار المشروب اللي عايز تعدل اسمه أو سعره أو تمسحه خالص:', getManageMenuInline());
+    sendTelegramMessage(chatId, '⚙️ اختار المشروب اللي عايز تعدل اسمه أو سعره أو ضيف صنف جديد:', getManageMenuInline());
     return;
   }
 
@@ -2233,7 +2306,6 @@ function initApp() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  // التحقق من وجود جلسة دخول نشطة مسبقاً
   const isAuth = sessionStorage.getItem('ahwa_auth_session');
   if (isAuth === 'authorized') {
     document.getElementById('loginOverlay').style.display = 'none';
