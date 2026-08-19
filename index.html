@@ -71,6 +71,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--brass);}
 .btn-block{width:100%;}
 .icon{font-size:1em;line-height:1;}
 
+/* شاشة تسجيل الدخول */
 #loginOverlay{
   position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;justify-content:center;align-items:center;padding:20px;
   background:
@@ -196,6 +197,7 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
+/* POS Multi-Select Toolbar */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -430,7 +432,7 @@ header{
   </div>
 </div>
 
-<!-- نافذة نوتة القعدة والملاحظات المنبثقة -->
+<!-- نافذة نوتة وملاحظات القعدة -->
 <div class="modal-overlay" id="notesModal">
   <div class="modal-box">
     <div class="modal-header">
@@ -586,9 +588,7 @@ function defaultData(){
     ghToken: HARDCODED_CONFIG.ghToken,
     botToken: HARDCODED_CONFIG.botToken,
     instaPay: HARDCODED_CONFIG.instaPay,
-    notes: `_pat_11A6DHWCI0sa0mAf4j5Cd2_jjvTv5XVbNTD4sZ9vS6cOsTLzD4DE7H7o5JH2V5FYxs6QNDJ5DMeLPm0UwM
-    8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450
-    `,
+    notes: '',
     sessionStartedAt: null,
     menu: [
       { name: "شاي كشري", price: 15 },
@@ -803,7 +803,7 @@ function copySessionNotes(){
 }
 
 /* =========================================================
-   محرك المزامنة والحفظ الدائم على GitHub
+   محرك المزامنة والحفظ المباشر على GitHub
 ========================================================= */
 let isSyncBusy = false;
 let syncIntervalHandle = null;
@@ -841,6 +841,7 @@ function buildSyncPayload(){
   return clone;
 }
 
+// 1. سحب أحدث نسخة من data.json
 async function pullDataFromGitHub(silent){
   const token = getGhToken();
   if (isSyncBusy) return;
@@ -855,12 +856,6 @@ async function pullDataFromGitHub(silent){
       headers: headers
     });
 
-    if (res.status === 404 && token) {
-      isSyncBusy = false;
-      await pushDataToGitHub();
-      return;
-    }
-
     if (res.ok) {
       const fileData = await res.json();
       sessionStorage.setItem('gh_file_sha', fileData.sha);
@@ -870,10 +865,15 @@ async function pullDataFromGitHub(silent){
       if (remoteData.menu && remoteData.members) {
         const remoteModified = remoteData.lastModified || 0;
         const localModified = appData.lastModified || 0;
+        
         if (remoteModified > localModified || !silent) {
           const keepGhToken = getGhToken();
           const keepBotToken = getBotToken();
-          appData = Object.assign({}, remoteData, { ghToken: keepGhToken, botToken: keepBotToken });
+          appData = Object.assign({}, remoteData, { 
+            ghToken: keepGhToken, 
+            botToken: keepBotToken,
+            notes: remoteData.notes !== undefined ? remoteData.notes : (appData.notes || '')
+          });
           localStorage.setItem(STORE_KEY, JSON.stringify(appData));
           renderAll();
           if (!silent) toast('تم تحميل آخر تحديثات القعدة ☁️', 'success');
@@ -890,17 +890,19 @@ async function pullDataFromGitHub(silent){
   }
 }
 
-async function pushDataToGitHub(isRetry){
+// 2. رفع أي تعديل جديد فوراً لـ data.json
+async function pushDataToGitHub(){
   const token = getGhToken();
   if (!token || isSyncBusy) return;
   isSyncBusy = true;
   setSyncStatus('syncing');
 
   try {
-    let sha = sessionStorage.getItem('gh_file_sha');
+    let sha = null;
     const getRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
       headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
     });
+    
     if (getRes.ok) {
       const currentFile = await getRes.json();
       sha = currentFile.sha;
@@ -915,7 +917,11 @@ async function pushDataToGitHub(isRetry){
 
     const putRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`, {
       method: 'PUT',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      headers: { 
+        'Authorization': `Bearer ${token}`, 
+        'Accept': 'application/vnd.github+json', 
+        'Content-Type': 'application/json' 
+      },
       body: JSON.stringify(payload)
     });
 
@@ -924,11 +930,6 @@ async function pushDataToGitHub(isRetry){
       sessionStorage.setItem('gh_file_sha', result.content.sha);
       lastSyncedAt = Date.now();
       setSyncStatus('synced');
-    } else if (putRes.status === 409 && !isRetry) {
-      sessionStorage.removeItem('gh_file_sha');
-      isSyncBusy = false;
-      await pushDataToGitHub(true);
-      return;
     } else {
       setSyncStatus('error');
     }
@@ -945,7 +946,7 @@ function startAutoSync(){
   if (!getGhToken()) return;
   syncIntervalHandle = setInterval(() => {
     if (document.visibilityState === 'visible') pullDataFromGitHub(true);
-  }, 15000);
+  }, 10000);
 }
 
 function stopAutoSync(){
