@@ -8,6 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Firebase Realtime Database SDK (Compat Mode) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
 :root{
   --bg:#15100b;
@@ -71,7 +76,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--brass);}
 .btn-block{width:100%;}
 .icon{font-size:1em;line-height:1;}
 
-/* شاشة تسجيل الدخول */
 #loginOverlay{
   position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;justify-content:center;align-items:center;padding:20px;
   background:
@@ -129,7 +133,7 @@ header{
 }
 .header-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:620px;justify-content:flex-end;}
 .sync-pill{
-  display:none;align-items:center;gap:6px;background:var(--surface-2);color:var(--text-dim);
+  display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);color:var(--text-dim);
   border:1px solid var(--line);padding:5px 11px;border-radius:100px;font-size:.74rem;font-weight:700;
 }
 .sync-pill.syncing{color:var(--sky);border-color:rgba(59,127,166,0.4);}
@@ -202,7 +206,6 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
-/* POS Multi-Select Toolbar */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -376,19 +379,19 @@ header{
       <div class="brand-mark">☕</div>
       <div>
         <h1>دفتر قعدتنا</h1>
-        <p>حساب القهوة والشلة… مزامنة سحابية على GitHub ومحفوظة دايماً</p>
+        <p>حساب القهوة والشلة… مزامنة سحابية على Firebase ومحفوظة دايماً</p>
         <div class="session-timer" id="sessionTimer" style="display:none;">⏱️ <span id="sessionTimerText"></span></div>
       </div>
     </div>
     <div class="header-actions">
-      <div class="sync-pill" id="syncStatusPill"><span class="sync-dot" id="syncStatusDot"></span><span id="syncStatusText">مزامنة سحابية</span></div>
+      <div class="sync-pill" id="syncStatusPill"><span class="sync-dot" id="syncStatusDot"></span><span id="syncStatusText">Firebase متصل</span></div>
       <button class="btn-ghost btn-sm" onclick="openNotesModal()">📝 نوتة القعدة</button>
       <button class="btn-ghost btn-sm" onclick="openHistoryModal()">📚 أرشيف القعدات</button>
       <button class="btn-ghost btn-sm" onclick="exportBillPdf()">📄 شيك PDF</button>
       <button class="btn-ghost btn-sm" onclick="exportBillImage()">🖼️ شيك صورة</button>
       <button class="btn-primary btn-sm" onclick="copySessionSummary()">📋 شير واتساب</button>
       <button class="btn-danger btn-sm" onclick="resetSessionOrders()">🔄 قعدة جديدة</button>
-      <button class="gear-btn" title="إعدادات والتزامن السحابي" onclick="openSettingsModal()">⚙️</button>
+      <button class="gear-btn" title="إعدادات وتليجرام" onclick="openSettingsModal()">⚙️</button>
       <button class="btn-ghost btn-xs" style="color:var(--text-faint);" title="تسجيل الخروج" onclick="logoutApp()">🚪 خروج</button>
     </div>
   </header>
@@ -438,7 +441,6 @@ header{
   </div>
 </div>
 
-<!-- نافذة نوتة وملاحظات القعدة -->
 <div class="modal-overlay" id="notesModal">
   <div class="modal-box">
     <div class="modal-header">
@@ -465,18 +467,8 @@ header{
 
 <div class="modal-overlay" id="settingsModal">
   <div class="modal-box">
-    <div class="modal-header"><span>⚙️ إعدادات المزامنة السحابية & الداتا</span><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
+    <div class="modal-header"><span>⚙️ إعدادات الحساب وتيليجرام</span><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
     <div class="modal-body">
-      <div class="form-group" style="background:var(--bg-2); padding:12px; border-radius:10px; border:1px solid var(--brass);">
-        <label style="color:var(--brass-hover); font-weight:bold;">☁️ المزامنة السحابية الدائمة (GitHub Token)</label>
-        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">التوكن مثبت ومحفوظ تلقائياً في النظام للمزامنة اللحظية بين الأجهزة.</p>
-        <div class="row-group">
-          <input type="password" id="ghTokenInput" placeholder="github_pat_...">
-          <button class="btn-mint btn-sm" onclick="saveGhToken()">حفظ ومزامنة</button>
-          <button class="btn-ghost btn-sm" onclick="manualSyncNow()">🔄 زامن دلوقتي</button>
-        </div>
-      </div>
-
       <div class="form-group">
         <label>عنوان / رقم InstaPay بتاعك (بيظهر في الشيك)</label>
         <div class="row-group">
@@ -571,23 +563,27 @@ header{
 
 <script>
 /* =========================================================
-   التوكنات المثبتة والبيانات الافتراضية المدمجة
+   إعدادات Firebase وكلمة السر المدمجة
 ========================================================= */
 const APP_PASSWORD = '@hw@2022';
 
+// ⬇️ الصق إعدادات Firebase الخاصة بمشروعك هنا ⬇️
+const FIREBASE_CONFIG = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
 const HARDCODED_CONFIG = {
-  ghToken: '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',
   botToken: '8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450',
   instaPay: ''
 };
 
 const STORE_KEY = 'cafe_egypt_ledger_v6';
-const GITHUB_CONFIG = {
-  owner: 'loayhegazi',
-  repo: 'LayaliZaman',
-  path: 'data.json',
-  branch: 'main'
-};
 
 function toggleLoginPassword() {
   const input = document.getElementById('loginPassInput');
@@ -603,7 +599,6 @@ function toggleLoginPassword() {
 
 function defaultData(){
   return {
-    ghToken: HARDCODED_CONFIG.ghToken,
     botToken: HARDCODED_CONFIG.botToken,
     instaPay: HARDCODED_CONFIG.instaPay,
     notes: '',
@@ -729,7 +724,6 @@ function loadAppData(){
   if (fresh) {
     try { loaded = JSON.parse(fresh); } catch(e){}
   }
-  if (!loaded.ghToken && HARDCODED_CONFIG.ghToken) loaded.ghToken = HARDCODED_CONFIG.ghToken;
   if (!loaded.botToken && HARDCODED_CONFIG.botToken) loaded.botToken = HARDCODED_CONFIG.botToken;
   if (!loaded.instaPay && HARDCODED_CONFIG.instaPay) loaded.instaPay = HARDCODED_CONFIG.instaPay;
   if (loaded.notes === undefined) loaded.notes = '';
@@ -742,20 +736,19 @@ let isPolling = false;
 let lastUpdateId = 0;
 let selectedPersonIndices = [];
 let sessionFilter = 'all';
-let syncTimeout = null;
+let dbRef = null;
+let isFirebaseReady = false;
 
 async function checkAppLogin() {
   const input = document.getElementById('loginPassInput');
   const entered = (input.value || '').trim();
-
-  // يقبل الباسورد سواء تم إدخاله بالإنجليزية مباشرة أو بتأثير الـ RTL
   const isValid = (entered === '@hw@2022' || entered === 'hw@2022@' || entered === '2022@hw@');
 
   if (isValid) {
     sessionStorage.setItem('ahwa_auth_session', 'authorized');
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainAppShell').style.display = 'block';
-    toast('نوّرت يا معلم! بنجيب آخر طلبات من السحابة... ☕', 'success', 2500);
+    toast('نوّرت يا معلم! بنربط مع سحابة Firebase... ☕', 'success', 2500);
     await initApp();
   } else {
     input.value = '';
@@ -778,15 +771,74 @@ function logoutApp() {
   toast('خرجت من القعدة.. مع السلامة يا معلم! 🚪', 'info');
 }
 
+/* =========================================================
+   محرك المزامنة الحية عبر Firebase Realtime Database
+========================================================= */
+function initFirebase() {
+  if (isFirebaseReady) return;
+  try {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    const db = firebase.database();
+    dbRef = db.ref('ahwa_ledger');
+
+    // الاستماع الفوري لأي تعديل يحصل على أي جهاز
+    dbRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.members && data.menu) {
+        appData = Object.assign({}, defaultData(), data);
+        localStorage.setItem(STORE_KEY, JSON.stringify(appData));
+        renderAll();
+        setSyncStatus('synced');
+      } else {
+        // إذا كانت قاعدة البيانات في Firebase فارغة لأول مرة، ارفع البيانات الافتراضية
+        pushDataToFirebase();
+      }
+    });
+
+    isFirebaseReady = true;
+    setSyncStatus('synced');
+  } catch (err) {
+    console.error("Firebase init error:", err);
+    setSyncStatus('error');
+  }
+}
+
+function setSyncStatus(state){
+  const pill = document.getElementById('syncStatusPill');
+  const dot = document.getElementById('syncStatusDot');
+  const text = document.getElementById('syncStatusText');
+  if (!pill) return;
+  pill.className = 'sync-pill ' + (state || '');
+  if (state === 'syncing') text.innerText = 'بيحفظ على Firebase...';
+  else if (state === 'synced') text.innerText = 'متصل سحابياً ☁️';
+  else if (state === 'error') text.innerText = 'مشكلة في اتصال Firebase';
+  else text.innerText = 'Firebase متصل';
+}
+
+function buildSyncPayload(){
+  const clone = JSON.parse(JSON.stringify(appData));
+  delete clone.botToken;
+  return clone;
+}
+
+function pushDataToFirebase(){
+  if (!dbRef) return;
+  setSyncStatus('syncing');
+  dbRef.set(buildSyncPayload())
+    .then(() => setSyncStatus('synced'))
+    .catch((err) => {
+      console.error('Firebase Push Error:', err);
+      setSyncStatus('error');
+    });
+}
+
 function saveData(){
   appData.lastModified = Date.now();
   localStorage.setItem(STORE_KEY, JSON.stringify(appData));
   renderAll();
-
-  clearTimeout(syncTimeout);
-  syncTimeout = setTimeout(() => {
-    pushDataToGitHub();
-  }, 800);
+  pushDataToFirebase();
 }
 
 function renderAll(){
@@ -797,9 +849,6 @@ function renderAll(){
   renderStats();
 }
 
-/* =========================================================
-   إدارة النوتة والملاحظات المنبثقة
-========================================================= */
 function openNotesModal(){
   document.getElementById('sessionNotesInput').value = appData.notes || '';
   openModal('notesModal');
@@ -822,185 +871,6 @@ function copySessionNotes(){
     toast('حصل خطأ في النسخ', 'error');
   });
 }
-
-/* =========================================================
-   محرك المزامنة والحفظ المباشر على GitHub
-========================================================= */
-let isSyncBusy = false;
-let syncIntervalHandle = null;
-let lastSyncedAt = null;
-
-function getGhToken(){
-  return (appData.ghToken || HARDCODED_CONFIG.ghToken || localStorage.getItem('gh_sync_token') || '').trim();
-}
-
-function getBotToken(){
-  return (appData.botToken || HARDCODED_CONFIG.botToken || '').trim();
-}
-
-function setSyncStatus(state){
-  const pill = document.getElementById('syncStatusPill');
-  const dot = document.getElementById('syncStatusDot');
-  const text = document.getElementById('syncStatusText');
-  if (!pill) return;
-  if (!getGhToken()) { pill.style.display = 'none'; return; }
-  pill.style.display = 'inline-flex';
-  pill.className = 'sync-pill ' + (state || '');
-  if (state === 'syncing') text.innerText = 'بيحفظ سحابياً...';
-  else if (state === 'synced') {
-    const t = lastSyncedAt ? new Date(lastSyncedAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
-    text.innerText = t ? `متزامن ☁️ - ${t}` : 'متزامن ☁️';
-  }
-  else if (state === 'error') text.innerText = 'مشكلة في الحفظ السحابي';
-  else text.innerText = 'مزامنة سحابية';
-}
-
-function buildSyncPayload(){
-  const clone = JSON.parse(JSON.stringify(appData));
-  delete clone.ghToken;
-  delete clone.botToken;
-  return clone;
-}
-
-// 1. سحب أحدث نسخة من data.json
-async function pullDataFromGitHub(silent){
-  const token = getGhToken();
-  if (isSyncBusy) return;
-  isSyncBusy = true;
-  if (!silent && token) setSyncStatus('syncing');
-
-  try {
-    const headers = { 'Accept': 'application/vnd.github+json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
-      headers: headers
-    });
-
-    if (res.ok) {
-      const fileData = await res.json();
-      sessionStorage.setItem('gh_file_sha', fileData.sha);
-      const content = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
-      const remoteData = JSON.parse(content);
-
-      if (remoteData.menu && remoteData.members) {
-        const remoteModified = remoteData.lastModified || 0;
-        const localModified = appData.lastModified || 0;
-        
-        if (remoteModified > localModified || !silent) {
-          const keepGhToken = getGhToken();
-          const keepBotToken = getBotToken();
-          appData = Object.assign({}, remoteData, { 
-            ghToken: keepGhToken, 
-            botToken: keepBotToken,
-            notes: remoteData.notes !== undefined ? remoteData.notes : (appData.notes || '')
-          });
-          localStorage.setItem(STORE_KEY, JSON.stringify(appData));
-          renderAll();
-          if (!silent) toast('تم تحميل آخر تحديثات القعدة ☁️', 'success');
-        }
-      }
-      lastSyncedAt = Date.now();
-      setSyncStatus('synced');
-    }
-  } catch (err) {
-    console.error('GitHub Pull Error:', err);
-    setSyncStatus('error');
-  } finally {
-    isSyncBusy = false;
-  }
-}
-
-// 2. رفع أي تعديل جديد فوراً لـ data.json
-async function pushDataToGitHub(){
-  const token = getGhToken();
-  if (!token || isSyncBusy) return;
-  isSyncBusy = true;
-  setSyncStatus('syncing');
-
-  try {
-    let sha = null;
-    const getRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
-    });
-    
-    if (getRes.ok) {
-      const currentFile = await getRes.json();
-      sha = currentFile.sha;
-    }
-
-    const payload = {
-      message: `Update data.json: ${new Date().toISOString()}`,
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(buildSyncPayload(), null, 2)))),
-      branch: GITHUB_CONFIG.branch,
-      ...(sha ? { sha } : {})
-    };
-
-    const putRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`, {
-      method: 'PUT',
-      headers: { 
-        'Authorization': `Bearer ${token}`, 
-        'Accept': 'application/vnd.github+json', 
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (putRes.ok) {
-      const result = await putRes.json();
-      sessionStorage.setItem('gh_file_sha', result.content.sha);
-      lastSyncedAt = Date.now();
-      setSyncStatus('synced');
-    } else {
-      setSyncStatus('error');
-    }
-  } catch (err) {
-    console.error('GitHub Push Error:', err);
-    setSyncStatus('error');
-  } finally {
-    isSyncBusy = false;
-  }
-}
-
-function startAutoSync(){
-  if (syncIntervalHandle) clearInterval(syncIntervalHandle);
-  if (!getGhToken()) return;
-  syncIntervalHandle = setInterval(() => {
-    if (document.visibilityState === 'visible') pullDataFromGitHub(true);
-  }, 10000);
-}
-
-function stopAutoSync(){
-  if (syncIntervalHandle) clearInterval(syncIntervalHandle);
-  syncIntervalHandle = null;
-}
-
-async function manualSyncNow(){
-  if (!getGhToken()) return toast('حط توكن GitHub الأول', 'error');
-  await pullDataFromGitHub();
-  await pushDataToGitHub();
-  toast('تم حفظ ومزامنة الداتا على GitHub ☁️', 'success');
-}
-
-function saveGhToken() {
-  const val = document.getElementById('ghTokenInput').value.trim();
-  appData.ghToken = val;
-  localStorage.setItem('gh_sync_token', val);
-  saveData();
-  setSyncStatus('idle');
-  if (val) {
-    toast('تم حفظ التوكن، جاري المزامنة مع data.json...', 'success');
-    pushDataToGitHub();
-    startAutoSync();
-  } else {
-    stopAutoSync();
-    toast('تم مسح التوكن', 'info');
-  }
-}
-
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullDataFromGitHub(true); });
-window.addEventListener('focus', () => pullDataFromGitHub(true));
-window.addEventListener('online', () => { toast('رجع النت! بنزامن دلوقتي...', 'info'); pullDataFromGitHub(true); });
 
 function toast(msg, type='info', ms=3200){
   const stack = document.getElementById('toastStack');
@@ -1704,7 +1574,7 @@ async function exportBillPdf(){
 async function sendPdfToTelegram(chatId){
   const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
   if (sessionMembers.length === 0) { await sendTelegramMessage(chatId, '❌ مفيش مشاريب مسجلة في القعدة دلوقتي.'); return; }
-  const token = getBotToken();
+  const token = HARDCODED_CONFIG.botToken;
   if (!token) return;
   await sendTelegramMessage(chatId, '⏳ دقيقة واحدة.. بنرفعلك الشيك PDF...');
   populateBillData();
@@ -1769,8 +1639,7 @@ function copySessionSummary(){
 
 function openSettingsModal(){
   document.getElementById('instaPayAccount').value = appData.instaPay || '';
-  document.getElementById('botToken').value = getBotToken();
-  document.getElementById('ghTokenInput').value = getGhToken();
+  document.getElementById('botToken').value = HARDCODED_CONFIG.botToken;
   openModal('settingsModal');
 }
 
@@ -1826,7 +1695,7 @@ function log(msg){
 }
 
 async function sendTelegramMessage(chatId, text, replyMarkup = null){
-  const token = getBotToken();
+  const token = HARDCODED_CONFIG.botToken;
   if (!token) return;
   const payload = { chat_id: chatId, text, parse_mode: 'Markdown' };
   if (replyMarkup) payload.reply_markup = replyMarkup;
@@ -1834,7 +1703,7 @@ async function sendTelegramMessage(chatId, text, replyMarkup = null){
 }
 
 async function editTelegramMessage(chatId, messageId, text, replyMarkup = null){
-  const token = getBotToken();
+  const token = HARDCODED_CONFIG.botToken;
   if (!token) return;
   const payload = { chat_id: chatId, message_id: messageId, text, parse_mode: 'Markdown' };
   if (replyMarkup) payload.reply_markup = replyMarkup;
@@ -1842,7 +1711,7 @@ async function editTelegramMessage(chatId, messageId, text, replyMarkup = null){
 }
 
 async function answerCallbackQuery(callbackQueryId, text = '', showAlert = false){
-  const token = getBotToken();
+  const token = HARDCODED_CONFIG.botToken;
   if (!token) return;
   try { fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ callback_query_id: callbackQueryId, text, show_alert: showAlert }) }); } catch (err) {}
 }
@@ -2386,7 +2255,7 @@ async function handleTelegramMessage(chatId, text){
 
 async function pollTelegramUpdates(){
   if (!isPolling) return;
-  const token = getBotToken();
+  const token = HARDCODED_CONFIG.botToken;
   if (!token) { toggleTelegramPolling(); return; }
   try {
     const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${lastUpdateId + 1}&timeout=5`);
@@ -2403,15 +2272,13 @@ async function pollTelegramUpdates(){
 }
 
 function toggleTelegramPolling(){
-  const token = getBotToken();
+  const token = HARDCODED_CONFIG.botToken;
   const dot = document.getElementById('botStatusDot');
   const statusText = document.getElementById('botStatusText');
   const btn = document.getElementById('toggleBotBtn');
 
   if (!isPolling) {
     if (!token) return toast('حط توكن البوت الأول يا باشا', 'error');
-    appData.botToken = token;
-    localStorage.setItem(STORE_KEY, JSON.stringify(appData));
     isPolling = true;
     dot.classList.add('active');
     statusText.innerText = 'البوت صاحي ومنوّر';
@@ -2429,21 +2296,14 @@ function toggleTelegramPolling(){
   }
 }
 
-/* =========================================================
-   تشغيل الصفحة
-========================================================= */
 async function initApp() {
-  const bToken = getBotToken();
-  if (bToken) { 
-    document.getElementById('botToken').value = bToken; 
+  if (HARDCODED_CONFIG.botToken) { 
+    document.getElementById('botToken').value = HARDCODED_CONFIG.botToken; 
     toggleTelegramPolling(); 
   }
   if (appData.instaPay) document.getElementById('instaPayAccount').value = appData.instaPay;
   renderAll();
-  setSyncStatus('idle');
-
-  await pullDataFromGitHub();
-  startAutoSync();
+  initFirebase();
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
