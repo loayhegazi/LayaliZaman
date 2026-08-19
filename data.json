@@ -1,7 +1,7 @@
 {
   "instaPay": "",
   "notes": "_pat_11A6DHWCI0sa0mAf4j5Cd2_jjvTv5XVbNTD4sZ9vS6cOsTLzD4DE7H7o5JH2V5FYxs6QNDJ5DMeLPm0UwM\n    8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450\n    ",
-  "sessionStartedAt": null,
+  "sessionStartedAt": 1787143876631,
   "menu": [
     {
       "name": "شاي كشري",
@@ -152,7 +152,7 @@
     },
     {
       "name": "loay",
-      "isPresent": false,
+      "isPresent": true,
       "hasLeft": false,
       "orders": [],
       "isPaid": false
@@ -319,5 +319,5 @@
       ]
     }
   ],
-  "lastModified": 1787143873546
+  "lastModified": 1787143876631
 }
