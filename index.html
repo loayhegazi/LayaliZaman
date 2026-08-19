@@ -165,7 +165,6 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
-/* POS Multi-Select Toolbar */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -403,7 +402,7 @@ header{
           <button class="btn-mint btn-sm" onclick="saveGhToken()">حفظ ومزامنة</button>
           <button class="btn-ghost btn-sm" onclick="manualSyncNow()">🔄 زامن دلوقتي</button>
         </div>
-        <p style="font-size:.72rem;color:var(--text-faint);">التوكن بيتحفظ على جهازك بس ومش بيتبعت جوه ملف الداتا، والمزامنة بتحصل تلقائي كل شوية طول ما الصفحة فاتحة.</p>
+        <p style="font-size:.72rem;color:var(--text-faint);">التوكن بيتحفظ على جهازك بس ومش بيتبعت جوه ملف الداتا، والمزامنة بتحصل تلقائي مع كل تغيير.</p>
       </div>
 
       <div class="form-group">
@@ -552,8 +551,6 @@ let appData = loadAppData();
 const userStates = {};
 let isPolling = false;
 let lastUpdateId = 0;
-
-// دعم التحديد المتعدد للأشخاص
 let selectedPersonIndices = [];
 let sessionFilter = 'all';
 let syncTimeout = null;
@@ -563,10 +560,11 @@ function saveData(){
   localStorage.setItem(STORE_KEY, JSON.stringify(appData));
   renderAll();
 
+  // رفع فوري تلقائي لـ data.json على GitHub
   clearTimeout(syncTimeout);
   syncTimeout = setTimeout(() => {
     pushDataToGitHub();
-  }, 1000);
+  }, 800);
 }
 
 function renderAll(){
@@ -578,7 +576,7 @@ function renderAll(){
 }
 
 /* =========================================================
-   محرك المزامنة التلقائية مع GitHub
+   محرك المزامنة والحفظ الدائم على GitHub
 ========================================================= */
 let isSyncBusy = false;
 let syncIntervalHandle = null;
@@ -596,12 +594,12 @@ function setSyncStatus(state){
   if (!getGhToken()) { pill.style.display = 'none'; return; }
   pill.style.display = 'inline-flex';
   pill.className = 'sync-pill ' + (state || '');
-  if (state === 'syncing') text.innerText = 'بيتزامن...';
+  if (state === 'syncing') text.innerText = 'بيحفظ سحابياً...';
   else if (state === 'synced') {
     const t = lastSyncedAt ? new Date(lastSyncedAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
-    text.innerText = t ? `متزامن - ${t}` : 'متزامن';
+    text.innerText = t ? `محفوظ ☁️ - ${t}` : 'محفوظ ☁️';
   }
-  else if (state === 'error') text.innerText = 'هنعيد المحاولة تاني...';
+  else if (state === 'error') text.innerText = 'مشكلة في الحفظ السحابي';
   else text.innerText = 'مزامنة سحابية';
 }
 
@@ -612,18 +610,22 @@ function buildSyncPayload(){
   return clone;
 }
 
+// قراءة من GitHub حتى لو بدون Token
 async function pullDataFromGitHub(silent){
   const token = getGhToken();
-  if (!token || isSyncBusy) return;
+  if (isSyncBusy) return;
   isSyncBusy = true;
-  if (!silent) setSyncStatus('syncing');
+  if (!silent && token) setSyncStatus('syncing');
 
   try {
+    const headers = { 'Accept': 'application/vnd.github+json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
     const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+      headers: headers
     });
 
-    if (res.status === 404) {
+    if (res.status === 404 && token) {
       isSyncBusy = false;
       await pushDataToGitHub();
       return;
@@ -639,21 +641,16 @@ async function pullDataFromGitHub(silent){
         const remoteModified = remoteData.lastModified || 0;
         const localModified = appData.lastModified || 0;
         if (remoteModified > localModified) {
-          const keepGhToken = appData.ghToken;
+          const keepGhToken = appData.ghToken || localStorage.getItem('gh_sync_token');
           const keepBotToken = appData.botToken;
           appData = Object.assign({}, remoteData, { ghToken: keepGhToken, botToken: keepBotToken });
           localStorage.setItem(STORE_KEY, JSON.stringify(appData));
           renderAll();
-          if (!silent) toast('جاتلك تحديثات من جهاز تاني ☁️', 'success');
+          if (!silent) toast('تم سحب أحدث بيانات من السحابة ☁️', 'success');
         }
       }
       lastSyncedAt = Date.now();
       setSyncStatus('synced');
-    } else if (res.status === 401 || res.status === 403) {
-      setSyncStatus('error');
-      if (!silent) toast('التوكن مش شغال أو مالوش صلاحية كافية', 'error');
-    } else {
-      setSyncStatus('error');
     }
   } catch (err) {
     console.error('GitHub Pull Error:', err);
@@ -663,6 +660,7 @@ async function pullDataFromGitHub(silent){
   }
 }
 
+// حفظ فوري ومباشر في ملف data.json على GitHub
 async function pushDataToGitHub(isRetry){
   const token = getGhToken();
   if (!token || isSyncBusy) return;
@@ -670,16 +668,18 @@ async function pushDataToGitHub(isRetry){
   setSyncStatus('syncing');
 
   try {
+    // جلب الـ SHA الأحدث للملف لتفادي أي رفض للطلب (409)
     let sha = sessionStorage.getItem('gh_file_sha');
-    if (!sha) {
-      const getRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`, {
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
-      });
-      if (getRes.ok) { const currentFile = await getRes.json(); sha = currentFile.sha; }
+    const getRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+    });
+    if (getRes.ok) {
+      const currentFile = await getRes.json();
+      sha = currentFile.sha;
     }
 
     const payload = {
-      message: `Sync session data: ${new Date().toISOString()}`,
+      message: `Update data.json: ${new Date().toISOString()}`,
       content: btoa(unescape(encodeURIComponent(JSON.stringify(buildSyncPayload(), null, 2)))),
       branch: GITHUB_CONFIG.branch,
       ...(sha ? { sha } : {})
@@ -701,9 +701,6 @@ async function pushDataToGitHub(isRetry){
       isSyncBusy = false;
       await pushDataToGitHub(true);
       return;
-    } else if (putRes.status === 401 || putRes.status === 403) {
-      setSyncStatus('error');
-      toast('التوكن مش شغال أو مالوش صلاحية الكتابة على الريبو', 'error');
     } else {
       setSyncStatus('error');
     }
@@ -732,7 +729,7 @@ async function manualSyncNow(){
   if (!getGhToken()) return toast('حط توكن GitHub الأول', 'error');
   await pullDataFromGitHub();
   await pushDataToGitHub();
-  toast('اتزامنت الداتا دلوقتي ☁️', 'success');
+  toast('تم حفظ ومزامنة الداتا على GitHub ☁️', 'success');
 }
 
 function saveGhToken() {
@@ -742,12 +739,12 @@ function saveGhToken() {
   saveData();
   setSyncStatus('idle');
   if (val) {
-    toast('تم حفظ التوكن، جاري المزامنة...', 'success');
-    pullDataFromGitHub();
+    toast('تم حفظ التوكن، جاري المزامنة مع data.json...', 'success');
+    pushDataToGitHub();
     startAutoSync();
   } else {
     stopAutoSync();
-    toast('تم مسح التوكن، المزامنة السحابية واقفة دلوقتي', 'info');
+    toast('تم مسح التوكن', 'info');
   }
 }
 
@@ -993,7 +990,6 @@ function renderPos(){
     .map((m, idx) => ({ ...m, idx }))
     .filter(m => m.isPresent && !m.hasLeft);
 
-  // تنظيف أي محددين مش موجودين في القعدة حالياً
   selectedPersonIndices = selectedPersonIndices.filter(i => activeMembers.some(m => m.idx === i));
 
   if (activeMembers.length === 0) {
@@ -1001,7 +997,6 @@ function renderPos(){
   } else {
     let toolbarHtml = '';
     
-    // شريط ملخص التحديد وأزرار التحكم
     if (selectedPersonIndices.length > 0) {
       const selectedNames = selectedPersonIndices.map(i => appData.members[i].name).join('، ');
       toolbarHtml = `
@@ -1071,7 +1066,6 @@ function clearPosSelection(){
   renderPos();
 }
 
-// تنفيذ الطلب لجميع الأشخاص المحددين معاً
 function posOrder(menuIndex){
   if (selectedPersonIndices.length === 0) {
     return toast('اختار مين هيشرب الأول (تقدر تختار أكتر من واحد) ☝️', 'error');
@@ -1598,7 +1592,7 @@ function importDataJson(event){
 }
 
 /* =========================================================
-   محرك وقوائم تيليجرام المتطابقة (Inline & Reply)
+   محرك وقوائم تيليجرام المتطابقة
 ========================================================= */
 function log(msg){
   const logBox = document.getElementById('botLog');
