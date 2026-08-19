@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>دفتر قعدتنا ☕ - قعدة قهوة</title>
+<title>دفتر قعدتنا ☕ - ليالي زمان</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -71,38 +71,7 @@ input:focus,select:focus{border-color:var(--brass);}
 .btn-block{width:100%;}
 .icon{font-size:1em;line-height:1;}
 
-#loginOverlay{
-  position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;justify-content:center;align-items:center;padding:20px;
-  background:
-    radial-gradient(ellipse 600px 400px at 50% 20%, rgba(207,154,62,0.15), transparent 70%),
-    var(--bg);
-}
-.login-card{
-  background:var(--surface);border:1.5px solid var(--brass);border-radius:20px;padding:32px 28px;
-  width:100%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);
-  display:flex;flex-direction:column;gap:18px;position:relative;
-}
-.login-mark{
-  width:68px;height:68px;border-radius:18px;background:linear-gradient(145deg, var(--brass), #8a5f20);
-  margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:2.2rem;
-  box-shadow:0 8px 20px rgba(207,154,62,0.3);
-}
-.login-card h2{font-size:1.5rem;color:var(--paper);font-weight:900;}
-.login-card p{font-size:0.85rem;color:var(--text-dim);line-height:1.6;}
-.login-input-group{position:relative;}
-.login-input-group input{
-  text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:monospace;
-  border:1.5px solid var(--line);background:var(--bg-2);padding:12px;
-}
-.login-input-group input:focus{border-color:var(--brass);box-shadow:0 0 0 3px var(--brass-dim);}
-.login-btn{
-  background:linear-gradient(135deg, var(--brass), var(--brass-hover));
-  color:#1a1206;padding:12px;font-size:1rem;font-weight:900;border-radius:10px;
-}
-.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(207,154,62,0.25);}
-.login-hint{font-size:0.75rem;color:var(--text-faint);}
-
-.app-shell{max-width:1280px;margin:0 auto;display:none;}
+.app-shell{max-width:1280px;margin:0 auto;}
 header{
   display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
   padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line);
@@ -121,7 +90,7 @@ header{
   background:var(--brass-dim);color:var(--brass-hover);border:1px solid rgba(207,154,62,0.35);
   padding:3px 10px;border-radius:100px;font-size:.74rem;font-weight:700;
 }
-.header-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:580px;justify-content:flex-end;}
+.header-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:520px;justify-content:flex-end;}
 .sync-pill{
   display:none;align-items:center;gap:6px;background:var(--surface-2);color:var(--text-dim);
   border:1px solid var(--line);padding:5px 11px;border-radius:100px;font-size:.74rem;font-weight:700;
@@ -196,6 +165,7 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
+/* POS Multi-Select Toolbar */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -345,23 +315,7 @@ header{
 </style>
 </head>
 <body>
-
-<div id="loginOverlay">
-  <div class="login-card">
-    <div class="login-mark">☕</div>
-    <div>
-      <h2>نوّرت قعدة قهوة</h2>
-      <p>الدفتر ده للمعلمين بس.. اكتب كلمة السر عشان تفتح القعدة والطلبات!</p>
-    </div>
-    <div class="login-input-group">
-      <input type="password" id="loginPassInput" placeholder="••• كلمة السر •••" onkeydown="if(event.key==='Enter')checkAppLogin()">
-    </div>
-    <button class="login-btn" onclick="checkAppLogin()">ادخل القعدة يا معلم 🚪</button>
-    <div class="login-hint">لو نسيت الباسورد اسأل صاحب القعدة 😉</div>
-  </div>
-</div>
-
-<div class="app-shell" id="mainAppShell">
+<div class="app-shell">
 
   <header>
     <div class="brand">
@@ -380,7 +334,6 @@ header{
       <button class="btn-primary btn-sm" onclick="copySessionSummary()">📋 شير واتساب</button>
       <button class="btn-danger btn-sm" onclick="resetSessionOrders()">🔄 قعدة جديدة</button>
       <button class="gear-btn" title="إعدادات والتزامن السحابي" onclick="openSettingsModal()">⚙️</button>
-      <button class="btn-ghost btn-xs" style="color:var(--text-faint);" title="تسجيل الخروج" onclick="logoutApp()">🚪 خروج</button>
     </div>
   </header>
 
@@ -429,6 +382,7 @@ header{
   </div>
 </div>
 
+<!-- نافذة سجل الأرشيف -->
 <div class="modal-overlay" id="historyModal">
   <div class="modal-box">
     <div class="modal-header"><span>📚 أرشيف وسجل القعدات السابقة</span><button class="modal-close" onclick="closeModal('historyModal')">✕</button></div>
@@ -436,21 +390,20 @@ header{
   </div>
 </div>
 
+<!-- نافذة الإعدادات والتزامن السحابي -->
 <div class="modal-overlay" id="settingsModal">
   <div class="modal-box">
     <div class="modal-header"><span>⚙️ إعدادات المزامنة السحابية & الداتا</span><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
     <div class="modal-body">
       <div class="form-group" style="background:var(--bg-2); padding:12px; border-radius:10px; border:1px solid var(--brass);">
-        <label style="color:var(--brass-hover); font-weight:bold;">☁️ المزامنة السحابية الدائمة (عن طريق Worker)</label>
-        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">التوكنات الحقيقية محفوظة جوه الـ Worker مش هنا - ده أأمن وميتقفلش من جيت هب.</p>
+        <label style="color:var(--brass-hover); font-weight:bold;">☁️ المزامنة السحابية الدائمة (GitHub Token)</label>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">حط التوكن هنا مرة واحدة عشان الداتا تتسجل وتتزامن تلقائياً بين الموبايل واللابتوب.</p>
         <div class="row-group">
-          <input type="text" id="ghTokenInput" placeholder="رابط الـ Worker: https://xxx.workers.dev">
-        </div>
-        <div class="row-group" style="margin-top:6px;">
-          <input type="password" id="appSecretInput" placeholder="App Secret (زي ما حطيته في الـ Worker)">
+          <input type="password" id="ghTokenInput" placeholder="github_pat_...">
           <button class="btn-mint btn-sm" onclick="saveGhToken()">حفظ ومزامنة</button>
           <button class="btn-ghost btn-sm" onclick="manualSyncNow()">🔄 زامن دلوقتي</button>
         </div>
+        <p style="font-size:.72rem;color:var(--text-faint);">التوكن بيتحفظ على جهازك بس ومش بيتبعت جوه ملف الداتا، والمزامنة بتحصل تلقائي كل شوية طول ما الصفحة فاتحة.</p>
       </div>
 
       <div class="form-group">
@@ -473,8 +426,8 @@ header{
 
       <div class="form-group">
         <label>بوت تيليجرام (اختياري - للطلبات عن بعد)</label>
-        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;">توكن البوت محفوظ جوه الـ Worker برضه - مش محتاج تحطه هنا، بس لازم رابط الـ Worker يبقى متسجل فوق.</p>
         <div class="row-group">
+          <input type="password" id="botToken" placeholder="حط توكن تيليجرام هنا">
           <button id="toggleBotBtn" class="btn-mint btn-sm" onclick="toggleTelegramPolling()">صحّي البوت</button>
         </div>
         <div class="bot-status-container">
@@ -487,6 +440,7 @@ header{
   </div>
 </div>
 
+<!-- نافذة تعديل مشروب -->
 <div class="modal-overlay" id="editItemModal">
   <div class="modal-box small">
     <div class="modal-header"><span>✏️ تعديل مشروب</span><button class="modal-close" onclick="closeModal('editItemModal')">✕</button></div>
@@ -502,6 +456,7 @@ header{
   </div>
 </div>
 
+<!-- نافذة تأكيد -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box small">
     <div class="modal-header"><span id="confirmModalTitle">تأكيد</span><button class="modal-close" onclick="resolveConfirm(false)">✕</button></div>
@@ -513,6 +468,7 @@ header{
   </div>
 </div>
 
+<!-- نافذة نقل الفلوس -->
 <div class="modal-overlay" id="transferModal">
   <div class="modal-box small">
     <div class="modal-header"><span>💸 ساب فلوسه لحد</span><button class="modal-close" onclick="closeModal('transferModal')">✕</button></div>
@@ -525,6 +481,7 @@ header{
 
 <div id="toastStack"></div>
 
+<!-- كارت الفاتورة -->
 <div id="billCaptureTarget">
   <div class="ledger-spiral"></div>
   <div class="bill-header">
@@ -547,56 +504,21 @@ header{
 
 <script>
 /* =========================================================
-   التوكنات المثبتة وكلمة السر
+   إعدادات GitHub والداتا
 ========================================================= */
-const APP_PASSWORD = '@hw@2022';
-
-const HARDCODED_CONFIG = {
-  workerUrl: '',     // رابط الـ Cloudflare Worker بتاعك (مثال: https://qahwa-sync.YOURNAME.workers.dev)
-  appSecret: '',     // سر مخترعه إنت (مش توكن حقيقي - جيت هب مش هيلاحظه) لازم يطابق APP_SECRET في الـ Worker
-  instaPay: ''       // عنوان أو رقم إنستاباي بتاعك
-};
-
 const STORE_KEY = 'cafe_egypt_ledger_v6';
-// ملحوظة: توكن جيت هب وتوكن البوت بقوا محفوظين جوه الـ Cloudflare Worker نفسه
-// مش هنا خالص - عشان جيت هب ميقفلهمش تاني لو اتعملهم كوميت غلط.
-
-async function checkAppLogin() {
-  const input = document.getElementById('loginPassInput');
-  const entered = (input.value || '').trim();
-
-  if (entered === APP_PASSWORD) {
-    sessionStorage.setItem('ahwa_auth_session', 'authorized');
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('mainAppShell').style.display = 'block';
-    toast('نوّرت يا معلم! بنجيب آخر طلبات من السحابة... ☕', 'success', 2500);
-    await initApp();
-  } else {
-    input.value = '';
-    const funnyAlerts = [
-      'إنت مين يا عمنا؟ الباسورد مش مظبوط خالص!',
-      'لا يا معلم.. كلمة السر عند المعلم الكبير بس 😉',
-      'الباسورد غلط يا باشا.. شكلك مش من الشلة!',
-      'ركز كده واكتب الباسورد صح يا غالي ☕'
-    ];
-    const randomMsg = funnyAlerts[Math.floor(Math.random() * funnyAlerts.length)];
-    toast(randomMsg, 'error', 3000);
-  }
-}
-
-function logoutApp() {
-  sessionStorage.removeItem('ahwa_auth_session');
-  document.getElementById('mainAppShell').style.display = 'none';
-  document.getElementById('loginOverlay').style.display = 'flex';
-  document.getElementById('loginPassInput').value = '';
-  toast('خرجت من القعدة.. مع السلامة يا معلم! 🚪', 'info');
-}
+const GITHUB_CONFIG = {
+  owner: 'loayhegazi',
+  repo: 'LayaliZaman',
+  path: 'data.json',
+  branch: 'main'
+};
 
 function defaultData(){
   return {
-    workerUrl: HARDCODED_CONFIG.workerUrl,
-    appSecret: HARDCODED_CONFIG.appSecret,
-    instaPay: HARDCODED_CONFIG.instaPay,
+    ghToken: '',
+    botToken: '',
+    instaPay: '',
     sessionStartedAt: null,
     menu: [
       { name: 'شاي كشري', price: 15 },
@@ -620,20 +542,18 @@ function defaultData(){
 
 function loadAppData(){
   const fresh = localStorage.getItem(STORE_KEY);
-  let loaded = defaultData();
   if (fresh) {
-    try { loaded = JSON.parse(fresh); } catch(e){}
+    try { return JSON.parse(fresh); } catch(e){ return defaultData(); }
   }
-  if (!loaded.workerUrl && HARDCODED_CONFIG.workerUrl) loaded.workerUrl = HARDCODED_CONFIG.workerUrl;
-  if (!loaded.appSecret && HARDCODED_CONFIG.appSecret) loaded.appSecret = HARDCODED_CONFIG.appSecret;
-  if (!loaded.instaPay && HARDCODED_CONFIG.instaPay) loaded.instaPay = HARDCODED_CONFIG.instaPay;
-  return loaded;
+  return defaultData();
 }
 
 let appData = loadAppData();
 const userStates = {};
 let isPolling = false;
 let lastUpdateId = 0;
+
+// دعم التحديد المتعدد للأشخاص
 let selectedPersonIndices = [];
 let sessionFilter = 'all';
 let syncTimeout = null;
@@ -646,7 +566,7 @@ function saveData(){
   clearTimeout(syncTimeout);
   syncTimeout = setTimeout(() => {
     pushDataToGitHub();
-  }, 800);
+  }, 1000);
 }
 
 function renderAll(){
@@ -657,27 +577,15 @@ function renderAll(){
   renderStats();
 }
 
+/* =========================================================
+   محرك المزامنة التلقائية مع GitHub
+========================================================= */
 let isSyncBusy = false;
 let syncIntervalHandle = null;
 let lastSyncedAt = null;
 
-function getWorkerUrl(){
-  return (appData.workerUrl || HARDCODED_CONFIG.workerUrl || '').trim().replace(/\/+$/, '');
-}
-
-function getAppSecret(){
-  return (appData.appSecret || HARDCODED_CONFIG.appSecret || '').trim();
-}
-
-// أسماء قديمة لسه مستخدمة كـ "هل المزامنة شغالة؟" في أماكن تانية بالكود
-function getGhToken(){ return getWorkerUrl(); }
-function getBotToken(){ return getWorkerUrl(); }
-
-async function tgFetch(method, options = {}){
-  const worker = getWorkerUrl();
-  if (!worker) return null;
-  const headers = Object.assign({}, options.headers || {}, { 'X-App-Secret': getAppSecret() });
-  return fetch(`${worker}/telegram/${method}`, Object.assign({}, options, { headers }));
+function getGhToken(){
+  return (appData.ghToken || localStorage.getItem('gh_sync_token') || '').trim();
 }
 
 function setSyncStatus(state){
@@ -685,36 +593,34 @@ function setSyncStatus(state){
   const dot = document.getElementById('syncStatusDot');
   const text = document.getElementById('syncStatusText');
   if (!pill) return;
-  if (!getWorkerUrl()) { pill.style.display = 'none'; return; }
+  if (!getGhToken()) { pill.style.display = 'none'; return; }
   pill.style.display = 'inline-flex';
   pill.className = 'sync-pill ' + (state || '');
-  if (state === 'syncing') text.innerText = 'بيحفظ سحابياً...';
+  if (state === 'syncing') text.innerText = 'بيتزامن...';
   else if (state === 'synced') {
     const t = lastSyncedAt ? new Date(lastSyncedAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
-    text.innerText = t ? `متزامن ☁️ - ${t}` : 'متزامن ☁️';
+    text.innerText = t ? `متزامن - ${t}` : 'متزامن';
   }
-  else if (state === 'error') text.innerText = 'مشكلة في الحفظ السحابي';
+  else if (state === 'error') text.innerText = 'هنعيد المحاولة تاني...';
   else text.innerText = 'مزامنة سحابية';
 }
 
 function buildSyncPayload(){
   const clone = JSON.parse(JSON.stringify(appData));
-  delete clone.workerUrl;
-  delete clone.appSecret;
+  delete clone.ghToken;
+  delete clone.botToken;
   return clone;
 }
 
 async function pullDataFromGitHub(silent){
-  const worker = getWorkerUrl();
-  if (isSyncBusy) return;
+  const token = getGhToken();
+  if (!token || isSyncBusy) return;
   isSyncBusy = true;
-  if (!silent && worker) setSyncStatus('syncing');
+  if (!silent) setSyncStatus('syncing');
 
   try {
-    if (!worker) { isSyncBusy = false; return; }
-
-    const res = await fetch(`${worker}/data?_t=${Date.now()}`, {
-      headers: { 'X-App-Secret': getAppSecret() }
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
     });
 
     if (res.status === 404) {
@@ -724,27 +630,33 @@ async function pullDataFromGitHub(silent){
     }
 
     if (res.ok) {
-      const remoteData = await res.json();
+      const fileData = await res.json();
+      sessionStorage.setItem('gh_file_sha', fileData.sha);
+      const content = decodeURIComponent(escape(atob(fileData.content.replace(/\s/g, ''))));
+      const remoteData = JSON.parse(content);
 
       if (remoteData.menu && remoteData.members) {
         const remoteModified = remoteData.lastModified || 0;
         const localModified = appData.lastModified || 0;
-        if (remoteModified > localModified || !silent) {
-          const keepWorkerUrl = getWorkerUrl();
-          const keepAppSecret = getAppSecret();
-          appData = Object.assign({}, remoteData, { workerUrl: keepWorkerUrl, appSecret: keepAppSecret });
+        if (remoteModified > localModified) {
+          const keepGhToken = appData.ghToken;
+          const keepBotToken = appData.botToken;
+          appData = Object.assign({}, remoteData, { ghToken: keepGhToken, botToken: keepBotToken });
           localStorage.setItem(STORE_KEY, JSON.stringify(appData));
           renderAll();
-          if (!silent) toast('تم تحميل آخر تحديثات القعدة ☁️', 'success');
+          if (!silent) toast('جاتلك تحديثات من جهاز تاني ☁️', 'success');
         }
       }
       lastSyncedAt = Date.now();
       setSyncStatus('synced');
+    } else if (res.status === 401 || res.status === 403) {
+      setSyncStatus('error');
+      if (!silent) toast('التوكن مش شغال أو مالوش صلاحية كافية', 'error');
     } else {
       setSyncStatus('error');
     }
   } catch (err) {
-    console.error('Sync Pull Error:', err);
+    console.error('GitHub Pull Error:', err);
     setSyncStatus('error');
   } finally {
     isSyncBusy = false;
@@ -752,33 +664,52 @@ async function pullDataFromGitHub(silent){
 }
 
 async function pushDataToGitHub(isRetry){
-  const worker = getWorkerUrl();
-  if (!worker || isSyncBusy) return;
+  const token = getGhToken();
+  if (!token || isSyncBusy) return;
   isSyncBusy = true;
   setSyncStatus('syncing');
 
   try {
-    const putRes = await fetch(`${worker}/data`, {
+    let sha = sessionStorage.getItem('gh_file_sha');
+    if (!sha) {
+      const getRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+      });
+      if (getRes.ok) { const currentFile = await getRes.json(); sha = currentFile.sha; }
+    }
+
+    const payload = {
+      message: `Sync session data: ${new Date().toISOString()}`,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(buildSyncPayload(), null, 2)))),
+      branch: GITHUB_CONFIG.branch,
+      ...(sha ? { sha } : {})
+    };
+
+    const putRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`, {
       method: 'PUT',
-      headers: { 'X-App-Secret': getAppSecret(), 'Content-Type': 'application/json' },
-      body: JSON.stringify(buildSyncPayload())
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
     if (putRes.ok) {
+      const result = await putRes.json();
+      sessionStorage.setItem('gh_file_sha', result.content.sha);
       lastSyncedAt = Date.now();
       setSyncStatus('synced');
     } else if (putRes.status === 409 && !isRetry) {
+      sessionStorage.removeItem('gh_file_sha');
       isSyncBusy = false;
       await pushDataToGitHub(true);
       return;
+    } else if (putRes.status === 401 || putRes.status === 403) {
+      setSyncStatus('error');
+      toast('التوكن مش شغال أو مالوش صلاحية الكتابة على الريبو', 'error');
     } else {
       setSyncStatus('error');
-      scheduleSyncRetry();
     }
   } catch (err) {
-    console.error('Sync Push Error:', err);
+    console.error('GitHub Push Error:', err);
     setSyncStatus('error');
-    scheduleSyncRetry();
   } finally {
     isSyncBusy = false;
   }
@@ -789,15 +720,7 @@ function startAutoSync(){
   if (!getGhToken()) return;
   syncIntervalHandle = setInterval(() => {
     if (document.visibilityState === 'visible') pullDataFromGitHub(true);
-  }, 8000);
-}
-
-let syncRetryHandle = null;
-function scheduleSyncRetry(){
-  clearTimeout(syncRetryHandle);
-  syncRetryHandle = setTimeout(() => {
-    if (getGhToken()) pushDataToGitHub();
-  }, 6000);
+  }, 20000);
 }
 
 function stopAutoSync(){
@@ -806,42 +729,35 @@ function stopAutoSync(){
 }
 
 async function manualSyncNow(){
-  if (!getWorkerUrl()) return toast('حط رابط الـ Worker الأول', 'error');
+  if (!getGhToken()) return toast('حط توكن GitHub الأول', 'error');
   await pullDataFromGitHub();
   await pushDataToGitHub();
-  toast('تم حفظ ومزامنة الداتا ☁️', 'success');
+  toast('اتزامنت الداتا دلوقتي ☁️', 'success');
 }
 
 function saveGhToken() {
-  const url = document.getElementById('ghTokenInput').value.trim();
-  const secret = document.getElementById('appSecretInput') ? document.getElementById('appSecretInput').value.trim() : appData.appSecret;
-  appData.workerUrl = url;
-  appData.appSecret = secret;
+  const val = document.getElementById('ghTokenInput').value.trim();
+  appData.ghToken = val;
+  localStorage.setItem('gh_sync_token', val);
   saveData();
   setSyncStatus('idle');
-  if (url) {
-    toast('تم حفظ الإعدادات، جاري المزامنة...', 'success');
-    pushDataToGitHub();
+  if (val) {
+    toast('تم حفظ التوكن، جاري المزامنة...', 'success');
+    pullDataFromGitHub();
     startAutoSync();
   } else {
     stopAutoSync();
-    toast('تم مسح رابط المزامنة', 'info');
+    toast('تم مسح التوكن، المزامنة السحابية واقفة دلوقتي', 'info');
   }
 }
 
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    pullDataFromGitHub(true);
-  } else if (getGhToken() && syncTimeout) {
-    // بتقفل التاب أو بتنقل لتطبيق تاني وفيه حفظ لسه مستني الديباونس - ابعته دلوقتي على طول
-    clearTimeout(syncTimeout);
-    pushDataToGitHub();
-  }
-});
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullDataFromGitHub(true); });
 window.addEventListener('focus', () => pullDataFromGitHub(true));
 window.addEventListener('online', () => { toast('رجع النت! بنزامن دلوقتي...', 'info'); pullDataFromGitHub(true); });
-window.addEventListener('pagehide', () => { if (getGhToken() && syncTimeout) { clearTimeout(syncTimeout); pushDataToGitHub(); } });
 
+/* =========================================================
+   أدوات الواجهة
+========================================================= */
 function toast(msg, type='info', ms=3200){
   const stack = document.getElementById('toastStack');
   const el = document.createElement('div');
@@ -889,6 +805,9 @@ function updateSessionTimer(){
 }
 setInterval(updateSessionTimer, 30000);
 
+/* =========================================================
+   دليل الشلة
+========================================================= */
 function renderMembers(){
   const list = document.getElementById('membersListUi');
   const q = (document.getElementById('memberSearch').value || '').trim().toLowerCase();
@@ -968,6 +887,9 @@ async function deleteMember(index){
   toast('اتمسح من الشلة', 'success');
 }
 
+/* =========================================================
+   المنيو
+========================================================= */
 function renderMenu(){
   const list = document.getElementById('menuListUi');
   const q = (document.getElementById('menuSearch').value || '').trim().toLowerCase();
@@ -1061,6 +983,9 @@ async function deleteMenuItem(index){
   toast('اتمسح من المنيو', 'success');
 }
 
+/* =========================================================
+   نظام الطلبات السريع (POS) - التحديد المتعدد
+========================================================= */
 function renderPos(){
   const bar = document.getElementById('posPersonBar');
   const grid = document.getElementById('posDrinkGrid');
@@ -1068,6 +993,7 @@ function renderPos(){
     .map((m, idx) => ({ ...m, idx }))
     .filter(m => m.isPresent && !m.hasLeft);
 
+  // تنظيف أي محددين مش موجودين في القعدة حالياً
   selectedPersonIndices = selectedPersonIndices.filter(i => activeMembers.some(m => m.idx === i));
 
   if (activeMembers.length === 0) {
@@ -1075,6 +1001,7 @@ function renderPos(){
   } else {
     let toolbarHtml = '';
     
+    // شريط ملخص التحديد وأزرار التحكم
     if (selectedPersonIndices.length > 0) {
       const selectedNames = selectedPersonIndices.map(i => appData.members[i].name).join('، ');
       toolbarHtml = `
@@ -1144,6 +1071,7 @@ function clearPosSelection(){
   renderPos();
 }
 
+// تنفيذ الطلب لجميع الأشخاص المحددين معاً
 function posOrder(menuIndex){
   if (selectedPersonIndices.length === 0) {
     return toast('اختار مين هيشرب الأول (تقدر تختار أكتر من واحد) ☝️', 'error');
@@ -1181,6 +1109,9 @@ function removeOneOrder(personIndex, itemName){
   saveData();
 }
 
+/* =========================================================
+   كروت الحسابات
+========================================================= */
 function togglePersonPayment(index){
   const person = appData.members[index];
   person.isPaid = !person.isPaid;
@@ -1348,6 +1279,9 @@ function renderSession(){
 
 function setSessionFilter(key){ sessionFilter = key; renderSession(); }
 
+/* =========================================================
+   الإحصائيات
+========================================================= */
 function renderStats(){
   let grandTotal = 0, collectedTotal = 0;
   const drinkCounts = {};
@@ -1380,6 +1314,9 @@ function renderStats(){
   updateSessionTimer();
 }
 
+/* =========================================================
+   الأرشيف والتصفير (Reset)
+========================================================= */
 function openHistoryModal(){
   const body = document.getElementById('historyModalBody');
   body.innerHTML = '';
@@ -1452,6 +1389,9 @@ async function hardResetCurrentSession(){
   toast('تم تصفير القعدة وإخلاء الترابيزة بالكامل! 💥', 'success');
 }
 
+/* =========================================================
+   تصدير الفاتورة (PDF / صورة / نص)
+========================================================= */
 function populateBillData(){
   const container = document.getElementById('billItemsContainer');
   container.innerHTML = '';
@@ -1544,7 +1484,8 @@ async function exportBillPdf(){
 async function sendPdfToTelegram(chatId){
   const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
   if (sessionMembers.length === 0) { await sendTelegramMessage(chatId, '❌ مفيش مشاريب مسجلة في القعدة دلوقتي.'); return; }
-  if (!getWorkerUrl()) return;
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) return;
   await sendTelegramMessage(chatId, '⏳ دقيقة واحدة.. بنرفعلك الشيك PDF...');
   populateBillData();
   const target = document.getElementById('billCaptureTarget');
@@ -1563,7 +1504,7 @@ async function sendPdfToTelegram(chatId){
     formData.append('chat_id', chatId);
     formData.append('document', pdfBlob, `شيك_القهوة_${Date.now()}.pdf`);
     formData.append('caption', '📄 شيك حساب القعدة الرسمي المعتمد يا رجالة! ☕');
-    await tgFetch('sendDocument', { method: 'POST', body: formData });
+    await fetch(`https://api.telegram.org/bot${token}/sendDocument`, { method: 'POST', body: formData });
   } catch (err) {
     target.style.top = '-9999px'; target.style.left = '-9999px';
     await sendTelegramMessage(chatId, '❌ حصل عطل وإحنا بنبعت ملف الـ PDF.');
@@ -1602,10 +1543,13 @@ function copySessionSummary(){
     .catch(() => toast('مقدرناش ننسخ، جرب تاني', 'error'));
 }
 
+/* =========================================================
+   النسخ الاحتياطي والإنستاباي
+========================================================= */
 function openSettingsModal(){
   document.getElementById('instaPayAccount').value = appData.instaPay || '';
-  document.getElementById('ghTokenInput').value = getWorkerUrl();
-  if (document.getElementById('appSecretInput')) document.getElementById('appSecretInput').value = getAppSecret();
+  document.getElementById('botToken').value = appData.botToken || '';
+  document.getElementById('ghTokenInput').value = appData.ghToken || localStorage.getItem('gh_sync_token') || '';
   openModal('settingsModal');
 }
 
@@ -1653,6 +1597,9 @@ function importDataJson(event){
   reader.readAsText(file);
 }
 
+/* =========================================================
+   محرك وقوائم تيليجرام المتطابقة (Inline & Reply)
+========================================================= */
 function log(msg){
   const logBox = document.getElementById('botLog');
   const time = new Date().toLocaleTimeString('ar-EG');
@@ -1660,22 +1607,25 @@ function log(msg){
 }
 
 async function sendTelegramMessage(chatId, text, replyMarkup = null){
-  if (!getWorkerUrl()) return;
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) return;
   const payload = { chat_id: chatId, text, parse_mode: 'Markdown' };
   if (replyMarkup) payload.reply_markup = replyMarkup;
-  try { await tgFetch('sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
+  try { await fetch(`https://api.telegram.org/bot${token}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
 }
 
 async function editTelegramMessage(chatId, messageId, text, replyMarkup = null){
-  if (!getWorkerUrl()) return;
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) return;
   const payload = { chat_id: chatId, message_id: messageId, text, parse_mode: 'Markdown' };
   if (replyMarkup) payload.reply_markup = replyMarkup;
-  try { await tgFetch('editMessageText', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
+  try { await fetch(`https://api.telegram.org/bot${token}/editMessageText`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch (err) {}
 }
 
 async function answerCallbackQuery(callbackQueryId, text = '', showAlert = false){
-  if (!getWorkerUrl()) return;
-  try { tgFetch('answerCallbackQuery', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ callback_query_id: callbackQueryId, text, show_alert: showAlert }) }); } catch (err) {}
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) return;
+  try { fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ callback_query_id: callbackQueryId, text, show_alert: showAlert }) }); } catch (err) {}
 }
 
 function getPersistentReplyKeyboard(){
@@ -1683,7 +1633,6 @@ function getPersistentReplyKeyboard(){
     keyboard: [
       [{ text: '📜 منيو المشاريب' }, { text: '👥 كشف الحضور' }],
       [{ text: '☕ اطلب مشروب' }, { text: '💰 كشوفات الحساب' }],
-      [{ text: '➕ ضيف صاحبك للشلة' }, { text: '➕ ضيف مشروب للمنيو' }],
       [{ text: '📚 أرشيف القعدات' }, { text: '💸 ساب فلوسه لحد' }],
       [{ text: '🧾 شيك القعدة نصياً' }, { text: '📄 شيك القعدة PDF' }],
       [{ text: '📊 فلوس الخزينة' }, { text: '⚙️ تظبيط المنيو' }]
@@ -1695,10 +1644,6 @@ function getPersistentReplyKeyboard(){
 function getMainMenuInline(){
   return {
     inline_keyboard: [
-      [
-        { text: '➕ ضيف صاحبك للشلة', callback_data: 'nav_add_person' },
-        { text: '➕ ضيف مشروب للمنيو', callback_data: 'nav_add_menu_item' }
-      ],
       [
         { text: '📜 منيو المشاريب', callback_data: 'nav_menu' },
         { text: '👥 كشف الحضور', callback_data: 'nav_presence' }
@@ -1752,8 +1697,6 @@ function getTreasurySummaryText() {
 
 function getPresenceInline(){
   const keyboard = [];
-  keyboard.push([{ text: '➕ ضيف حد جديد للشلة', callback_data: 'nav_add_person' }]);
-  
   for (let i = 0; i < appData.members.length; i += 2) {
     const m1 = appData.members[i];
     let tag1 = '⚪'; if (m1.isPresent && !m1.hasLeft) tag1 = '🟢'; if (m1.hasLeft) tag1 = '🚶';
@@ -1771,8 +1714,6 @@ function getPresenceInline(){
 
 function getMenuInline(){
   const keyboard = [];
-  keyboard.push([{ text: '➕ ضيف مشروب جديد للمنيو', callback_data: 'nav_add_menu_item' }]);
-  
   for (let i = 0; i < appData.menu.length; i += 2) {
     const item1 = appData.menu[i];
     const row = [{ text: `☕ ${item1.name} (${item1.price} ج)`, callback_data: `price_${i}` }];
@@ -1806,8 +1747,6 @@ function getChecksInline(){
 
 function getManageMenuInline(){
   const keyboard = [];
-  keyboard.push([{ text: '➕ ضيف صنف جديد للمنيو', callback_data: 'nav_add_menu_item' }]);
-  
   for (let i = 0; i < appData.menu.length; i++) {
     const item = appData.menu[i];
     keyboard.push([{ text: `✏️ ${item.name} (${item.price} ج)`, callback_data: `itemopt_${i}` }]);
@@ -1842,22 +1781,6 @@ async function handleCallbackQuery(cb){
 
   if (data === 'nav_main') {
     editTelegramMessage(chatId, messageId, '☕ أهلاً بيك يا كبير في دفتر قعدتنا!\nاختار اللي محتاجه:', getMainMenuInline());
-    return;
-  }
-
-  if (data === 'nav_add_person') {
-    userStates[chatId] = { action: 'WAITING_NEW_MEMBER_NAME' };
-    editTelegramMessage(chatId, messageId, '👤 *إضافة صاحبك الجديد للشلة:*\n\n✍️ ابعتلي اسم المعلم الجديد في رسالة دلوقتي:', {
-      inline_keyboard: [[{ text: '🔙 إلغاء والرجوع', callback_data: 'nav_presence' }]]
-    });
-    return;
-  }
-
-  if (data === 'nav_add_menu_item') {
-    userStates[chatId] = { action: 'WAITING_NEW_ITEM_NAME' };
-    editTelegramMessage(chatId, messageId, '☕ *إضافة مشروب جديد للمنيو:*\n\n✍️ ابعتلي اسم المشروب في رسالة دلوقتي:', {
-      inline_keyboard: [[{ text: '🔙 إلغاء والرجوع', callback_data: 'nav_menu' }]]
-    });
     return;
   }
 
@@ -1929,7 +1852,7 @@ async function handleCallbackQuery(cb){
   }
 
   if (data === 'nav_manage_menu') {
-    if (appData.menu.length === 0) { editTelegramMessage(chatId, messageId, '❌ المنيو فاضي حالياً.', { inline_keyboard: [[{ text: '➕ ضيف مشروب', callback_data: 'nav_add_menu_item' }], [{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
+    if (appData.menu.length === 0) { editTelegramMessage(chatId, messageId, '❌ المنيو فاضي حالياً.', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
     editTelegramMessage(chatId, messageId, '⚙️ اختار المشروب اللي عايز تعدل اسمه أو سعره أو تمسحه خالص:', getManageMenuInline());
     return;
   }
@@ -2062,54 +1985,6 @@ async function handleTelegramMessage(chatId, text){
 
   const state = userStates[chatId];
   if (state) {
-    if (state.action === 'WAITING_NEW_MEMBER_NAME') {
-      const name = cleanText;
-      delete userStates[chatId];
-      if (!name) {
-        sendTelegramMessage(chatId, '❌ الاسم مينفعش يبقى فاضي يا باشا.', getPersistentReplyKeyboard());
-      } else if (appData.members.some(m => m.name.toLowerCase() === name.toLowerCase())) {
-        sendTelegramMessage(chatId, `⚠️ المعلم *${name}* متسجل في الشلة قبل كده!`, getPersistentReplyKeyboard());
-      } else {
-        appData.members.push({ name: name, isPresent: true, hasLeft: false, orders: [], isPaid: false });
-        markSessionStarted();
-        saveData();
-        sendTelegramMessage(chatId, `✅ تم إضافة المعلم *${name}* للشلة ونوّر القعدة دلوقتي! 🟢`, getPersistentReplyKeyboard());
-      }
-      return;
-    }
-
-    if (state.action === 'WAITING_NEW_ITEM_NAME') {
-      const itemName = cleanText;
-      if (!itemName) {
-        delete userStates[chatId];
-        sendTelegramMessage(chatId, '❌ الاسم مينفعش يبقى فاضي.', getPersistentReplyKeyboard());
-        return;
-      }
-      userStates[chatId] = { action: 'WAITING_NEW_ITEM_PRICE', itemName: itemName };
-      sendTelegramMessage(chatId, `☕ مشروب: *${itemName}*\n\n✍️ ابعتلي دلوقتي *سعره كام جنيه*؟ (أرقام بس):`);
-      return;
-    }
-
-    if (state.action === 'WAITING_NEW_ITEM_PRICE') {
-      const price = parseFloat(cleanText.replace(',', '.'));
-      const itemName = state.itemName;
-      delete userStates[chatId];
-
-      if (isNaN(price) || price < 0) {
-        sendTelegramMessage(chatId, '❌ السعر مش مظبوط، جرب تضيف المشروب من الأول.', getPersistentReplyKeyboard());
-      } else {
-        const existingIdx = appData.menu.findIndex(m => m.name.toLowerCase() === itemName.toLowerCase());
-        if (existingIdx !== -1) {
-          appData.menu[existingIdx].price = price;
-        } else {
-          appData.menu.push({ name: itemName, price: price });
-        }
-        saveData();
-        sendTelegramMessage(chatId, `✅ نزلنا مشروب *${itemName}* بسعر *${price.toFixed(2)} ج* في المنيو بنجاح! ☕`, getPersistentReplyKeyboard());
-      }
-      return;
-    }
-
     if (state.action === 'WAITING_EDIT_PRICE') {
       const newPrice = parseFloat(cleanText.replace(',', '.'));
       if (isNaN(newPrice) || newPrice < 0) { sendTelegramMessage(chatId, '❌ ابعت رقم صحيح للسعر بس.'); return; }
@@ -2118,7 +1993,6 @@ async function handleTelegramMessage(chatId, text){
       delete userStates[chatId];
       return;
     }
-
     if (state.action === 'WAITING_EDIT_NAME') {
       const item = appData.menu[state.itemIndex];
       if (item) {
@@ -2131,18 +2005,6 @@ async function handleTelegramMessage(chatId, text){
       delete userStates[chatId];
       return;
     }
-  }
-
-  if (cleanText === '➕ ضيف صاحبك للشلة') {
-    userStates[chatId] = { action: 'WAITING_NEW_MEMBER_NAME' };
-    sendTelegramMessage(chatId, '👤 *إضافة صاحبك الجديد للشلة:*\n\n✍️ ابعتلي اسم المعلم الجديد في رسالة دلوقتي:');
-    return;
-  }
-
-  if (cleanText === '➕ ضيف مشروب للمنيو') {
-    userStates[chatId] = { action: 'WAITING_NEW_ITEM_NAME' };
-    sendTelegramMessage(chatId, '☕ *إضافة مشروب جديد للمنيو:*\n\n✍️ ابعتلي اسم المشروب في رسالة دلوقتي:');
-    return;
   }
 
   if (cleanText === '👥 كشف الحضور' || cleanText === '👥 مين قاعد ومين مأنتخ؟') {
@@ -2193,7 +2055,11 @@ async function handleTelegramMessage(chatId, text){
   }
 
   if (cleanText === '⚙️ تظبيط المنيو' || cleanText === '⚙️ تظبيط أسعار المنيو') {
-    sendTelegramMessage(chatId, '⚙️ اختار المشروب اللي عايز تعدل اسمه أو سعره أو ضيف صنف جديد:', getManageMenuInline());
+    if (appData.menu.length === 0) {
+      sendTelegramMessage(chatId, '❌ المنيو فاضي حالياً.', getPersistentReplyKeyboard());
+      return;
+    }
+    sendTelegramMessage(chatId, '⚙️ اختار المشروب اللي عايز تعدل اسمه أو سعره أو تمسحه خالص:', getManageMenuInline());
     return;
   }
 
@@ -2217,9 +2083,10 @@ async function handleTelegramMessage(chatId, text){
 
 async function pollTelegramUpdates(){
   if (!isPolling) return;
-  if (!getWorkerUrl()) { toggleTelegramPolling(); return; }
+  const token = document.getElementById('botToken').value.trim();
+  if (!token) { toggleTelegramPolling(); return; }
   try {
-    const res = await tgFetch(`getUpdates?offset=${lastUpdateId + 1}&timeout=5`);
+    const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${lastUpdateId + 1}&timeout=5`);
     const data = await res.json();
     if (data.ok && data.result.length > 0) {
       for (const update of data.result) {
@@ -2233,13 +2100,15 @@ async function pollTelegramUpdates(){
 }
 
 function toggleTelegramPolling(){
-  const worker = getWorkerUrl();
+  const token = document.getElementById('botToken').value.trim();
   const dot = document.getElementById('botStatusDot');
   const statusText = document.getElementById('botStatusText');
   const btn = document.getElementById('toggleBotBtn');
 
   if (!isPolling) {
-    if (!worker) return toast('حط رابط الـ Worker الأول يا باشا', 'error');
+    if (!token) return toast('حط توكن البوت الأول يا باشا', 'error');
+    appData.botToken = token;
+    localStorage.setItem(STORE_KEY, JSON.stringify(appData));
     isPolling = true;
     dot.classList.add('active');
     statusText.innerText = 'البوت صاحي ومنوّر';
@@ -2257,29 +2126,17 @@ function toggleTelegramPolling(){
   }
 }
 
-async function initApp() {
-  if (getWorkerUrl()) {
-    toggleTelegramPolling();
-  }
+/* =========================================================
+   تشغيل الصفحة
+========================================================= */
+window.addEventListener('DOMContentLoaded', async () => {
+  if (appData.botToken) { document.getElementById('botToken').value = appData.botToken; toggleTelegramPolling(); }
   if (appData.instaPay) document.getElementById('instaPayAccount').value = appData.instaPay;
   renderAll();
   setSyncStatus('idle');
 
   await pullDataFromGitHub();
   startAutoSync();
-}
-
-window.addEventListener('DOMContentLoaded', async () => {
-  const isAuth = sessionStorage.getItem('ahwa_auth_session');
-  if (isAuth === 'authorized') {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('mainAppShell').style.display = 'block';
-    await initApp();
-  } else {
-    document.getElementById('loginOverlay').style.display = 'flex';
-    document.getElementById('mainAppShell').style.display = 'none';
-    document.getElementById('loginPassInput').focus();
-  }
 });
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
