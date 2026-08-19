@@ -147,17 +147,12 @@
       "hasLeft": false,
       "orders": [],
       "isPaid": false
-    },
-    {
-      "name": "يوسف",
-      "isPresent": false,
-      "hasLeft": false,
-      "orders": [],
-      "isPaid": false
     }
   ],
   "sessionStartedAt": null,
-  "lastModified": 1787125828254,
+  "lastModified": 1787061880556,
+  "ghToken": "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",
+  "botToken": "8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450",
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
