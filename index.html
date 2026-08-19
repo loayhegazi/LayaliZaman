@@ -90,12 +90,17 @@ input:focus,select:focus,textarea:focus{border-color:var(--brass);}
 }
 .login-card h2{font-size:1.5rem;color:var(--paper);font-weight:900;}
 .login-card p{font-size:0.85rem;color:var(--text-dim);line-height:1.6;}
-.login-input-group{position:relative;}
+.login-input-group{position:relative;display:flex;align-items:center;}
 .login-input-group input{
   text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:monospace;
-  border:1.5px solid var(--line);background:var(--bg-2);padding:12px;
+  border:1.5px solid var(--line);background:var(--bg-2);padding:12px 40px 12px 12px;
+  direction:ltr !important;unicode-bidi:bidi-override;
 }
 .login-input-group input:focus{border-color:var(--brass);box-shadow:0 0 0 3px var(--brass-dim);}
+.login-toggle-btn{
+  position:absolute;right:10px;background:transparent;border:none;padding:4px;
+  font-size:1.1rem;color:var(--text-dim);cursor:pointer;
+}
 .login-btn{
   background:linear-gradient(135deg, var(--brass), var(--brass-hover));
   color:#1a1206;padding:12px;font-size:1rem;font-weight:900;border-radius:10px;
@@ -197,7 +202,6 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
-/* POS Multi-Select Toolbar */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -348,6 +352,7 @@ header{
 </head>
 <body>
 
+<!-- شاشة تسجيل الدخول -->
 <div id="loginOverlay">
   <div class="login-card">
     <div class="login-mark">☕</div>
@@ -357,6 +362,7 @@ header{
     </div>
     <div class="login-input-group">
       <input type="password" id="loginPassInput" placeholder="••• كلمة السر •••" onkeydown="if(event.key==='Enter')checkAppLogin()">
+      <button class="login-toggle-btn" type="button" onclick="toggleLoginPassword()" title="إظهار/إخفاء الباسورد">👁️</button>
     </div>
     <button class="login-btn" onclick="checkAppLogin()">ادخل القعدة يا معلم 🚪</button>
     <div class="login-hint">لو نسيت الباسورد اسأل صاحب القعدة 😉</div>
@@ -583,12 +589,25 @@ const GITHUB_CONFIG = {
   branch: 'main'
 };
 
+function toggleLoginPassword() {
+  const input = document.getElementById('loginPassInput');
+  const btn = document.querySelector('.login-toggle-btn');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.innerText = '🙈';
+  } else {
+    input.type = 'password';
+    btn.innerText = '👁️';
+  }
+}
+
 function defaultData(){
   return {
     ghToken: HARDCODED_CONFIG.ghToken,
     botToken: HARDCODED_CONFIG.botToken,
     instaPay: HARDCODED_CONFIG.instaPay,
-    notes: '',
+    notes: '8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450
+      _pat_11A6DHWCI0sa0mAf4j5Cd2_jjvTv5XVbNTD4sZ9vS6cOsTLzD4DE7H7o5JH2V5FYxs6QNDJ5DMeLPm0UwM',
     sessionStartedAt: null,
     menu: [
       { name: "شاي كشري", price: 15 },
