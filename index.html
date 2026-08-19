@@ -71,7 +71,6 @@ input:focus,select:focus{border-color:var(--brass);}
 .btn-block{width:100%;}
 .icon{font-size:1em;line-height:1;}
 
-/* شاشة تسجيل الدخول */
 #loginOverlay{
   position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;justify-content:center;align-items:center;padding:20px;
   background:
@@ -197,7 +196,6 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
-/* POS Multi-Select Toolbar */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -348,7 +346,6 @@ header{
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول الصايعة -->
 <div id="loginOverlay">
   <div class="login-card">
     <div class="login-mark">☕</div>
@@ -432,7 +429,6 @@ header{
   </div>
 </div>
 
-<!-- نافذة سجل الأرشيف -->
 <div class="modal-overlay" id="historyModal">
   <div class="modal-box">
     <div class="modal-header"><span>📚 أرشيف وسجل القعدات السابقة</span><button class="modal-close" onclick="closeModal('historyModal')">✕</button></div>
@@ -440,7 +436,6 @@ header{
   </div>
 </div>
 
-<!-- نافذة الإعدادات والتزامن السحابي -->
 <div class="modal-overlay" id="settingsModal">
   <div class="modal-box">
     <div class="modal-header"><span>⚙️ إعدادات المزامنة السحابية & الداتا</span><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
@@ -489,7 +484,6 @@ header{
   </div>
 </div>
 
-<!-- نافذة تعديل مشروب -->
 <div class="modal-overlay" id="editItemModal">
   <div class="modal-box small">
     <div class="modal-header"><span>✏️ تعديل مشروب</span><button class="modal-close" onclick="closeModal('editItemModal')">✕</button></div>
@@ -505,7 +499,6 @@ header{
   </div>
 </div>
 
-<!-- نافذة تأكيد -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box small">
     <div class="modal-header"><span id="confirmModalTitle">تأكيد</span><button class="modal-close" onclick="resolveConfirm(false)">✕</button></div>
@@ -517,7 +510,6 @@ header{
   </div>
 </div>
 
-<!-- نافذة نقل الفلوس -->
 <div class="modal-overlay" id="transferModal">
   <div class="modal-box small">
     <div class="modal-header"><span>💸 ساب فلوسه لحد</span><button class="modal-close" onclick="closeModal('transferModal')">✕</button></div>
@@ -530,7 +522,6 @@ header{
 
 <div id="toastStack"></div>
 
-<!-- كارت الفاتورة -->
 <div id="billCaptureTarget">
   <div class="ledger-spiral"></div>
   <div class="bill-header">
@@ -553,13 +544,13 @@ header{
 
 <script>
 /* =========================================================
-   كلمة السر والتوكنات المسبقة
+   التوكنات المثبتة وكلمة السر
 ========================================================= */
-const APP_PASSWORD = '@hw@2022'; // باسورد القعدة
+const APP_PASSWORD = '@hw@2022';
 
 const HARDCODED_CONFIG = {
-  ghToken: '',       // حط توكن جيت هب هنا (github_pat_...)
-  botToken: '',      // حط توكن بوت تيليجرام هنا
+  ghToken: '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',       // حط توكن جيت هب هنا (github_pat_...)
+  botToken: '8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450',      // حط توكن بوت تيليجرام هنا
   instaPay: ''       // عنوان أو رقم إنستاباي بتاعك
 };
 
@@ -571,7 +562,7 @@ const GITHUB_CONFIG = {
   branch: 'main'
 };
 
-function checkAppLogin() {
+async function checkAppLogin() {
   const input = document.getElementById('loginPassInput');
   const entered = (input.value || '').trim();
 
@@ -579,8 +570,8 @@ function checkAppLogin() {
     sessionStorage.setItem('ahwa_auth_session', 'authorized');
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainAppShell').style.display = 'block';
-    toast('نوّرت يا معلم! بنجهّز الدفتر والطلبات... ☕', 'success', 2000);
-    initApp();
+    toast('نوّرت يا معلم! بنجيب آخر طلبات من السحابة... ☕', 'success', 2500);
+    await initApp();
   } else {
     input.value = '';
     const funnyAlerts = [
@@ -667,9 +658,6 @@ function renderAll(){
   renderStats();
 }
 
-/* =========================================================
-   محرك المزامنة والحفظ الدائم على GitHub
-========================================================= */
 let isSyncBusy = false;
 let syncIntervalHandle = null;
 let lastSyncedAt = null;
@@ -693,7 +681,7 @@ function setSyncStatus(state){
   if (state === 'syncing') text.innerText = 'بيحفظ سحابياً...';
   else if (state === 'synced') {
     const t = lastSyncedAt ? new Date(lastSyncedAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
-    text.innerText = t ? `محفوظ ☁️ - ${t}` : 'محفوظ ☁️';
+    text.innerText = t ? `متزامن ☁️ - ${t}` : 'متزامن ☁️';
   }
   else if (state === 'error') text.innerText = 'مشكلة في الحفظ السحابي';
   else text.innerText = 'مزامنة سحابية';
@@ -735,13 +723,13 @@ async function pullDataFromGitHub(silent){
       if (remoteData.menu && remoteData.members) {
         const remoteModified = remoteData.lastModified || 0;
         const localModified = appData.lastModified || 0;
-        if (remoteModified > localModified) {
+        if (remoteModified > localModified || !silent) {
           const keepGhToken = getGhToken();
           const keepBotToken = getBotToken();
           appData = Object.assign({}, remoteData, { ghToken: keepGhToken, botToken: keepBotToken });
           localStorage.setItem(STORE_KEY, JSON.stringify(appData));
           renderAll();
-          if (!silent) toast('تم سحب أحدث بيانات من السحابة ☁️', 'success');
+          if (!silent) toast('تم تحميل آخر تحديثات القعدة ☁️', 'success');
         }
       }
       lastSyncedAt = Date.now();
@@ -845,9 +833,6 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 window.addEventListener('focus', () => pullDataFromGitHub(true));
 window.addEventListener('online', () => { toast('رجع النت! بنزامن دلوقتي...', 'info'); pullDataFromGitHub(true); });
 
-/* =========================================================
-   أدوات الواجهة
-========================================================= */
 function toast(msg, type='info', ms=3200){
   const stack = document.getElementById('toastStack');
   const el = document.createElement('div');
@@ -895,9 +880,6 @@ function updateSessionTimer(){
 }
 setInterval(updateSessionTimer, 30000);
 
-/* =========================================================
-   دليل الشلة
-========================================================= */
 function renderMembers(){
   const list = document.getElementById('membersListUi');
   const q = (document.getElementById('memberSearch').value || '').trim().toLowerCase();
@@ -977,9 +959,6 @@ async function deleteMember(index){
   toast('اتمسح من الشلة', 'success');
 }
 
-/* =========================================================
-   المنيو
-========================================================= */
 function renderMenu(){
   const list = document.getElementById('menuListUi');
   const q = (document.getElementById('menuSearch').value || '').trim().toLowerCase();
@@ -1073,9 +1052,6 @@ async function deleteMenuItem(index){
   toast('اتمسح من المنيو', 'success');
 }
 
-/* =========================================================
-   نظام الطلبات السريع (POS) - التحديد المتعدد
-========================================================= */
 function renderPos(){
   const bar = document.getElementById('posPersonBar');
   const grid = document.getElementById('posDrinkGrid');
@@ -1196,9 +1172,6 @@ function removeOneOrder(personIndex, itemName){
   saveData();
 }
 
-/* =========================================================
-   كروت الحسابات
-========================================================= */
 function togglePersonPayment(index){
   const person = appData.members[index];
   person.isPaid = !person.isPaid;
@@ -1366,9 +1339,6 @@ function renderSession(){
 
 function setSessionFilter(key){ sessionFilter = key; renderSession(); }
 
-/* =========================================================
-   الإحصائيات
-========================================================= */
 function renderStats(){
   let grandTotal = 0, collectedTotal = 0;
   const drinkCounts = {};
@@ -1401,9 +1371,6 @@ function renderStats(){
   updateSessionTimer();
 }
 
-/* =========================================================
-   الأرشيف والتصفير (Reset)
-========================================================= */
 function openHistoryModal(){
   const body = document.getElementById('historyModalBody');
   body.innerHTML = '';
@@ -1476,9 +1443,6 @@ async function hardResetCurrentSession(){
   toast('تم تصفير القعدة وإخلاء الترابيزة بالكامل! 💥', 'success');
 }
 
-/* =========================================================
-   تصدير الفاتورة (PDF / صورة / نص)
-========================================================= */
 function populateBillData(){
   const container = document.getElementById('billItemsContainer');
   container.innerHTML = '';
@@ -1630,9 +1594,6 @@ function copySessionSummary(){
     .catch(() => toast('مقدرناش ننسخ، جرب تاني', 'error'));
 }
 
-/* =========================================================
-   النسخ الاحتياطي والإنستاباي
-========================================================= */
 function openSettingsModal(){
   document.getElementById('instaPayAccount').value = appData.instaPay || '';
   document.getElementById('botToken').value = getBotToken();
@@ -1684,9 +1645,6 @@ function importDataJson(event){
   reader.readAsText(file);
 }
 
-/* =========================================================
-   محرك وقوائم تيليجرام المتطابقة
-========================================================= */
 function log(msg){
   const logBox = document.getElementById('botLog');
   const time = new Date().toLocaleTimeString('ar-EG');
@@ -2297,10 +2255,7 @@ function toggleTelegramPolling(){
   }
 }
 
-/* =========================================================
-   تشغيل الصفحة
-========================================================= */
-function initApp() {
+async function initApp() {
   const bToken = getBotToken();
   if (bToken) { 
     document.getElementById('botToken').value = bToken; 
@@ -2310,7 +2265,7 @@ function initApp() {
   renderAll();
   setSyncStatus('idle');
 
-  pullDataFromGitHub();
+  await pullDataFromGitHub();
   startAutoSync();
 }
 
@@ -2319,7 +2274,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (isAuth === 'authorized') {
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainAppShell').style.display = 'block';
-    initApp();
+    await initApp();
   } else {
     document.getElementById('loginOverlay').style.display = 'flex';
     document.getElementById('mainAppShell').style.display = 'none';
