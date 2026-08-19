@@ -784,10 +784,12 @@ async function pushDataToGitHub(isRetry){
       return;
     } else {
       setSyncStatus('error');
+      scheduleSyncRetry();
     }
   } catch (err) {
     console.error('GitHub Push Error:', err);
     setSyncStatus('error');
+    scheduleSyncRetry();
   } finally {
     isSyncBusy = false;
   }
@@ -798,7 +800,15 @@ function startAutoSync(){
   if (!getGhToken()) return;
   syncIntervalHandle = setInterval(() => {
     if (document.visibilityState === 'visible') pullDataFromGitHub(true);
-  }, 15000);
+  }, 8000);
+}
+
+let syncRetryHandle = null;
+function scheduleSyncRetry(){
+  clearTimeout(syncRetryHandle);
+  syncRetryHandle = setTimeout(() => {
+    if (getGhToken()) pushDataToGitHub();
+  }, 6000);
 }
 
 function stopAutoSync(){
@@ -829,9 +839,18 @@ function saveGhToken() {
   }
 }
 
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullDataFromGitHub(true); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    pullDataFromGitHub(true);
+  } else if (getGhToken() && syncTimeout) {
+    // بتقفل التاب أو بتنقل لتطبيق تاني وفيه حفظ لسه مستني الديباونس - ابعته دلوقتي على طول
+    clearTimeout(syncTimeout);
+    pushDataToGitHub();
+  }
+});
 window.addEventListener('focus', () => pullDataFromGitHub(true));
 window.addEventListener('online', () => { toast('رجع النت! بنزامن دلوقتي...', 'info'); pullDataFromGitHub(true); });
+window.addEventListener('pagehide', () => { if (getGhToken() && syncTimeout) { clearTimeout(syncTimeout); pushDataToGitHub(); } });
 
 function toast(msg, type='info', ms=3200){
   const stack = document.getElementById('toastStack');
