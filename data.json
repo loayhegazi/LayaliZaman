@@ -1,5 +1,7 @@
 {
   "instaPay": "",
+  "notes": "_pat_11A6DHWCI0sa0mAf4j5Cd2_jjvTv5XVbNTD4sZ9vS6cOsTLzD4DE7H7o5JH2V5FYxs6QNDJ5DMeLPm0UwM\n    8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450\n    ",
+  "sessionStartedAt": null,
   "menu": [
     {
       "name": "شاي كشري",
@@ -144,15 +146,11 @@
     {
       "name": "حماد",
       "isPresent": false,
-      "hasLeft": false,
       "orders": [],
-      "isPaid": false
+      "isPaid": false,
+      "hasLeft": false
     }
   ],
-  "sessionStartedAt": null,
-  "lastModified": 1787061880556,
-  "ghToken": "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",
-  "botToken": "8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450",
   "history": [
     {
       "date": "١٨‏/٨‏/٢٠٢٦، ٤:٢٨:٣٦ م",
@@ -313,5 +311,6 @@
         }
       ]
     }
-  ]
+  ],
+  "lastModified": 1787142219704
 }
