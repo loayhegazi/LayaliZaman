@@ -78,12 +78,7 @@
       "isPaid": false,
       "isPresent": true,
       "name": "لؤي",
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        }
-      ]
+      "orders": []
     },
     {
       "hasLeft": false,
@@ -360,6 +355,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787415056667,
+  "lastModified": 1787417783546,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
