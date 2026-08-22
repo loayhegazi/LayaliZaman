@@ -719,6 +719,8 @@ let selectedPersonIndices = [];
 let sessionFilter = 'all';
 let dbRef = null;
 let isFirebaseReady = false;
+let firebasePushInFlight = false;
+let firebasePushQueued = false;
 
 /* =========================================================
    محرك المزامنة الحية عبر Firebase Realtime Database
@@ -736,12 +738,17 @@ async function initFirebase() {
       await Promise.all(firebase.apps.map(app => app.delete()));
     }
 
+    firebasePushInFlight = false;
+    firebasePushQueued = false;
     firebase.initializeApp(getFirebaseConfig());
     const db = firebase.database();
     dbRef = db.ref('ahwa_ledger');
 
     // الاستماع الفوري لأي تعديل يحصل على أي جهاز
     dbRef.on('value', (snapshot) => {
+      // لو إحنا لسه بنرفع تعديل محلي، متسبقهوش بنسخة قديمة جايه من السيرفر -
+      // خلي التحديث بتاعنا يوصل الأول عشان محدش يمسح آخر مشروب اتضاف
+      if (firebasePushInFlight || firebasePushQueued) return;
       const data = snapshot.val();
       if (data && data.members && data.menu) {
         appData = Object.assign({}, defaultData(), data);
@@ -790,11 +797,21 @@ function buildSyncPayload(){
   return clone;
 }
 
+// بيرفع آخر نسخة من appData على Firebase. لو فيه رفع شغال بالفعل، بيأجل رفع
+// تاني (بآخر نسخة من appData وقتها) بدل ما يبعت طلبين مع بعض ويحصل تعارض
+// في الترتيب يمسح بيه رد قديم فوق تعديل أحدث (وده كان سبب اختفاء الطلبات).
 function pushDataToFirebase(manual){
   if (!dbRef) {
     if (manual) toast('لسه مش متصل بـ Firebase', 'error');
     return;
   }
+  if (firebasePushInFlight) {
+    firebasePushQueued = true;
+    if (manual) toast('في رفع شغال دلوقتي.. هيتبعت آخر تحديث أول ما يخلص ⏳', 'info');
+    return;
+  }
+
+  firebasePushInFlight = true;
   setSyncStatus('syncing');
   dbRef.set(buildSyncPayload())
     .then(() => {
@@ -805,6 +822,13 @@ function pushDataToFirebase(manual){
       console.error('Firebase Push Error:', err);
       setSyncStatus('error');
       if (manual) toast('مقدرناش نبعت على Firebase، جرب تاني', 'error');
+    })
+    .then(() => {
+      firebasePushInFlight = false;
+      if (firebasePushQueued) {
+        firebasePushQueued = false;
+        pushDataToFirebase();
+      }
     });
 }
 
