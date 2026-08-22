@@ -9,9 +9,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- Firebase Realtime Database SDK (Compat Mode) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
 :root{
@@ -76,7 +73,43 @@ input:focus,select:focus,textarea:focus{border-color:var(--brass);}
 .btn-block{width:100%;}
 .icon{font-size:1em;line-height:1;}
 
-.app-shell{max-width:1280px;margin:0 auto;display:block;}
+#loginOverlay{
+  position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;justify-content:center;align-items:center;padding:20px;
+  background:
+    radial-gradient(ellipse 600px 400px at 50% 20%, rgba(207,154,62,0.15), transparent 70%),
+    var(--bg);
+}
+.login-card{
+  background:var(--surface);border:1.5px solid var(--brass);border-radius:20px;padding:32px 28px;
+  width:100%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  display:flex;flex-direction:column;gap:18px;position:relative;
+}
+.login-mark{
+  width:68px;height:68px;border-radius:18px;background:linear-gradient(145deg, var(--brass), #8a5f20);
+  margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:2.2rem;
+  box-shadow:0 8px 20px rgba(207,154,62,0.3);
+}
+.login-card h2{font-size:1.5rem;color:var(--paper);font-weight:900;}
+.login-card p{font-size:0.85rem;color:var(--text-dim);line-height:1.6;}
+.login-input-group{position:relative;display:flex;align-items:center;}
+.login-input-group input{
+  text-align:center;font-size:1.1rem;letter-spacing:1px;font-family:monospace, Tahoma, sans-serif;
+  border:1.5px solid var(--line);background:var(--bg-2);padding:12px 40px 12px 12px;
+  direction:ltr !important;
+}
+.login-input-group input:focus{border-color:var(--brass);box-shadow:0 0 0 3px var(--brass-dim);}
+.login-toggle-btn{
+  position:absolute;right:10px;background:transparent;border:none;padding:4px;
+  font-size:1.1rem;color:var(--text-dim);cursor:pointer;
+}
+.login-btn{
+  background:linear-gradient(135deg, var(--brass), var(--brass-hover));
+  color:#1a1206;padding:12px;font-size:1rem;font-weight:900;border-radius:10px;
+}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(207,154,62,0.25);}
+.login-hint{font-size:0.75rem;color:var(--text-faint);}
+
+.app-shell{max-width:1280px;margin:0 auto;display:none;}
 header{
   display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
   padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line);
@@ -320,6 +353,22 @@ header{
 </head>
 <body>
 
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="login-mark">☕</div>
+    <div>
+      <h2>نوّرت قعدة قهوة</h2>
+      <p>الدفتر ده للمعلمين بس.. اكتب كلمة السر عشان تفتح القعدة والطلبات!</p>
+    </div>
+    <div class="login-input-group">
+      <input type="password" id="loginPassInput" placeholder="••• كلمة السر •••" onkeydown="if(event.key==='Enter')checkAppLogin()">
+      <button class="login-toggle-btn" type="button" onclick="toggleLoginPassword()" title="إظهار/إخفاء الباسورد">👁️</button>
+    </div>
+    <button class="login-btn" onclick="checkAppLogin()">ادخل القعدة يا معلم 🚪</button>
+    <div class="login-hint">لو نسيت الباسورد اسأل صاحب القعدة 😉</div>
+  </div>
+</div>
+
 <div class="app-shell" id="mainAppShell">
 
   <header>
@@ -327,14 +376,12 @@ header{
       <div class="brand-mark">☕</div>
       <div>
         <h1>دفتر قعدتنا</h1>
-        <p>حساب القهوة والشلة… مزامنة سحابية على Firebase ومحفوظة دايماً</p>
+        <p>حساب القهوة والشلة… مزامنة عبر GitHub ومحفوظة دايماً</p>
         <div class="session-timer" id="sessionTimer" style="display:none;">⏱️ <span id="sessionTimerText"></span></div>
       </div>
     </div>
     <div class="header-actions">
-      <div class="sync-pill" id="syncStatusPill"><span class="sync-dot" id="syncStatusDot"></span><span id="syncStatusText">Firebase متصل</span></div>
-      <button class="btn-sky btn-sm" title="اسحب أحدث نسخة من Firebase" onclick="pullDataFromFirebase()">⬇️ Pull</button>
-      <button class="btn-mint btn-sm" title="ارفع نسختك الحالية على Firebase" onclick="pushDataToFirebase(true)">⬆️ Push</button>
+      <div class="sync-pill" id="syncStatusPill" onclick="manualSyncGithub()" style="cursor:pointer;" title="اضغط عشان تعمل Sync يدوي دلوقتي"><span class="sync-dot" id="syncStatusDot"></span><span id="syncStatusText">GitHub مش متظبط</span></div>
       <button class="btn-ghost btn-sm" onclick="openNotesModal()">📝 نوتة القعدة</button>
       <button class="btn-ghost btn-sm" onclick="openHistoryModal()">📚 أرشيف القعدات</button>
       <button class="btn-ghost btn-sm" onclick="exportBillPdf()">📄 شيك PDF</button>
@@ -342,6 +389,7 @@ header{
       <button class="btn-primary btn-sm" onclick="copySessionSummary()">📋 شير واتساب</button>
       <button class="btn-danger btn-sm" onclick="resetSessionOrders()">🔄 قعدة جديدة</button>
       <button class="gear-btn" title="إعدادات وتليجرام" onclick="openSettingsModal()">⚙️</button>
+      <button class="btn-ghost btn-xs" style="color:var(--text-faint);" title="تسجيل الخروج" onclick="logoutApp()">🚪 خروج</button>
     </div>
   </header>
 
@@ -428,31 +476,20 @@ header{
       </div>
 
       <div class="form-group">
-        <label>إعدادات Firebase (اربط بمشروعك الخاص)</label>
-        <div class="row-group" style="flex-wrap:wrap;">
-          <input type="text" id="fbApiKey" placeholder="apiKey">
-          <input type="text" id="fbAuthDomain" placeholder="authDomain">
-        </div>
-        <div class="row-group" style="flex-wrap:wrap;margin-top:8px;">
-          <input type="text" id="fbDatabaseURL" placeholder="databaseURL">
-          <input type="text" id="fbProjectId" placeholder="projectId">
-        </div>
-        <div class="row-group" style="flex-wrap:wrap;margin-top:8px;">
-          <input type="text" id="fbStorageBucket" placeholder="storageBucket">
-          <input type="text" id="fbMessagingSenderId" placeholder="messagingSenderId">
-        </div>
-        <div class="row-group" style="flex-wrap:wrap;margin-top:8px;">
-          <input type="text" id="fbAppId" placeholder="appId">
-          <input type="text" id="fbMeasurementId" placeholder="measurementId (اختياري)">
+        <label>☁️ مزامنة GitHub (Push / Pull تلقائي كل 20 ثانية)</label>
+        <input type="password" id="githubToken" placeholder="حط GitHub Token بتاعك هنا (ghp_...)">
+        <input type="text" id="githubRepo" placeholder="اسم الريبو: username/repo-name" style="margin-top:8px;">
+        <div class="row-group" style="margin-top:8px;">
+          <input type="text" id="githubPath" placeholder="اسم ملف الداتا (اختياري)">
+          <input type="text" id="githubBranch" placeholder="البرانش (اختياري - افتراضي main)">
         </div>
         <div class="row-group" style="margin-top:8px;">
-          <button class="btn-primary btn-sm" onclick="saveFirebaseConfig()">💾 حفظ واتصل</button>
-          <button class="btn-ghost btn-sm" onclick="resetFirebaseConfig()">↩️ رجّع الإعداد الافتراضي</button>
+          <button class="btn-primary btn-sm" onclick="saveGithubConfigFromUi()">💾 حفظ الإعدادات</button>
+          <button class="btn-mint btn-sm" onclick="manualSyncGithub()">⬇️ Sync (هات آخر داتا)</button>
+          <button class="btn-ghost btn-sm" onclick="pushToGithub(true)">⬆️ Push (ارفع داتاي)</button>
         </div>
-        <div class="bot-status-container" style="margin-top:8px;">
-          <div class="status-dot" id="fbConfigStatusDot"></div>
-          <span id="fbConfigStatusText">بيستخدم إعداد Firebase الافتراضي</span>
-        </div>
+        <p style="font-size:.72rem;color:var(--text-faint);margin-top:4px;">افتح من جهاز تاني؟ حط نفس التوكن ونفس اسم الريبو واضغط Sync عشان تنزل نفس الداتا. بعد كده الداتا هتتزامن أوتوماتيك كل 20 ثانية.</p>
+        <div class="console-log" id="githubSyncLog">مستني تظبط التوكن...</div>
       </div>
 
       <div class="form-group">
@@ -540,36 +577,12 @@ header{
 
 <script>
 /* =========================================================
-   إعدادات Firebase
+   إعدادات كلمة السر المدمجة
 ========================================================= */
-// ⬇️ ده الإعداد الافتراضي - ينفع تستبدله من شاشة الإعدادات جوا التطبيق ⬇️
-const DEFAULT_FIREBASE_CONFIG = {
-  apiKey: "AIzaSyC3MHISCX2fvFd3Ub3mpW-cxVGewbh5bsk",
-  authDomain: "layalizaman-112ba.firebaseapp.com",
-  databaseURL: "https://layalizaman-112ba-default-rtdb.firebaseio.com",
-  projectId: "layalizaman-112ba",
-  storageBucket: "layalizaman-112ba.firebasestorage.app",
-  messagingSenderId: "789252843728",
-  appId: "1:789252843728:web:59de9a70f681d80a2ad6d5",
-  measurementId: "G-X7LTPF4Z7D"
-};
+const APP_PASSWORD = '@hw@2022';
 
-const FIREBASE_CONFIG_KEY = 'ahwa_firebase_config_v1';
-
-function getFirebaseConfig(){
-  const saved = localStorage.getItem(FIREBASE_CONFIG_KEY);
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      if (parsed && parsed.databaseURL) return parsed;
-    } catch(e){}
-  }
-  return DEFAULT_FIREBASE_CONFIG;
-}
-
-function isUsingCustomFirebaseConfig(){
-  return !!localStorage.getItem(FIREBASE_CONFIG_KEY);
-}
+const GITHUB_STORE_KEY = 'ahwa_github_sync_config_v1';
+const GITHUB_SYNC_INTERVAL_MS = 20000;
 
 const HARDCODED_CONFIG = {
   botToken: '8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450',
@@ -577,6 +590,18 @@ const HARDCODED_CONFIG = {
 };
 
 const STORE_KEY = 'cafe_egypt_ledger_v6';
+
+function toggleLoginPassword() {
+  const input = document.getElementById('loginPassInput');
+  const btn = document.querySelector('.login-toggle-btn');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.innerText = '🙈';
+  } else {
+    input.type = 'password';
+    btn.innerText = '👁️';
+  }
+}
 
 function defaultData(){
   return {
@@ -717,67 +742,96 @@ let isPolling = false;
 let lastUpdateId = 0;
 let selectedPersonIndices = [];
 let sessionFilter = 'all';
-let dbRef = null;
-let isFirebaseReady = false;
-let firebasePushInFlight = false;
-let firebasePushQueued = false;
+let githubSyncTimer = null;
+let isGithubSyncing = false;
+
+async function checkAppLogin() {
+  const input = document.getElementById('loginPassInput');
+  const entered = (input.value || '').trim();
+  const isValid = (entered === '@hw@2022' || entered === 'hw@2022@' || entered === '2022@hw@');
+
+  if (isValid) {
+    sessionStorage.setItem('ahwa_auth_session', 'authorized');
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('mainAppShell').style.display = 'block';
+    toast('نوّرت يا معلم! بنجهزلك القعدة... ☕', 'success', 2500);
+    await initApp();
+  } else {
+    input.value = '';
+    const funnyAlerts = [
+      'إنت مين يا عمنا؟ الباسورد مش مظبوط خالص!',
+      'لا يا معلم.. كلمة السر عند المعلم الكبير بس 😉',
+      'الباسورد غلط يا باشا.. شكلك مش من الشلة!',
+      'ركز كده واكتب الباسورد صح يا غالي ☕'
+    ];
+    const randomMsg = funnyAlerts[Math.floor(Math.random() * funnyAlerts.length)];
+    toast(randomMsg, 'error', 3000);
+  }
+}
+
+function logoutApp() {
+  sessionStorage.removeItem('ahwa_auth_session');
+  document.getElementById('mainAppShell').style.display = 'none';
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('loginPassInput').value = '';
+  toast('خرجت من القعدة.. مع السلامة يا معلم! 🚪', 'info');
+}
 
 /* =========================================================
-   محرك المزامنة الحية عبر Firebase Realtime Database
+   محرك المزامنة عبر GitHub (Push / Pull بتوكن شخصي)
 ========================================================= */
-let autoPushTimer = null;
+function githubLog(msg){
+  const el = document.getElementById('githubSyncLog');
+  if (!el) return;
+  const time = new Date().toLocaleTimeString('ar-EG');
+  el.innerHTML = `[${time}] ${msg}<br>` + el.innerHTML;
+}
 
-async function initFirebase() {
+function loadGithubConfig(){
   try {
-    // لو فيه اتصال قديم شغال، اقفله الأول (مفيد عند تغيير الإعدادات)
-    if (dbRef) {
-      try { dbRef.off(); } catch(e){}
-      dbRef = null;
-    }
-    if (firebase.apps.length) {
-      await Promise.all(firebase.apps.map(app => app.delete()));
-    }
+    const raw = localStorage.getItem(GITHUB_STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e){}
+  return { token: '', repo: '', path: 'ahwa-data.json', branch: 'main' };
+}
 
-    firebasePushInFlight = false;
-    firebasePushQueued = false;
-    firebase.initializeApp(getFirebaseConfig());
-    const db = firebase.database();
-    dbRef = db.ref('ahwa_ledger');
+function githubConfigured(cfg){
+  cfg = cfg || loadGithubConfig();
+  return !!(cfg.token && cfg.repo);
+}
 
-    // الاستماع الفوري لأي تعديل يحصل على أي جهاز
-    dbRef.on('value', (snapshot) => {
-      // لو إحنا لسه بنرفع تعديل محلي، متسبقهوش بنسخة قديمة جايه من السيرفر -
-      // خلي التحديث بتاعنا يوصل الأول عشان محدش يمسح آخر مشروب اتضاف
-      if (firebasePushInFlight || firebasePushQueued) return;
-      const data = snapshot.val();
-      if (data && data.members && data.menu) {
-        appData = Object.assign({}, defaultData(), data);
-        localStorage.setItem(STORE_KEY, JSON.stringify(appData));
-        renderAll();
-        setSyncStatus('synced');
-      } else {
-        // إذا كانت قاعدة البيانات في Firebase فارغة لأول مرة، ارفع البيانات الافتراضية
-        pushDataToFirebase();
-      }
-    }, (err) => {
-      console.error('Firebase listen error:', err);
-      setSyncStatus('error');
-      toastFirebaseErrorThrottled('انقطع الاتصال اللحظي بـ Firebase: ' + explainFirebaseError(err));
-    });
+function saveGithubConfigFromUi(){
+  const token = document.getElementById('githubToken').value.trim();
+  const repo = document.getElementById('githubRepo').value.trim().replace(/^\/|\/$/g, '');
+  const path = document.getElementById('githubPath').value.trim() || 'ahwa-data.json';
+  const branch = document.getElementById('githubBranch').value.trim() || 'main';
 
-    isFirebaseReady = true;
-    setSyncStatus('synced');
-
-    // بوش تلقائي كل 20 ثانية عشان أي جهاز آخر ياخد آخر تحديث بسرعة
-    if (autoPushTimer) clearInterval(autoPushTimer);
-    autoPushTimer = setInterval(() => {
-      if (dbRef) pushDataToFirebase();
-    }, 20000);
-  } catch (err) {
-    console.error("Firebase init error:", err);
-    isFirebaseReady = false;
-    setSyncStatus('error');
+  if (!token || !repo) {
+    toast('لازم تحط التوكن واسم الريبو الأول يا معلم', 'error');
+    return;
   }
+
+  const cfg = { token, repo, path, branch };
+  localStorage.setItem(GITHUB_STORE_KEY, JSON.stringify(cfg));
+  toast('اتحفظت إعدادات GitHub، هنجرب نعمل Sync دلوقتي ☁️', 'success');
+  githubLog('اتحفظت الإعدادات. بنجرب نتصل...');
+  startGithubAutoSync();
+  manualSyncGithub();
+}
+
+// ترميز/فك ترميز base64 آمن للنصوص العربية (UTF-8)
+function utf8ToB64(str){ return btoa(unescape(encodeURIComponent(str))); }
+function b64ToUtf8(str){ return decodeURIComponent(escape(atob(str.replace(/\n/g, '')))); }
+
+function githubApiBase(cfg){
+  return `https://api.github.com/repos/${cfg.repo}/contents/${encodeURIComponent(cfg.path)}`;
+}
+
+function githubHeaders(cfg){
+  return {
+    'Authorization': `token ${cfg.token}`,
+    'Accept': 'application/vnd.github+json'
+  };
 }
 
 function setSyncStatus(state){
@@ -786,31 +840,10 @@ function setSyncStatus(state){
   const text = document.getElementById('syncStatusText');
   if (!pill) return;
   pill.className = 'sync-pill ' + (state || '');
-  if (state === 'syncing') text.innerText = 'بيحفظ على Firebase...';
-  else if (state === 'synced') text.innerText = 'متصل سحابياً ☁️';
-  else if (state === 'error') text.innerText = 'مشكلة في اتصال Firebase';
-  else text.innerText = 'Firebase متصل';
-}
-
-// بيرجع رسالة مفهومة حسب نوع خطأ Firebase، عشان تعرف تشخص المشكلة بسرعة
-// (زي مشكلة في Rules قاعدة البيانات، أو رابط databaseURL غلط)
-function explainFirebaseError(err){
-  const code = (err && err.code) || '';
-  if (code === 'PERMISSION_DENIED') {
-    return 'الصلاحيات (Rules) في Firebase مش مسموح فيها بالقراءة/الكتابة. ادخل Firebase Console > Realtime Database > Rules واتأكد إنها فاتحة.';
-  }
-  if (code === 'unavailable' || code === 'NETWORK_ERROR') {
-    return 'مفيش اتصال بالإنترنت أو Firebase مش راضي يرد، جرب تاني.';
-  }
-  return (err && (err.message || err.code)) || 'خطأ غير معروف';
-}
-
-let lastFirebaseErrorToastAt = 0;
-function toastFirebaseErrorThrottled(message){
-  const now = Date.now();
-  if (now - lastFirebaseErrorToastAt < 15000) return; // كل 15 ثانية بالكتير عشان محدش يتقصف بتوستات
-  lastFirebaseErrorToastAt = now;
-  toast(message, 'error', 5000);
+  if (state === 'syncing') text.innerText = 'بيتزامن مع GitHub...';
+  else if (state === 'synced') text.innerText = 'متزامن ☁️ GitHub';
+  else if (state === 'error') text.innerText = 'مشكلة في مزامنة GitHub';
+  else text.innerText = 'GitHub مش متظبط';
 }
 
 function buildSyncPayload(){
@@ -819,74 +852,154 @@ function buildSyncPayload(){
   return clone;
 }
 
-// بيرفع آخر نسخة من appData على Firebase. لو فيه رفع شغال بالفعل، بيأجل رفع
-// تاني (بآخر نسخة من appData وقتها) بدل ما يبعت طلبين مع بعض ويحصل تعارض
-// في الترتيب يمسح بيه رد قديم فوق تعديل أحدث (وده كان سبب اختفاء الطلبات).
-function pushDataToFirebase(manual){
-  if (!dbRef) {
-    if (manual) toast('لسه مش متصل بـ Firebase', 'error');
-    return;
-  }
-  if (firebasePushInFlight) {
-    firebasePushQueued = true;
-    if (manual) toast('في رفع شغال دلوقتي.. هيتبعت آخر تحديث أول ما يخلص ⏳', 'info');
-    return;
-  }
-
-  firebasePushInFlight = true;
+// هات آخر نسخة من GitHub. force=true (زرار Sync اليدوي) بتاخد آخر نسخة
+// وتكتب فوق المحلي على طول. من غير force (المزامنة الأوتوماتيكية) بناخد
+// النسخة الأحدث بس (بمقارنة lastModified) عشان منضيعش تعديل لسه حاصل هنا.
+async function pullFromGithub(force){
+  const cfg = loadGithubConfig();
+  if (!githubConfigured(cfg)) { if (force) toast('حط التوكن واسم الريبو في الإعدادات الأول', 'error'); return null; }
   setSyncStatus('syncing');
-  dbRef.set(buildSyncPayload())
-    .then(() => {
-      setSyncStatus('synced');
-      if (manual) toast('اتبعتت آخر نسخة على Firebase ⬆️', 'success');
-    })
-    .catch((err) => {
-      console.error('Firebase Push Error:', err);
-      setSyncStatus('error');
-      if (manual) toast('مقدرناش نبعت على Firebase: ' + explainFirebaseError(err), 'error', 5000);
-      else toastFirebaseErrorThrottled('مقدرناش نبعت على Firebase: ' + explainFirebaseError(err));
-    })
-    .then(() => {
-      firebasePushInFlight = false;
-      if (firebasePushQueued) {
-        firebasePushQueued = false;
-        pushDataToFirebase();
-      }
+  try {
+    const res = await fetch(`${githubApiBase(cfg)}?ref=${encodeURIComponent(cfg.branch)}&t=${Date.now()}`, {
+      headers: githubHeaders(cfg), cache: 'no-store'
     });
+    if (res.status === 404) {
+      // الملف لسه مش موجود على GitHub، هنعتبره أول مزامنة ونرفع الداتا الحالية
+      setSyncStatus('synced');
+      if (force) { githubLog('مفيش داتا على GitHub لسه، هنرفع نسختك الحالية.'); await pushToGithub(true); }
+      return null;
+    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const remote = JSON.parse(b64ToUtf8(json.content));
+    githubLastSha = json.sha;
+
+    const remoteTime = remote.lastModified || 0;
+    const localTime = appData.lastModified || 0;
+
+    if (force || remoteTime > localTime) {
+      appData = Object.assign({}, defaultData(), remote);
+      localStorage.setItem(STORE_KEY, JSON.stringify(appData));
+      renderAll();
+      githubLog(force ? 'تم تنزيل آخر داتا من GitHub ✅' : 'لقينا تحديث جديد وتم تنزيله أوتوماتيك ✅');
+    } else if (force) {
+      githubLog('الداتا بتاعتك أصلاً هي الأحدث.');
+    }
+    setSyncStatus('synced');
+    return remote;
+  } catch (err) {
+    console.error('GitHub Pull Error:', err);
+    githubLog('فشل جلب الداتا من GitHub: ' + err.message);
+    setSyncStatus('error');
+    return null;
+  }
 }
 
-function pullDataFromFirebase(){
-  if (!dbRef) {
-    toast('لسه مش متصل بـ Firebase', 'error');
+let githubLastSha = null;
+
+// ارفع الداتا الحالية على GitHub (push)
+async function pushToGithub(manual){
+  const cfg = loadGithubConfig();
+  if (!githubConfigured(cfg)) { if (manual) toast('حط التوكن واسم الريبو في الإعدادات الأول', 'error'); return; }
+  if (isGithubSyncing) return;
+  isGithubSyncing = true;
+  setSyncStatus('syncing');
+  try {
+    // هات الـ sha الحالي للملف الأول (لو موجود) عشان GitHub يقبل التحديث
+    if (!githubLastSha) {
+      try {
+        const check = await fetch(`${githubApiBase(cfg)}?ref=${encodeURIComponent(cfg.branch)}&t=${Date.now()}`, {
+          headers: githubHeaders(cfg), cache: 'no-store'
+        });
+        if (check.ok) { const j = await check.json(); githubLastSha = j.sha; }
+      } catch(e){}
+    }
+
+    const payload = buildSyncPayload();
+    const body = {
+      message: `ahwa sync ${new Date().toISOString()}`,
+      content: utf8ToB64(JSON.stringify(payload, null, 2)),
+      branch: cfg.branch
+    };
+    if (githubLastSha) body.sha = githubLastSha;
+
+    const res = await fetch(githubApiBase(cfg), {
+      method: 'PUT',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, githubHeaders(cfg)),
+      body: JSON.stringify(body)
+    });
+
+    if (res.status === 409 || res.status === 422) {
+      // في تعارض (حد تاني رفع نسخة قبلك) - هات الـ sha الجديد وحاول تاني
+      githubLastSha = null;
+      const retryCheck = await fetch(`${githubApiBase(cfg)}?ref=${encodeURIComponent(cfg.branch)}&t=${Date.now()}`, { headers: githubHeaders(cfg), cache: 'no-store' });
+      if (retryCheck.ok) {
+        const j = await retryCheck.json();
+        githubLastSha = j.sha;
+        body.sha = githubLastSha;
+        const retryRes = await fetch(githubApiBase(cfg), {
+          method: 'PUT',
+          headers: Object.assign({ 'Content-Type': 'application/json' }, githubHeaders(cfg)),
+          body: JSON.stringify(body)
+        });
+        if (!retryRes.ok) throw new Error('HTTP ' + retryRes.status);
+        const retryData = await retryRes.json();
+        githubLastSha = retryData.content.sha;
+      } else {
+        throw new Error('HTTP ' + res.status);
+      }
+    } else if (!res.ok) {
+      throw new Error('HTTP ' + res.status);
+    } else {
+      const data = await res.json();
+      githubLastSha = data.content.sha;
+    }
+
+    setSyncStatus('synced');
+    if (manual) { githubLog('تم رفع داتاك على GitHub ✅'); toast('اتحفظت الداتا على GitHub ☁️', 'success'); }
+  } catch (err) {
+    console.error('GitHub Push Error:', err);
+    githubLog('فشل رفع الداتا على GitHub: ' + err.message);
+    setSyncStatus('error');
+    if (manual) toast('حصلت مشكلة في الرفع على GitHub', 'error');
+  } finally {
+    isGithubSyncing = false;
+  }
+}
+
+// زرار الـ Sync اليدوي: هات آخر داتا موجودة على GitHub وحطها هنا
+async function manualSyncGithub(){
+  const cfg = loadGithubConfig();
+  if (!githubConfigured(cfg)) {
+    openSettingsModal();
+    toast('ظبط التوكن واسم الريبو الأول عشان تعمل Sync', 'error');
     return;
   }
-  setSyncStatus('syncing');
-  dbRef.once('value')
-    .then((snapshot) => {
-      const data = snapshot.val();
-      if (data && data.members && data.menu) {
-        appData = Object.assign({}, defaultData(), data);
-        localStorage.setItem(STORE_KEY, JSON.stringify(appData));
-        renderAll();
-        setSyncStatus('synced');
-        toast('اتجابت آخر نسخة من Firebase ⬇️', 'success');
-      } else {
-        setSyncStatus('synced');
-        toast('معدش لسه أي داتا على Firebase', 'info');
-      }
-    })
-    .catch((err) => {
-      console.error('Firebase Pull Error:', err);
-      setSyncStatus('error');
-      toast('مقدرناش نجيب من Firebase: ' + explainFirebaseError(err), 'error', 6000);
-    });
+  await pullFromGithub(true);
+}
+
+function startGithubAutoSync(){
+  if (githubSyncTimer) clearInterval(githubSyncTimer);
+  githubSyncTimer = setInterval(() => {
+    if (githubConfigured()) pullFromGithub(false);
+  }, GITHUB_SYNC_INTERVAL_MS);
+}
+
+async function initGithubSync(){
+  const cfg = loadGithubConfig();
+  if (githubConfigured(cfg)) {
+    await pullFromGithub(true);
+  } else {
+    setSyncStatus('');
+  }
+  startGithubAutoSync();
 }
 
 function saveData(){
   appData.lastModified = Date.now();
   localStorage.setItem(STORE_KEY, JSON.stringify(appData));
   renderAll();
-  pushDataToFirebase();
+  pushToGithub(false);
 }
 
 function renderAll(){
@@ -1688,58 +1801,12 @@ function copySessionSummary(){
 function openSettingsModal(){
   document.getElementById('instaPayAccount').value = appData.instaPay || '';
   document.getElementById('botToken').value = HARDCODED_CONFIG.botToken;
-  populateFirebaseConfigForm();
+  const cfg = loadGithubConfig();
+  document.getElementById('githubToken').value = cfg.token || '';
+  document.getElementById('githubRepo').value = cfg.repo || '';
+  document.getElementById('githubPath').value = cfg.path || 'ahwa-data.json';
+  document.getElementById('githubBranch').value = cfg.branch || 'main';
   openModal('settingsModal');
-}
-
-function populateFirebaseConfigForm(){
-  const cfg = getFirebaseConfig();
-  document.getElementById('fbApiKey').value = cfg.apiKey || '';
-  document.getElementById('fbAuthDomain').value = cfg.authDomain || '';
-  document.getElementById('fbDatabaseURL').value = cfg.databaseURL || '';
-  document.getElementById('fbProjectId').value = cfg.projectId || '';
-  document.getElementById('fbStorageBucket').value = cfg.storageBucket || '';
-  document.getElementById('fbMessagingSenderId').value = cfg.messagingSenderId || '';
-  document.getElementById('fbAppId').value = cfg.appId || '';
-  document.getElementById('fbMeasurementId').value = cfg.measurementId || '';
-
-  const dot = document.getElementById('fbConfigStatusDot');
-  const text = document.getElementById('fbConfigStatusText');
-  if (isUsingCustomFirebaseConfig()) {
-    dot.classList.add('active');
-    text.innerText = 'بيستخدم إعداد Firebase بتاعك';
-  } else {
-    dot.classList.remove('active');
-    text.innerText = 'بيستخدم إعداد Firebase الافتراضي';
-  }
-}
-
-async function saveFirebaseConfig(){
-  const cfg = {
-    apiKey: document.getElementById('fbApiKey').value.trim(),
-    authDomain: document.getElementById('fbAuthDomain').value.trim(),
-    databaseURL: document.getElementById('fbDatabaseURL').value.trim(),
-    projectId: document.getElementById('fbProjectId').value.trim(),
-    storageBucket: document.getElementById('fbStorageBucket').value.trim(),
-    messagingSenderId: document.getElementById('fbMessagingSenderId').value.trim(),
-    appId: document.getElementById('fbAppId').value.trim(),
-    measurementId: document.getElementById('fbMeasurementId').value.trim()
-  };
-  if (!cfg.apiKey || !cfg.databaseURL || !cfg.projectId) {
-    toast('لازم تملى على الأقل apiKey و databaseURL و projectId', 'error');
-    return;
-  }
-  localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(cfg));
-  toast('اتحفظ إعداد Firebase.. بنتصل دلوقتي 🔌', 'info');
-  await initFirebase();
-  populateFirebaseConfigForm();
-}
-
-async function resetFirebaseConfig(){
-  localStorage.removeItem(FIREBASE_CONFIG_KEY);
-  toast('رجعنا إعداد Firebase الافتراضي.. بنتصل دلوقتي 🔌', 'info');
-  await initFirebase();
-  populateFirebaseConfigForm();
 }
 
 function saveInstaPay(){
@@ -2401,12 +2468,26 @@ async function initApp() {
     toggleTelegramPolling(); 
   }
   if (appData.instaPay) document.getElementById('instaPayAccount').value = appData.instaPay;
+  const gcfg = loadGithubConfig();
+  if (gcfg.token) document.getElementById('githubToken').value = gcfg.token;
+  if (gcfg.repo) document.getElementById('githubRepo').value = gcfg.repo;
+  if (gcfg.path) document.getElementById('githubPath').value = gcfg.path;
+  if (gcfg.branch) document.getElementById('githubBranch').value = gcfg.branch;
   renderAll();
-  await initFirebase();
+  initGithubSync();
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  await initApp();
+  const isAuth = sessionStorage.getItem('ahwa_auth_session');
+  if (isAuth === 'authorized') {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('mainAppShell').style.display = 'block';
+    await initApp();
+  } else {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('mainAppShell').style.display = 'none';
+    document.getElementById('loginPassInput').focus();
+  }
 });
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
