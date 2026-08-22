@@ -762,6 +762,7 @@ async function initFirebase() {
     }, (err) => {
       console.error('Firebase listen error:', err);
       setSyncStatus('error');
+      toastFirebaseErrorThrottled('انقطع الاتصال اللحظي بـ Firebase: ' + explainFirebaseError(err));
     });
 
     isFirebaseReady = true;
@@ -789,6 +790,27 @@ function setSyncStatus(state){
   else if (state === 'synced') text.innerText = 'متصل سحابياً ☁️';
   else if (state === 'error') text.innerText = 'مشكلة في اتصال Firebase';
   else text.innerText = 'Firebase متصل';
+}
+
+// بيرجع رسالة مفهومة حسب نوع خطأ Firebase، عشان تعرف تشخص المشكلة بسرعة
+// (زي مشكلة في Rules قاعدة البيانات، أو رابط databaseURL غلط)
+function explainFirebaseError(err){
+  const code = (err && err.code) || '';
+  if (code === 'PERMISSION_DENIED') {
+    return 'الصلاحيات (Rules) في Firebase مش مسموح فيها بالقراءة/الكتابة. ادخل Firebase Console > Realtime Database > Rules واتأكد إنها فاتحة.';
+  }
+  if (code === 'unavailable' || code === 'NETWORK_ERROR') {
+    return 'مفيش اتصال بالإنترنت أو Firebase مش راضي يرد، جرب تاني.';
+  }
+  return (err && (err.message || err.code)) || 'خطأ غير معروف';
+}
+
+let lastFirebaseErrorToastAt = 0;
+function toastFirebaseErrorThrottled(message){
+  const now = Date.now();
+  if (now - lastFirebaseErrorToastAt < 15000) return; // كل 15 ثانية بالكتير عشان محدش يتقصف بتوستات
+  lastFirebaseErrorToastAt = now;
+  toast(message, 'error', 5000);
 }
 
 function buildSyncPayload(){
@@ -821,7 +843,8 @@ function pushDataToFirebase(manual){
     .catch((err) => {
       console.error('Firebase Push Error:', err);
       setSyncStatus('error');
-      if (manual) toast('مقدرناش نبعت على Firebase، جرب تاني', 'error');
+      if (manual) toast('مقدرناش نبعت على Firebase: ' + explainFirebaseError(err), 'error', 5000);
+      else toastFirebaseErrorThrottled('مقدرناش نبعت على Firebase: ' + explainFirebaseError(err));
     })
     .then(() => {
       firebasePushInFlight = false;
@@ -855,7 +878,7 @@ function pullDataFromFirebase(){
     .catch((err) => {
       console.error('Firebase Pull Error:', err);
       setSyncStatus('error');
-      toast('مقدرناش نجيب من Firebase، جرب تاني', 'error');
+      toast('مقدرناش نجيب من Firebase: ' + explainFirebaseError(err), 'error', 6000);
     });
 }
 
