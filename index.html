@@ -73,43 +73,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--brass);}
 .btn-block{width:100%;}
 .icon{font-size:1em;line-height:1;}
 
-#loginOverlay{
-  position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;justify-content:center;align-items:center;padding:20px;
-  background:
-    radial-gradient(ellipse 600px 400px at 50% 20%, rgba(207,154,62,0.15), transparent 70%),
-    var(--bg);
-}
-.login-card{
-  background:var(--surface);border:1.5px solid var(--brass);border-radius:20px;padding:32px 28px;
-  width:100%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);
-  display:flex;flex-direction:column;gap:18px;position:relative;
-}
-.login-mark{
-  width:68px;height:68px;border-radius:18px;background:linear-gradient(145deg, var(--brass), #8a5f20);
-  margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:2.2rem;
-  box-shadow:0 8px 20px rgba(207,154,62,0.3);
-}
-.login-card h2{font-size:1.5rem;color:var(--paper);font-weight:900;}
-.login-card p{font-size:0.85rem;color:var(--text-dim);line-height:1.6;}
-.login-input-group{position:relative;display:flex;align-items:center;}
-.login-input-group input{
-  text-align:center;font-size:1.1rem;letter-spacing:1px;font-family:monospace, Tahoma, sans-serif;
-  border:1.5px solid var(--line);background:var(--bg-2);padding:12px 40px 12px 12px;
-  direction:ltr !important;
-}
-.login-input-group input:focus{border-color:var(--brass);box-shadow:0 0 0 3px var(--brass-dim);}
-.login-toggle-btn{
-  position:absolute;right:10px;background:transparent;border:none;padding:4px;
-  font-size:1.1rem;color:var(--text-dim);cursor:pointer;
-}
-.login-btn{
-  background:linear-gradient(135deg, var(--brass), var(--brass-hover));
-  color:#1a1206;padding:12px;font-size:1rem;font-weight:900;border-radius:10px;
-}
-.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(207,154,62,0.25);}
-.login-hint{font-size:0.75rem;color:var(--text-faint);}
-
-.app-shell{max-width:1280px;margin:0 auto;display:none;}
+.app-shell{max-width:1280px;margin:0 auto;}
 header{
   display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
   padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line);
@@ -353,23 +317,7 @@ header{
 </head>
 <body>
 
-<div id="loginOverlay">
-  <div class="login-card">
-    <div class="login-mark">☕</div>
-    <div>
-      <h2>نوّرت قعدة قهوة</h2>
-      <p>الدفتر ده للمعلمين بس.. اكتب كلمة السر عشان تفتح القعدة والطلبات!</p>
-    </div>
-    <div class="login-input-group">
-      <input type="password" id="loginPassInput" placeholder="••• كلمة السر •••" onkeydown="if(event.key==='Enter')checkAppLogin()">
-      <button class="login-toggle-btn" type="button" onclick="toggleLoginPassword()" title="إظهار/إخفاء الباسورد">👁️</button>
-    </div>
-    <button class="login-btn" onclick="checkAppLogin()">ادخل القعدة يا معلم 🚪</button>
-    <div class="login-hint">لو نسيت الباسورد اسأل صاحب القعدة 😉</div>
-  </div>
-</div>
-
-<div class="app-shell" id="mainAppShell">
+<div class="app-shell" id="mainAppShell" style="display:block;">
 
   <header>
     <div class="brand">
@@ -389,7 +337,6 @@ header{
       <button class="btn-primary btn-sm" onclick="copySessionSummary()">📋 شير واتساب</button>
       <button class="btn-danger btn-sm" onclick="resetSessionOrders()">🔄 قعدة جديدة</button>
       <button class="gear-btn" title="إعدادات وتليجرام" onclick="openSettingsModal()">⚙️</button>
-      <button class="btn-ghost btn-xs" style="color:var(--text-faint);" title="تسجيل الخروج" onclick="logoutApp()">🚪 خروج</button>
     </div>
   </header>
 
@@ -577,10 +524,8 @@ header{
 
 <script>
 /* =========================================================
-   إعدادات كلمة السر المدمجة
+   إعدادات عامة للتطبيق
 ========================================================= */
-const APP_PASSWORD = '@hw@2022';
-
 const GITHUB_STORE_KEY = 'ahwa_github_sync_config_v1';
 const GITHUB_SYNC_INTERVAL_MS = 20000;
 
@@ -590,18 +535,6 @@ const HARDCODED_CONFIG = {
 };
 
 const STORE_KEY = 'cafe_egypt_ledger_v6';
-
-function toggleLoginPassword() {
-  const input = document.getElementById('loginPassInput');
-  const btn = document.querySelector('.login-toggle-btn');
-  if (input.type === 'password') {
-    input.type = 'text';
-    btn.innerText = '🙈';
-  } else {
-    input.type = 'password';
-    btn.innerText = '👁️';
-  }
-}
 
 function defaultData(){
   return {
@@ -744,38 +677,6 @@ let selectedPersonIndices = [];
 let sessionFilter = 'all';
 let githubSyncTimer = null;
 let isGithubSyncing = false;
-
-async function checkAppLogin() {
-  const input = document.getElementById('loginPassInput');
-  const entered = (input.value || '').trim();
-  const isValid = (entered === '@hw@2022' || entered === 'hw@2022@' || entered === '2022@hw@');
-
-  if (isValid) {
-    sessionStorage.setItem('ahwa_auth_session', 'authorized');
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('mainAppShell').style.display = 'block';
-    toast('نوّرت يا معلم! بنجهزلك القعدة... ☕', 'success', 2500);
-    await initApp();
-  } else {
-    input.value = '';
-    const funnyAlerts = [
-      'إنت مين يا عمنا؟ الباسورد مش مظبوط خالص!',
-      'لا يا معلم.. كلمة السر عند المعلم الكبير بس 😉',
-      'الباسورد غلط يا باشا.. شكلك مش من الشلة!',
-      'ركز كده واكتب الباسورد صح يا غالي ☕'
-    ];
-    const randomMsg = funnyAlerts[Math.floor(Math.random() * funnyAlerts.length)];
-    toast(randomMsg, 'error', 3000);
-  }
-}
-
-function logoutApp() {
-  sessionStorage.removeItem('ahwa_auth_session');
-  document.getElementById('mainAppShell').style.display = 'none';
-  document.getElementById('loginOverlay').style.display = 'flex';
-  document.getElementById('loginPassInput').value = '';
-  toast('خرجت من القعدة.. مع السلامة يا معلم! 🚪', 'info');
-}
 
 /* =========================================================
    محرك المزامنة عبر GitHub (Push / Pull بتوكن شخصي)
@@ -2478,16 +2379,7 @@ async function initApp() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const isAuth = sessionStorage.getItem('ahwa_auth_session');
-  if (isAuth === 'authorized') {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('mainAppShell').style.display = 'block';
-    await initApp();
-  } else {
-    document.getElementById('loginOverlay').style.display = 'flex';
-    document.getElementById('mainAppShell').style.display = 'none';
-    document.getElementById('loginPassInput').focus();
-  }
+  await initApp();
 });
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
