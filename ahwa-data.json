@@ -80,10 +80,6 @@
       "name": "لؤي",
       "orders": [
         {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
           "name": "كانز",
           "price": 35
         }
@@ -366,6 +362,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787421978788,
+  "lastModified": 1787421984772,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
