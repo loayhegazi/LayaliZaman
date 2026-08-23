@@ -1,7 +1,7 @@
 {
   "instaPay": "",
   "notes": "",
-  "sessionStartedAt": 1787415006590,
+  "sessionStartedAt": null,
   "menu": [
     {
       "name": "شاي كشري",
@@ -78,68 +78,28 @@
       "isPaid": false,
       "isPresent": true,
       "name": "لؤي",
-      "orders": [
-        {
-          "name": "كانز",
-          "price": 35
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        }
-      ]
+      "orders": []
     },
     {
       "hasLeft": false,
       "isPaid": false,
       "isPresent": true,
       "name": "فرج",
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        }
-      ]
+      "orders": []
     },
     {
       "hasLeft": false,
       "isPaid": false,
       "isPresent": true,
       "name": "تركي",
-      "orders": [
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        },
-        {
-          "name": "شاي كشري",
-          "price": 15
-        }
-      ]
+      "orders": []
     },
     {
       "hasLeft": false,
       "isPaid": false,
       "isPresent": true,
       "name": "اسامة",
-      "orders": [
-        {
-          "name": "شاي كشري",
-          "price": 15
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        }
-      ]
+      "orders": []
     },
     {
       "hasLeft": false,
@@ -153,28 +113,14 @@
       "isPaid": false,
       "isPresent": true,
       "name": "عاصم",
-      "orders": [
-        {
-          "name": "قهوة تركي",
-          "price": 30
-        }
-      ]
+      "orders": []
     },
     {
       "hasLeft": false,
       "isPaid": false,
       "isPresent": true,
       "name": "خضر",
-      "orders": [
-        {
-          "name": "نسكافية",
-          "price": 45
-        },
-        {
-          "name": "مياه معدنية",
-          "price": 10
-        }
-      ]
+      "orders": []
     },
     {
       "hasLeft": false,
@@ -393,10 +339,112 @@
           ]
         }
       ]
+    },
+    {
+      "date": "٢٣‏/٨‏/٢٠٢٦، ٣:٣٥:٥٦ ص",
+      "grandTotal": 220,
+      "members": [
+        {
+          "hasLeft": false,
+          "isPaid": false,
+          "isPresent": true,
+          "name": "لؤي",
+          "orders": [
+            {
+              "name": "كانز",
+              "price": 35
+            },
+            {
+              "name": "شاي كشري",
+              "price": 15
+            },
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            }
+          ]
+        },
+        {
+          "hasLeft": false,
+          "isPaid": false,
+          "isPresent": true,
+          "name": "فرج",
+          "orders": [
+            {
+              "name": "شاي كشري",
+              "price": 15
+            },
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            }
+          ]
+        },
+        {
+          "hasLeft": false,
+          "isPaid": false,
+          "isPresent": true,
+          "name": "تركي",
+          "orders": [
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            },
+            {
+              "name": "شاي كشري",
+              "price": 15
+            }
+          ]
+        },
+        {
+          "hasLeft": false,
+          "isPaid": false,
+          "isPresent": true,
+          "name": "اسامة",
+          "orders": [
+            {
+              "name": "شاي كشري",
+              "price": 15
+            },
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            }
+          ]
+        },
+        {
+          "hasLeft": false,
+          "isPaid": false,
+          "isPresent": true,
+          "name": "عاصم",
+          "orders": [
+            {
+              "name": "قهوة تركي",
+              "price": 30
+            }
+          ]
+        },
+        {
+          "hasLeft": false,
+          "isPaid": false,
+          "isPresent": true,
+          "name": "خضر",
+          "orders": [
+            {
+              "name": "نسكافية",
+              "price": 45
+            },
+            {
+              "name": "مياه معدنية",
+              "price": 10
+            }
+          ]
+        }
+      ]
     }
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787428509742,
+  "lastModified": 1787445356941,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
