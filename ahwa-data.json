@@ -99,7 +99,12 @@
       "isPaid": false,
       "isPresent": true,
       "name": "فرج",
-      "orders": []
+      "orders": [
+        {
+          "name": "شاي كشري",
+          "price": 15
+        }
+      ]
     },
     {
       "hasLeft": false,
@@ -615,6 +620,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787596711120,
+  "lastModified": 1787598025584,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
