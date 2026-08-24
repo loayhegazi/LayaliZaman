@@ -2,7 +2,7 @@
   "instaPay": "",
   "targetChatId": "1280341518",
   "notes": "",
-  "sessionStartedAt": null,
+  "sessionStartedAt": 1787589208550,
   "menu": [
     {
       "name": "شاي كشري",
@@ -77,7 +77,7 @@
     {
       "hasLeft": false,
       "isPaid": false,
-      "isPresent": false,
+      "isPresent": true,
       "name": "لؤي",
       "orders": []
     },
@@ -583,6 +583,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787571634885,
+  "lastModified": 1787589208550,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
