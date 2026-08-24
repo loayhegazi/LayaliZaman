@@ -9,7 +9,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-
 <style>
 :root{
   --bg:#15100b;
@@ -167,6 +166,7 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
+/* POS Multi-Select Toolbar */
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -720,7 +720,6 @@ function saveGithubConfigFromUi(){
   manualSyncGithub();
 }
 
-// ترميز/فك ترميز base64 آمن للنصوص العربية (UTF-8)
 function utf8ToB64(str){ return btoa(unescape(encodeURIComponent(str))); }
 function b64ToUtf8(str){ return decodeURIComponent(escape(atob(str.replace(/\n/g, '')))); }
 
@@ -753,9 +752,6 @@ function buildSyncPayload(){
   return clone;
 }
 
-// هات آخر نسخة من GitHub. force=true (زرار Sync اليدوي) بتاخد آخر نسخة
-// وتكتب فوق المحلي على طول. من غير force (المزامنة الأوتوماتيكية) بناخد
-// النسخة الأحدث بس (بمقارنة lastModified) عشان منضيعش تعديل لسه حاصل هنا.
 async function pullFromGithub(force){
   const cfg = loadGithubConfig();
   if (!githubConfigured(cfg)) { if (force) toast('حط التوكن واسم الريبو في الإعدادات الأول', 'error'); return null; }
@@ -765,7 +761,6 @@ async function pullFromGithub(force){
       headers: githubHeaders(cfg), cache: 'no-store'
     });
     if (res.status === 404) {
-      // الملف لسه مش موجود على GitHub، هنعتبره أول مزامنة ونرفع الداتا الحالية
       setSyncStatus('synced');
       if (force) { githubLog('مفيش داتا على GitHub لسه، هنرفع نسختك الحالية.'); await pushToGithub(true); }
       return null;
@@ -798,7 +793,6 @@ async function pullFromGithub(force){
 
 let githubLastSha = null;
 
-// ارفع الداتا الحالية على GitHub (push)
 async function pushToGithub(manual){
   const cfg = loadGithubConfig();
   if (!githubConfigured(cfg)) { if (manual) toast('حط التوكن واسم الريبو في الإعدادات الأول', 'error'); return; }
@@ -806,7 +800,6 @@ async function pushToGithub(manual){
   isGithubSyncing = true;
   setSyncStatus('syncing');
   try {
-    // هات الـ sha الحالي للملف الأول (لو موجود) عشان GitHub يقبل التحديث
     if (!githubLastSha) {
       try {
         const check = await fetch(`${githubApiBase(cfg)}?ref=${encodeURIComponent(cfg.branch)}&t=${Date.now()}`, {
@@ -831,7 +824,6 @@ async function pushToGithub(manual){
     });
 
     if (res.status === 409 || res.status === 422) {
-      // في تعارض (حد تاني رفع نسخة قبلك) - هات الـ sha الجديد وحاول تاني
       githubLastSha = null;
       const retryCheck = await fetch(`${githubApiBase(cfg)}?ref=${encodeURIComponent(cfg.branch)}&t=${Date.now()}`, { headers: githubHeaders(cfg), cache: 'no-store' });
       if (retryCheck.ok) {
@@ -868,7 +860,6 @@ async function pushToGithub(manual){
   }
 }
 
-// زرار الـ Sync اليدوي: هات آخر داتا موجودة على GitHub وحطها هنا
 async function manualSyncGithub(){
   const cfg = loadGithubConfig();
   if (!githubConfigured(cfg)) {
@@ -1508,7 +1499,7 @@ async function deleteHistoryItem(index){
 
 async function resetSessionOrders(){
   const activeSessionMembers = appData.members.filter(m => (m.isPresent || m.hasLeft) && m.orders.length > 0);
-  const ok = await showConfirm('هل تريد أرشفة القعدة الحالية وبدء قعدة جديدة؟ (هيتصفروا المشاريب وتتحفظ في السجل)', 'قعدة جديدة');
+  const ok = await showConfirm('هل تريد أرشفة القعدة الحالية وبدء قعدة جديدة؟ (هتتحفظ في السجل والكل هيرجع مأنتخ بدون حسابات)', 'قعدة جديدة');
   if (!ok) return;
 
   if (activeSessionMembers.length > 0) {
@@ -1521,11 +1512,17 @@ async function resetSessionOrders(){
     });
   }
 
-  appData.members.forEach(m => { m.orders = []; m.isPaid = false; m.hasLeft = false; });
+  // تصفير المشاريب وإرجاع جميع الأعضاء لغير حاضرين (مأنتخين)
+  appData.members.forEach(m => {
+    m.orders = [];
+    m.isPaid = false;
+    m.hasLeft = false;
+    m.isPresent = false;
+  });
   appData.sessionStartedAt = null;
   selectedPersonIndices = [];
   saveData();
-  toast('اتأرشفت القعدة وجاهزين لقعدة جديدة! ☕', 'success');
+  toast('اتأرشفت القعدة والكل رجع مأنتخ.. جاهزين لقعدة جديدة! ☕', 'success');
 }
 
 async function hardResetCurrentSession(){
@@ -2363,6 +2360,9 @@ function toggleTelegramPolling(){
   }
 }
 
+/* =========================================================
+   تشغيل الصفحة
+========================================================= */
 async function initApp() {
   if (HARDCODED_CONFIG.botToken) { 
     document.getElementById('botToken').value = HARDCODED_CONFIG.botToken; 
