@@ -178,7 +178,12 @@
       "isPaid": false,
       "isPresent": true,
       "name": "خضر",
-      "orders": []
+      "orders": [
+        {
+          "name": "مياه معدنية",
+          "price": 10
+        }
+      ]
     },
     {
       "hasLeft": false,
@@ -640,6 +645,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787608942682,
+  "lastModified": 1787608954518,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
