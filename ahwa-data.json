@@ -76,14 +76,14 @@
     {
       "hasLeft": false,
       "isPaid": false,
-      "isPresent": true,
+      "isPresent": false,
       "name": "لؤي",
       "orders": []
     },
     {
       "hasLeft": false,
       "isPaid": false,
-      "isPresent": true,
+      "isPresent": false,
       "name": "فرج",
       "orders": []
     },
@@ -582,6 +582,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787558995037,
+  "lastModified": 1787559063537,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
