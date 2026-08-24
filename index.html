@@ -450,7 +450,7 @@ header{
           <button id="toggleBotBtn" class="btn-mint btn-sm" onclick="toggleTelegramPolling()">صحّي البوت</button>
         </div>
         <div class="row-group" style="margin-top:6px;">
-          <input type="text" id="telegramChatIdInput" placeholder="Chat ID بتاعك (رقم حسابك في تيليجرام)">
+          <input type="text" id="telegramChatIdInput" placeholder="Chat ID بتاعك (رقم حسابك الشخصي)">
           <button class="btn-primary btn-sm" onclick="saveTelegramChatIdManual()">حفظ الـ ID</button>
         </div>
         <div class="bot-status-container" style="margin-top:8px;">
@@ -531,7 +531,7 @@ const TELEGRAM_CHAT_ID_KEY = 'ahwa_telegram_last_chat_id';
 
 const HARDCODED_CONFIG = {
   botToken: '8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450',
-  chatId: '8632662580', // ضع الـ Chat ID هنا ليعمل الإرسال أوتوماتيك فوراً دون الحاجة لكتابة /start
+  chatId: '', // ضع الـ User ID الشخصي الخاص بحسابك هنا
   instaPay: ''
 };
 
@@ -682,7 +682,7 @@ let githubSyncTimer = null;
 let isGithubSyncing = false;
 
 /* =========================================================
-   محرك الأوسمة والألقاب الذكية (Dynamic Badges Engine)
+   محرك الأوسمة والألقاب الذكية
 ========================================================= */
 function calculateMemberBadges(){
   const badges = {};
@@ -1766,7 +1766,7 @@ function copySessionSummary(){
    إرسال مباشر ومؤكد لشيك الحساب لشات البوت
 ========================================================= */
 function getActiveTelegramChatId(){
-  return (HARDCODED_CONFIG.chatId || appData.targetChatId || localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '').trim();
+  return (HARDCODED_CONFIG.chatId || localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || appData.targetChatId || '').trim();
 }
 
 async function sendSessionSummaryToTelegramDirect(){
@@ -1775,7 +1775,7 @@ async function sendSessionSummaryToTelegramDirect(){
 
   let chatId = getActiveTelegramChatId();
 
-  // لو مش متخزن في الكود، بنجرب نلتقطه من آخر تحديثات فوراً
+  // فحص والتقاط المعرف الحقيقي تلقائياً من آخر رسالة استلمها البوت
   if (!chatId) {
     try {
       const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
@@ -1783,8 +1783,14 @@ async function sendSessionSummaryToTelegramDirect(){
       if (data.ok && data.result.length > 0) {
         for (let i = data.result.length - 1; i >= 0; i--) {
           const u = data.result[i];
-          if (u.message && u.message.chat) { chatId = String(u.message.chat.id); break; }
-          if (u.callback_query && u.callback_query.message) { chatId = String(u.callback_query.message.chat.id); break; }
+          if (u.message && u.message.chat && u.message.chat.id) { 
+            chatId = String(u.message.chat.id); 
+            break; 
+          }
+          if (u.callback_query && u.callback_query.message && u.callback_query.message.chat) { 
+            chatId = String(u.callback_query.message.chat.id); 
+            break; 
+          }
         }
         if (chatId) {
           localStorage.setItem(TELEGRAM_CHAT_ID_KEY, chatId);
@@ -1796,7 +1802,7 @@ async function sendSessionSummaryToTelegramDirect(){
 
   if (!chatId) {
     openSettingsModal();
-    toast('حط رقم الـ Chat ID بتاعك في الإعدادات ⚙️ عشان يبعتلك علطول بضغطة زرار!', 'info', 5000);
+    toast('افتح البوت واكتب له أي رسالة مرة واحدة عشان يسجل الـ ID بتاعك تلقائياً 📲', 'error', 5500);
     return;
   }
 
@@ -1805,7 +1811,7 @@ async function sendSessionSummaryToTelegramDirect(){
     return toast('مفيش مشاريب مسجلة في القعدة عشان نبعتها!', 'info');
   }
 
-  toast('جاري إرسال الشيك المفصل لشات البوت... ✈️', 'info', 2000);
+  toast('جاري إرسال الشيك المفصل لشاتك... ✈️', 'info', 2000);
   const text = generateSessionSummaryText();
   
   try {
@@ -1821,10 +1827,10 @@ async function sendSessionSummaryToTelegramDirect(){
     
     const result = await res.json();
     if (result.ok) {
-      toast('تم إرسال كشف الحساب لشات البوت بنجاح! ☕✈️', 'success');
+      toast('تم إرسال كشف الحساب لشاتك بنجاح! ☕✈️', 'success');
     } else {
       openSettingsModal();
-      toast('تأكد من رقم الـ Chat ID في الإعدادات أو مراسلة البوت مرة واحدة', 'error', 4500);
+      toast('تأكد من رقم الـ Chat ID الشخصي في الإعدادات', 'error', 4500);
     }
   } catch(err) {
     toast('حصل خطأ في الاتصال بتليجرام', 'error');
@@ -2423,8 +2429,11 @@ async function handleTelegramMessage(chatId, text){
 
   if (cleanText === '💰 كشوفات الحساب' || cleanText === '💰 كشوفات حساب الشباب') {
     const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
-    if (sessionMembers.length === 0) sendTelegramMessage(chatId, '❌ مفيش حد في القعدة دلوقتي.', getPersistentReplyKeyboard());
-    else sendTelegramMessage(chatId, '💰 اختار اسم المعلم عشان تشوف حسابه ومشاريبه:', getChecksInline());
+    if (sessionMembers.length === 0) {
+      sendTelegramMessage(chatId, '❌ مفيش حد في القعدة دلوقتي.', getPersistentReplyKeyboard());
+    } else {
+      sendTelegramMessage(chatId, '💰 اختار اسم المعلم عشان تشوف حسابه ومشاريبه:', getChecksInline());
+    }
     return;
   }
 
