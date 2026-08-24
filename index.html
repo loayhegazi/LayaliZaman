@@ -166,7 +166,11 @@ header{
 .status-pill.off{background:rgba(176,155,120,0.12);color:var(--text-faint);}
 .status-pill.left{background:rgba(59,127,166,0.18);color:var(--sky);}
 
-/* POS Multi-Select Toolbar */
+.dynamic-badge{
+  font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:100px;display:inline-flex;align-items:center;gap:3px;
+  background:rgba(207,154,62,0.15);color:var(--brass-hover);border:1px solid rgba(207,154,62,0.3);
+}
+
 .pos-select-bar{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg-2);border:1px solid var(--line);
   border-radius:10px;padding:10px;min-height:48px;
@@ -219,7 +223,7 @@ header{
 .stamp.mint{color:var(--mint);border-color:var(--mint);}
 .stamp.sky{color:var(--sky);border-color:var(--sky);}
 .person-header{display:flex;justify-content:space-between;align-items:center;font-size:1rem;font-weight:800;font-family:'Cairo',sans-serif;}
-.person-name{display:flex;align-items:center;gap:8px;}
+.person-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .payment-badge{font-size:.7rem;padding:3px 9px;border-radius:100px;font-weight:800;}
 .badge-pending{background:rgba(182,71,47,0.18);color:var(--danger);}
 .badge-paid{background:rgba(78,149,117,0.2);color:var(--mint);}
@@ -330,7 +334,7 @@ header{
     </div>
     <div class="header-actions">
       <div class="sync-pill" id="syncStatusPill" onclick="manualSyncGithub()" style="cursor:pointer;" title="اضغط عشان تعمل Sync يدوي دلوقتي"><span class="sync-dot" id="syncStatusDot"></span><span id="syncStatusText">GitHub مش متظبط</span></div>
-      <button class="btn-sky btn-sm" onclick="sendSessionSummaryToTelegramDirect()" title="ابعت شيك حساب القعدة لتليجرام فوراً">✈️ ابعت ع التليجرام</button>
+      <button class="btn-sky btn-sm" onclick="sendSessionSummaryToTelegramDirect()" title="ابعت شيك حساب القعدة لشات البوت مباشرة">✈️ ابعت لشات البوت</button>
       <button class="btn-ghost btn-sm" onclick="openNotesModal()">📝 نوتة القعدة</button>
       <button class="btn-ghost btn-sm" onclick="openHistoryModal()">📚 أرشيف القعدات</button>
       <button class="btn-ghost btn-sm" onclick="exportBillPdf()">📄 شيك PDF</button>
@@ -436,17 +440,7 @@ header{
           <button class="btn-mint btn-sm" onclick="manualSyncGithub()">⬇️ Sync (هات آخر داتا)</button>
           <button class="btn-ghost btn-sm" onclick="pushToGithub(true)">⬆️ Push (ارفع داتاي)</button>
         </div>
-        <p style="font-size:.72rem;color:var(--text-faint);margin-top:4px;">افتح من جهاز تاني؟ حط نفس التوكن ونفس اسم الريبو واضغط Sync عشان تنزل نفس الداتا. بعد كده الداتا هتتزامن أوتوماتيك كل 20 ثانية.</p>
         <div class="console-log" id="githubSyncLog">مستني تظبط التوكن...</div>
-      </div>
-
-      <div class="form-group">
-        <label>نسخة احتياطية يدوية من الداتا (JSON)</label>
-        <div class="row-group">
-          <button class="btn-primary btn-sm" onclick="exportDataJson()">💾 احفظ نسخة</button>
-          <button class="btn-ghost btn-sm" onclick="document.getElementById('importJsonInput').click()">📥 رجّع نسخة</button>
-          <input type="file" id="importJsonInput" style="display:none" accept=".json" onchange="importDataJson(event)">
-        </div>
       </div>
 
       <div class="form-group">
@@ -686,7 +680,48 @@ let githubSyncTimer = null;
 let isGithubSyncing = false;
 
 /* =========================================================
-   محرك المزامنة عبر GitHub (Push / Pull بتوكن شخصي)
+   محرك الأوسمة والألقاب الذكية (Dynamic Badges Engine)
+========================================================= */
+function calculateMemberBadges(){
+  const badges = {};
+  const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
+  if (sessionMembers.length === 0) return badges;
+
+  let maxSpent = -1, mayorName = null;
+  let maxCaffeine = 0, caffeineName = null;
+  let firstLeftName = null;
+
+  sessionMembers.forEach(m => {
+    const totalSpent = m.orders.reduce((s, o) => s + o.price, 0);
+    if (totalSpent > maxSpent && totalSpent > 0) {
+      maxSpent = totalSpent;
+      mayorName = m.name;
+    }
+
+    const caffeineCount = m.orders.filter(o => o.name.includes('قهوة') || o.name.includes('شاي') || o.name.includes('نسكافية')).length;
+    if (caffeineCount > maxCaffeine) {
+      maxCaffeine = caffeineCount;
+      caffeineName = m.name;
+    }
+
+    if (m.hasLeft && !firstLeftName) {
+      firstLeftName = m.name;
+    }
+  });
+
+  sessionMembers.forEach(m => {
+    badges[m.name] = [];
+    if (m.name === mayorName) badges[m.name].push({ text: '👑 عمدة القعدة', type: 'mayor' });
+    if (m.name === caffeineName && maxCaffeine > 0) badges[m.name].push({ text: '☕ مدمن كافيين', type: 'caffeine' });
+    if (m.name === firstLeftName) badges[m.name].push({ text: '⚡ الطيار', type: 'flyer' });
+    if (m.orders.length === 0 && m.isPresent && !m.hasLeft) badges[m.name].push({ text: '🐢 مأنتخ', type: 'chill' });
+  });
+
+  return badges;
+}
+
+/* =========================================================
+   محرك المزامنة عبر GitHub
 ========================================================= */
 function githubLog(msg){
   const el = document.getElementById('githubSyncLog');
@@ -1347,6 +1382,8 @@ function renderSession(){
   const tabsEl = document.getElementById('sessionFilterTabs');
   grid.innerHTML = '';
 
+  const memberBadges = calculateMemberBadges();
+
   const sessionMembers = appData.members
     .map((m, idx) => ({ m, idx }))
     .filter(({ m }) => m.isPresent || m.hasLeft || m.orders.length > 0);
@@ -1395,6 +1432,9 @@ function renderSession(){
     if (hasLeft) { badgeHtml = `<span class="payment-badge badge-left">🚶 حاسب ومشى</span>`; stampHtml = `<div class="stamp sky">حاسب ومشى</div>`; }
     else if (isPaid) { badgeHtml = `<span class="payment-badge badge-paid">🟢 خالص ومروّق</span>`; stampHtml = `<div class="stamp mint">مدفوع ✓</div>`; }
 
+    const userBadges = memberBadges[person.name] || [];
+    const badgesRendered = userBadges.map(b => `<span class="dynamic-badge">${b.text}</span>`).join(' ');
+
     const grouped = groupOrders(person.orders);
     const orderRows = Object.entries(grouped).map(([name, d]) => `
       <li class="order-item">
@@ -1413,7 +1453,11 @@ function renderSession(){
     card.innerHTML = `
       ${stampHtml}
       <div class="person-header">
-        <span class="person-name"><span class="chip-avatar">${initials(person.name)}</span>${person.name}</span>
+        <span class="person-name">
+          <span class="chip-avatar">${initials(person.name)}</span>
+          ${person.name}
+          ${badgesRendered}
+        </span>
         ${badgeHtml}
       </div>
       <ul class="order-list">
@@ -1670,8 +1714,18 @@ function generateSessionSummaryText(){
   const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
   if (sessionMembers.length === 0) return 'مفيش حد في القعدة حالياً.';
 
+  const memberBadges = calculateMemberBadges();
   let grandTotal = 0, paidTotal = 0;
   let report = `🧾 *شيك وكشف حساب قعدة القهوة* ☕\n📅 التاريخ: ${new Date().toLocaleDateString('ar-EG')}\n━━━━━━━━━━━━━━━━━━\n\n`;
+
+  const activeBadges = Object.entries(memberBadges).filter(([_, bList]) => bList.length > 0);
+  if (activeBadges.length > 0) {
+    report += `🏆 *أوسمة وألقاب القعدة الحالية:*\n`;
+    activeBadges.forEach(([name, bList]) => {
+      report += `• *${name}*: ${bList.map(b => b.text).join('، ')}\n`;
+    });
+    report += `\n━━━━━━━━━━━━━━━━━━\n\n`;
+  }
 
   sessionMembers.forEach(p => {
     const total = p.orders.reduce((sum, item) => sum + item.price, 0);
@@ -1682,7 +1736,11 @@ function generateSessionSummaryText(){
     let statusTag = '🔴 [مطلوب منه]';
     if (p.hasLeft) statusTag = '🚶 [حاسب ومشي]';
     else if (p.isPaid) statusTag = '🟢 [خالص ومروّق]';
-    report += `👤 *المعلم ${p.name}* ${statusTag}\n${details || '  ├ منزلوش مشاريب'}\n  └ 💵 حسابه: *${total.toFixed(2)} جنيه*\n\n`;
+    
+    const userBadges = memberBadges[p.name] || [];
+    const bTag = userBadges.length > 0 ? ` (${userBadges.map(b => b.text).join(' ')})` : '';
+
+    report += `👤 *المعلم ${p.name}* ${statusTag}${bTag}\n${details || '  ├ منزلوش مشاريب'}\n  └ 💵 حسابه: *${total.toFixed(2)} جنيه*\n\n`;
   });
 
   const remainTotal = grandTotal - paidTotal;
@@ -1703,7 +1761,7 @@ function copySessionSummary(){
 }
 
 /* =========================================================
-   إرسال مباشر لشيك الحساب إلى تيليجرام
+   إرسال مباشر لشيك الحساب لشات البوت
 ========================================================= */
 function getActiveTelegramChatId(){
   return (appData.targetChatId || localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '').trim();
@@ -1715,19 +1773,22 @@ async function sendSessionSummaryToTelegramDirect(){
 
   let chatId = getActiveTelegramChatId();
 
-  // لو لسه محفظش الـ Chat ID، هنجرب نجيبه من آخر تحديثات البوت تلقائياً
   if (!chatId) {
     try {
-      const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=5`);
+      const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=10`);
       const data = await res.json();
       if (data.ok && data.result.length > 0) {
-        const lastMsg = data.result[data.result.length - 1];
-        if (lastMsg.message && lastMsg.message.chat) {
-          chatId = String(lastMsg.message.chat.id);
-          localStorage.setItem(TELEGRAM_CHAT_ID_KEY, chatId);
-          appData.targetChatId = chatId;
-        } else if (lastMsg.callback_query && lastMsg.callback_query.message) {
-          chatId = String(lastMsg.callback_query.message.chat.id);
+        for (let i = data.result.length - 1; i >= 0; i--) {
+          const update = data.result[i];
+          if (update.message && update.message.chat) {
+            chatId = String(update.message.chat.id);
+            break;
+          } else if (update.callback_query && update.callback_query.message) {
+            chatId = String(update.callback_query.message.chat.id);
+            break;
+          }
+        }
+        if (chatId) {
           localStorage.setItem(TELEGRAM_CHAT_ID_KEY, chatId);
           appData.targetChatId = chatId;
         }
@@ -1737,7 +1798,7 @@ async function sendSessionSummaryToTelegramDirect(){
 
   if (!chatId) {
     openSettingsModal();
-    toast('ابعت أي رسالة للبوت على تليجرام الأول (زي كلمة /start) عشان يعرف يبعتلك!', 'error', 4500);
+    toast('افتح شات البوت على تيليجرام وابعتله أي كلمة (زي كلمة /start) عشان يقدر يبعتلك الشيك!', 'error', 5000);
     return;
   }
 
@@ -1746,7 +1807,7 @@ async function sendSessionSummaryToTelegramDirect(){
     return toast('مفيش مشاريب مسجلة في القعدة عشان نبعتها!', 'info');
   }
 
-  toast('جاري إرسال الشيك المفصل لتليجرام... ✈️', 'info', 2000);
+  toast('جاري إرسال الشيك المفصل لشات البوت... ✈️', 'info', 2000);
   const text = generateSessionSummaryText();
   
   try {
@@ -1761,34 +1822,18 @@ async function sendSessionSummaryToTelegramDirect(){
     });
     
     if (res.ok) {
-      toast('تم إرسال كشف الحساب لتليجرام بنجاح! ☕✈️', 'success');
+      toast('تم إرسال كشف الحساب لشات البوت بنجاح! ☕✈️', 'success');
     } else {
-      toast('فشل الإرسال، اتأكد إنك باعت رسالة للبوت الأول', 'error');
+      toast('فشل الإرسال، اتأكد إنك باعت رسالة في شات البوت الأول', 'error');
     }
   } catch(err) {
     toast('حصل خطأ في الاتصال بتليجرام', 'error');
   }
 }
 
-function saveTelegramChatIdManual(){
-  const val = document.getElementById('telegramChatIdInput').value.trim();
-  if (val) {
-    localStorage.setItem(TELEGRAM_CHAT_ID_KEY, val);
-    appData.targetChatId = val;
-    saveData();
-    toast('اتحفظ الـ Chat ID بنجاح ✅', 'success');
-  } else {
-    localStorage.removeItem(TELEGRAM_CHAT_ID_KEY);
-    appData.targetChatId = '';
-    saveData();
-    toast('تم مسح الـ Chat ID', 'info');
-  }
-}
-
 function openSettingsModal(){
   document.getElementById('instaPayAccount').value = appData.instaPay || '';
   document.getElementById('botToken').value = HARDCODED_CONFIG.botToken;
-  document.getElementById('telegramChatIdInput').value = getActiveTelegramChatId();
   const cfg = loadGithubConfig();
   document.getElementById('githubToken').value = cfg.token || '';
   document.getElementById('githubRepo').value = cfg.repo || '';
@@ -2013,7 +2058,6 @@ async function handleCallbackQuery(cb){
   const messageId = cb.message.message_id;
   const data = cb.data;
 
-  // التقاط وتحديث الـ Chat ID الخاص بالمستخدم تلقائياً
   if (chatId) {
     localStorage.setItem(TELEGRAM_CHAT_ID_KEY, String(chatId));
     appData.targetChatId = String(chatId);
@@ -2223,7 +2267,7 @@ async function handleCallbackQuery(cb){
     const presentMembers = appData.members.map((m, idx) => ({ ...m, origIdx: idx })).filter(m => m.isPresent && !m.hasLeft);
     if (presentMembers.length === 0) { editTelegramMessage(chatId, messageId, '❌ مفيش حد قاعد ع القهوة، علم على الحاضرين الأول!', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
     const keyboard = presentMembers.map(p => [{ text: `🧔 ${p.name}`, callback_data: `selperson_${p.origIdx}` }]);
-    keyboard.push([{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]);
+    keyboard.push([{ text: '🔙 إلغاء', callback_data: 'nav_main' }]);
     editTelegramMessage(chatId, messageId, 'مين اللي هيشرب من الحاضرين؟ اختار الاسم:', { inline_keyboard: keyboard });
     return;
   }
@@ -2258,7 +2302,6 @@ async function handleTelegramMessage(chatId, text){
   const cleanText = text.trim();
   log(`رسالة: "${cleanText}"`);
 
-  // التقاط وتحديث الـ Chat ID الخاص بالمستخدم تلقائياً
   if (chatId) {
     localStorage.setItem(TELEGRAM_CHAT_ID_KEY, String(chatId));
     appData.targetChatId = String(chatId);
@@ -2476,6 +2519,7 @@ async function initApp() {
   if (gcfg.repo) document.getElementById('githubRepo').value = gcfg.repo;
   if (gcfg.path) document.getElementById('githubPath').value = gcfg.path;
   if (gcfg.branch) document.getElementById('githubBranch').value = gcfg.branch;
+  
   renderAll();
   initGithubSync();
 }
