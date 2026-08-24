@@ -83,28 +83,28 @@
     {
       "hasLeft": false,
       "isPaid": false,
-      "isPresent": true,
+      "isPresent": false,
       "name": "فرج",
       "orders": []
     },
     {
       "hasLeft": false,
       "isPaid": false,
-      "isPresent": true,
+      "isPresent": false,
       "name": "تركي",
       "orders": []
     },
     {
       "hasLeft": false,
       "isPaid": false,
-      "isPresent": true,
+      "isPresent": false,
       "name": "اسامة",
       "orders": []
     },
     {
       "hasLeft": false,
       "isPaid": false,
-      "isPresent": true,
+      "isPresent": false,
       "name": "عصام",
       "orders": []
     },
@@ -118,7 +118,7 @@
     {
       "hasLeft": false,
       "isPaid": false,
-      "isPresent": true,
+      "isPresent": false,
       "name": "خضر",
       "orders": []
     },
@@ -146,7 +146,7 @@
     {
       "hasLeft": false,
       "isPaid": false,
-      "isPresent": true,
+      "isPresent": false,
       "name": "حماد",
       "orders": []
     },
@@ -159,7 +159,7 @@
     },
     {
       "name": "موسي",
-      "isPresent": true,
+      "isPresent": false,
       "hasLeft": false,
       "orders": [],
       "isPaid": false
@@ -582,6 +582,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787557850710,
+  "lastModified": 1787557857013,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
