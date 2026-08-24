@@ -444,15 +444,16 @@ header{
       </div>
 
       <div class="form-group">
-        <label>بوت تيليجرام (اختياري - للطلبات عن بعد)</label>
+        <label>بوت تيليجرام (للطلبات والإشعارات)</label>
         <div class="row-group">
           <input type="password" id="botToken" placeholder="حط توكن تيليجرام هنا">
           <button id="toggleBotBtn" class="btn-mint btn-sm" onclick="toggleTelegramPolling()">صحّي البوت</button>
         </div>
         <div class="row-group" style="margin-top:6px;">
-          <input type="text" id="telegramChatIdInput" placeholder="Chat ID بتاعك (بيتحدد أوتوماتيك)">
-          <button class="btn-ghost btn-sm" onclick="saveTelegramChatIdManual()">حفظ ID</button>
+          <input type="text" id="telegramChatIdInput" placeholder="Chat ID بتاعك (رقم حسابك في تيليجرام)">
+          <button class="btn-primary btn-sm" onclick="saveTelegramChatIdManual()">حفظ الـ ID</button>
         </div>
+        <p style="font-size:0.75rem; color:var(--text-dim); margin-top:4px;">💡 هات الـ ID بتاعك بسهولة من بوت <code>@userinfobot</code> على تليجرام وحطه هنا عشان الزرار يبعتلك علطول.</p>
         <div class="bot-status-container" style="margin-top:8px;">
           <div class="status-dot" id="botStatusDot"></div>
           <span id="botStatusText">البوت مأنتخ (واقف)</span>
@@ -531,6 +532,7 @@ const TELEGRAM_CHAT_ID_KEY = 'ahwa_telegram_last_chat_id';
 
 const HARDCODED_CONFIG = {
   botToken: '8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450',
+  chatId: '8632662580', // حط الـ Chat ID بتاعك هنا لو حابب تثبته علطول
   instaPay: ''
 };
 
@@ -540,7 +542,7 @@ function defaultData(){
   return {
     botToken: HARDCODED_CONFIG.botToken,
     instaPay: HARDCODED_CONFIG.instaPay,
-    targetChatId: '',
+    targetChatId: HARDCODED_CONFIG.chatId || '',
     notes: '',
     sessionStartedAt: null,
     menu: [
@@ -666,6 +668,7 @@ function loadAppData(){
   }
   if (!loaded.botToken && HARDCODED_CONFIG.botToken) loaded.botToken = HARDCODED_CONFIG.botToken;
   if (!loaded.instaPay && HARDCODED_CONFIG.instaPay) loaded.instaPay = HARDCODED_CONFIG.instaPay;
+  if (!loaded.targetChatId && HARDCODED_CONFIG.chatId) loaded.targetChatId = HARDCODED_CONFIG.chatId;
   if (loaded.notes === undefined) loaded.notes = '';
   return loaded;
 }
@@ -1764,7 +1767,7 @@ function copySessionSummary(){
    إرسال مباشر لشيك الحساب لشات البوت
 ========================================================= */
 function getActiveTelegramChatId(){
-  return (appData.targetChatId || localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '').trim();
+  return (appData.targetChatId || localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || HARDCODED_CONFIG.chatId || '').trim();
 }
 
 async function sendSessionSummaryToTelegramDirect(){
@@ -1773,9 +1776,10 @@ async function sendSessionSummaryToTelegramDirect(){
 
   let chatId = getActiveTelegramChatId();
 
+  // لو مفيش Chat ID متخزن، بنجيب شاتك مع البوت أوتوماتيك من آخر تفاعل
   if (!chatId) {
     try {
-      const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=10`);
+      const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
       const data = await res.json();
       if (data.ok && data.result.length > 0) {
         for (let i = data.result.length - 1; i >= 0; i--) {
@@ -1798,7 +1802,7 @@ async function sendSessionSummaryToTelegramDirect(){
 
   if (!chatId) {
     openSettingsModal();
-    toast('افتح شات البوت على تيليجرام وابعتله أي كلمة (زي كلمة /start) عشان يقدر يبعتلك الشيك!', 'error', 5000);
+    toast('ابعت أي رسالة للبوت على تليجرام أو حط الـ Chat ID بتاعك في الإعدادات ⚙️', 'error', 5500);
     return;
   }
 
@@ -1821,19 +1825,37 @@ async function sendSessionSummaryToTelegramDirect(){
       })
     });
     
-    if (res.ok) {
+    const result = await res.json();
+    if (result.ok) {
       toast('تم إرسال كشف الحساب لشات البوت بنجاح! ☕✈️', 'success');
     } else {
-      toast('فشل الإرسال، اتأكد إنك باعت رسالة في شات البوت الأول', 'error');
+      openSettingsModal();
+      toast('تأكد من إرسال رسالة في شات البوت أولاً أو مراجعة الـ Chat ID', 'error', 4500);
     }
   } catch(err) {
     toast('حصل خطأ في الاتصال بتليجرام', 'error');
   }
 }
 
+function saveTelegramChatIdManual(){
+  const val = document.getElementById('telegramChatIdInput').value.trim();
+  if (val) {
+    localStorage.setItem(TELEGRAM_CHAT_ID_KEY, val);
+    appData.targetChatId = val;
+    saveData();
+    toast('اتحفظ الـ Chat ID بنجاح ✅', 'success');
+  } else {
+    localStorage.removeItem(TELEGRAM_CHAT_ID_KEY);
+    appData.targetChatId = '';
+    saveData();
+    toast('تم مسح الـ Chat ID', 'info');
+  }
+}
+
 function openSettingsModal(){
   document.getElementById('instaPayAccount').value = appData.instaPay || '';
   document.getElementById('botToken').value = HARDCODED_CONFIG.botToken;
+  document.getElementById('telegramChatIdInput').value = getActiveTelegramChatId();
   const cfg = loadGithubConfig();
   document.getElementById('githubToken').value = cfg.token || '';
   document.getElementById('githubRepo').value = cfg.repo || '';
