@@ -449,10 +449,6 @@ header{
           <input type="password" id="botToken" placeholder="حط توكن تيليجرام هنا">
           <button id="toggleBotBtn" class="btn-mint btn-sm" onclick="toggleTelegramPolling()">صحّي البوت</button>
         </div>
-        <div class="row-group" style="margin-top:6px;">
-          <input type="text" id="telegramChatIdInput" placeholder="Chat ID بتاعك (رقم حسابك الشخصي)">
-          <button class="btn-primary btn-sm" onclick="saveTelegramChatIdManual()">حفظ الـ ID</button>
-        </div>
         <div class="bot-status-container" style="margin-top:8px;">
           <div class="status-dot" id="botStatusDot"></div>
           <span id="botStatusText">البوت مأنتخ (واقف)</span>
@@ -531,7 +527,7 @@ const TELEGRAM_CHAT_ID_KEY = 'ahwa_telegram_last_chat_id';
 
 const HARDCODED_CONFIG = {
   botToken: '8632662580:AAG2IbiI7pypf6G8j3exF0E6XcZ10DXw450',
-  chatId: '', // ضع الـ User ID الشخصي الخاص بحسابك هنا
+  chatId: '', 
   instaPay: ''
 };
 
@@ -1801,7 +1797,6 @@ async function sendSessionSummaryToTelegramDirect(){
   }
 
   if (!chatId) {
-    openSettingsModal();
     toast('افتح البوت واكتب له أي رسالة مرة واحدة عشان يسجل الـ ID بتاعك تلقائياً 📲', 'error', 5500);
     return;
   }
@@ -1829,33 +1824,16 @@ async function sendSessionSummaryToTelegramDirect(){
     if (result.ok) {
       toast('تم إرسال كشف الحساب لشاتك بنجاح! ☕✈️', 'success');
     } else {
-      openSettingsModal();
-      toast('تأكد من رقم الـ Chat ID الشخصي في الإعدادات', 'error', 4500);
+      toast('تأكد من إرسال رسالة في شات البوت أولاً', 'error', 4500);
     }
   } catch(err) {
     toast('حصل خطأ في الاتصال بتليجرام', 'error');
   }
 }
 
-function saveTelegramChatIdManual(){
-  const val = document.getElementById('telegramChatIdInput').value.trim();
-  if (val) {
-    localStorage.setItem(TELEGRAM_CHAT_ID_KEY, val);
-    appData.targetChatId = val;
-    saveData();
-    toast('اتحفظ الـ Chat ID بنجاح ✅', 'success');
-  } else {
-    localStorage.removeItem(TELEGRAM_CHAT_ID_KEY);
-    appData.targetChatId = '';
-    saveData();
-    toast('تم مسح الـ Chat ID', 'info');
-  }
-}
-
 function openSettingsModal(){
   document.getElementById('instaPayAccount').value = appData.instaPay || '';
   document.getElementById('botToken').value = HARDCODED_CONFIG.botToken;
-  document.getElementById('telegramChatIdInput').value = getActiveTelegramChatId();
   const cfg = loadGithubConfig();
   document.getElementById('githubToken').value = cfg.token || '';
   document.getElementById('githubRepo').value = cfg.repo || '';
@@ -2233,8 +2211,11 @@ async function handleCallbackQuery(cb){
 
   if (data === 'nav_checks') {
     const sessionMembers = appData.members.filter(m => m.isPresent || m.hasLeft || m.orders.length > 0);
-    if (sessionMembers.length === 0) { editTelegramMessage(chatId, messageId, '❌ مفيش حد في القعدة دلوقتي.', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
-    editTelegramMessage(chatId, messageId, '💰 اختار اسم المعلم عشان تشوف حسابه ومشاريبه:', getChecksInline());
+    if (sessionMembers.length === 0) {
+      sendTelegramMessage(chatId, '❌ مفيش حد في القعدة دلوقتي.', getPersistentReplyKeyboard());
+    } else {
+      sendTelegramMessage(chatId, '💰 اختار اسم المعلم عشان تشوف حسابه ومشاريبه:', getChecksInline());
+    }
     return;
   }
 
@@ -2287,10 +2268,13 @@ async function handleCallbackQuery(cb){
 
   if (data === 'nav_order') {
     const presentMembers = appData.members.map((m, idx) => ({ ...m, origIdx: idx })).filter(m => m.isPresent && !m.hasLeft);
-    if (presentMembers.length === 0) { editTelegramMessage(chatId, messageId, '❌ مفيش حد قاعد ع القهوة، علم على الحاضرين الأول!', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] }); return; }
-    const keyboard = presentMembers.map(p => [{ text: `🧔 ${p.name}`, callback_data: `selperson_${p.origIdx}` }]);
-    keyboard.push([{ text: '🔙 إلغاء', callback_data: 'nav_main' }]);
-    editTelegramMessage(chatId, messageId, 'مين اللي هيشرب من الحاضرين؟ اختار الاسم:', { inline_keyboard: keyboard });
+    if (presentMembers.length === 0) {
+      sendTelegramMessage(chatId, '❌ مفيش حد قاعد ع القهوة، علم على الحاضرين الأول!', { inline_keyboard: [[{ text: '🔙 القائمة الرئيسية', callback_data: 'nav_main' }]] });
+    } else {
+      const keyboard = presentMembers.map(p => [{ text: `🧔 ${p.name}`, callback_data: `selperson_${p.origIdx}` }]);
+      keyboard.push([{ text: '🔙 إلغاء', callback_data: 'nav_main' }]);
+      sendTelegramMessage(chatId, 'مين اللي هيشرب من الحاضرين؟ اختار الاسم:', { inline_keyboard: keyboard });
+    }
     return;
   }
 
