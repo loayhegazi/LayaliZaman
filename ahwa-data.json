@@ -579,48 +579,10 @@
           "isPaid": true
         }
       ]
-    },
-    {
-      "date": "٢٤‏/٨‏/٢٠٢٦، ٢:٤٠:٢٧ م",
-      "grandTotal": 90,
-      "members": [
-        {
-          "hasLeft": false,
-          "isPaid": false,
-          "isPresent": true,
-          "name": "لؤي",
-          "orders": [
-            {
-              "name": "شاي كشري",
-              "price": 15
-            },
-            {
-              "name": "قهوة تركي",
-              "price": 30
-            }
-          ]
-        },
-        {
-          "hasLeft": false,
-          "isPaid": false,
-          "isPresent": true,
-          "name": "فرج",
-          "orders": [
-            {
-              "name": "شاي كشري",
-              "price": 15
-            },
-            {
-              "name": "قهوة تركي",
-              "price": 30
-            }
-          ]
-        }
-      ]
     }
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787571627012,
+  "lastModified": 1787571634885,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
