@@ -102,6 +102,10 @@
         {
           "name": "قهوة تركي",
           "price": 30
+        },
+        {
+          "name": "مياه معدنية",
+          "price": 10
         }
       ]
     },
@@ -110,7 +114,12 @@
       "isPaid": false,
       "isPresent": true,
       "name": "اسامة",
-      "orders": []
+      "orders": [
+        {
+          "name": "قهوة فرنساوي",
+          "price": 40
+        }
+      ]
     },
     {
       "hasLeft": false,
@@ -719,6 +728,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787689379179,
+  "lastModified": 1787689384554,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
