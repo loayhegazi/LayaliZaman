@@ -107,6 +107,10 @@
         {
           "name": "شاي كشري",
           "price": 15
+        },
+        {
+          "name": "مياه معدنية",
+          "price": 10
         }
       ]
     },
@@ -159,6 +163,10 @@
         {
           "name": "قهوة تركي",
           "price": 30
+        },
+        {
+          "name": "مياه معدنية",
+          "price": 10
         }
       ]
     },
@@ -767,6 +775,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1787690763942,
+  "lastModified": 1787690980353,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
