@@ -2,7 +2,7 @@
   "instaPay": "",
   "targetChatId": "1280341518",
   "notes": "",
-  "sessionStartedAt": 1789167604975,
+  "sessionStartedAt": null,
   "menu": [
     {
       "name": "شاي كشري",
@@ -75,20 +75,11 @@
   ],
   "members": [
     {
-      "hasLeft": true,
-      "isPaid": true,
-      "isPresent": true,
+      "hasLeft": false,
+      "isPaid": false,
+      "isPresent": false,
       "name": "لؤي",
-      "orders": [
-        {
-          "name": "قهوة فرنساوي",
-          "price": 40
-        },
-        {
-          "name": "كانز",
-          "price": 35
-        }
-      ]
+      "orders": []
     },
     {
       "hasLeft": false,
@@ -848,10 +839,32 @@
           ]
         }
       ]
+    },
+    {
+      "date": "١٢‏/٩‏/٢٠٢٦، ١٠:٣٣:٤٥ م",
+      "grandTotal": 75,
+      "members": [
+        {
+          "hasLeft": true,
+          "isPaid": true,
+          "isPresent": true,
+          "name": "لؤي",
+          "orders": [
+            {
+              "name": "قهوة فرنساوي",
+              "price": 40
+            },
+            {
+              "name": "كانز",
+              "price": 35
+            }
+          ]
+        }
+      ]
     }
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1789168342484,
+  "lastModified": 1789241625748,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
