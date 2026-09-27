@@ -95,6 +95,10 @@
         {
           "name": "قهوة تركي",
           "price": 30
+        },
+        {
+          "name": "مياه معدنية",
+          "price": 10
         }
       ]
     },
@@ -912,6 +916,6 @@
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1790543320757,
+  "lastModified": 1790543322139,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
