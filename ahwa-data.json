@@ -2,7 +2,7 @@
   "instaPay": "",
   "targetChatId": "1280341518",
   "notes": "",
-  "sessionStartedAt": 1792409961322,
+  "sessionStartedAt": null,
   "menu": [
     {
       "name": "شاي كشري",
@@ -75,28 +75,11 @@
   ],
   "members": [
     {
-      "hasLeft": true,
-      "isPaid": true,
-      "isPresent": true,
+      "hasLeft": false,
+      "isPaid": false,
+      "isPresent": false,
       "name": "لؤي",
-      "orders": [
-        {
-          "name": "قهوة تركي",
-          "price": 30
-        },
-        {
-          "name": "كانز",
-          "price": 35
-        },
-        {
-          "name": "شاي بحليب",
-          "price": 45
-        },
-        {
-          "name": "شاي كرك",
-          "price": 50
-        }
-      ]
+      "orders": []
     },
     {
       "hasLeft": false,
@@ -908,10 +891,40 @@
           ]
         }
       ]
+    },
+    {
+      "date": "١٩‏/١٠‏/٢٠٢٦، ٢:٣٩:٤٠ م",
+      "grandTotal": 160,
+      "members": [
+        {
+          "hasLeft": true,
+          "isPaid": true,
+          "isPresent": true,
+          "name": "لؤي",
+          "orders": [
+            {
+              "name": "قهوة تركي",
+              "price": 30
+            },
+            {
+              "name": "كانز",
+              "price": 35
+            },
+            {
+              "name": "شاي بحليب",
+              "price": 45
+            },
+            {
+              "name": "شاي كرك",
+              "price": 50
+            }
+          ]
+        }
+      ]
     }
   ],
   "appSecret": "@hw@2022",
   "ghToken": "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",
-  "lastModified": 1792409972162,
+  "lastModified": 1792409980732,
   "workerUrl": "https://layalizaman.loaysherin.workers.dev/"
 }
